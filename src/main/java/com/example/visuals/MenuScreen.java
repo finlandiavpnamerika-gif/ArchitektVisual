@@ -3,21 +3,13 @@ package com.example.visuals;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.HashSet;
 import java.util.Set;
 
+/** Клик-ГУИ в стиле референса: 5 отдельных панелей с иконками и галочками. */
 public class MenuScreen extends Screen {
-    private static final int ACC = -4883201;
-    private static final int ACC_DIM = -9814091;
-    private static final int BG = -435155944;
-    private static final int ROW = -15068122;
-    private static final int ROW2 = -15593958;
-    private static final int OFF = -11910056;
-    private static final int WHITE = -1;
-
     private static final Set<String> open = new HashSet<>();
 
     private int mx, my;
@@ -27,74 +19,72 @@ public class MenuScreen extends Screen {
     private int cx, cy, cw;
 
     public MenuScreen() {
-        super(Text.literal("Visuals"));
+        super(Text.literal("ArchitektVisuals"));
     }
 
     private boolean hit(int x, int y, int w, int h) {
         return mx >= x && mx < x + w && my >= y && my < y + h;
     }
 
-    private void text(DrawContext g, String s, int x, int y, int color) {
-        g.drawTextWithShadow(textRenderer, s, x, y, color);
-    }
-
-    private void box(DrawContext g, int x, int y, int w, int h, int outer, int inner) {
-        g.fill(x, y, x + w, y + h, outer);
-        g.fill(x + 1, y + 1, x + w - 1, y + h - 1, inner);
-    }
-
-    private void sw(DrawContext g, int x, int y, boolean on) {
-        g.fill(x, y, x + 22, y + 10, on ? ACC : OFF);
-        int k = on ? x + 12 : x + 2;
-        g.fill(k, y + 2, k + 8, y + 8, WHITE);
-    }
-
     private int mh(String id, int options) {
-        return 24 + (open.contains(id) ? options * 20 + 2 : 0);
+        return Theme.TITLE_HEIGHT + 4 + (open.contains(id) ? options * Theme.ROW_HEIGHT + 2 : 0);
     }
 
-    private void panel(DrawContext g, String title, int x, int y, int w, int h) {
-        box(g, x, y, w, h, ACC_DIM, BG);
-        g.drawCenteredTextWithShadow(textRenderer, Text.literal(title).formatted(Formatting.BOLD),
-                x + w / 2, y + 8, WHITE);
-        g.fill(x + 6, y + 22, x + w - 6, y + 24, ACC);
-        cx = x + 6;
-        cw = w - 12;
-        cy = y + 30;
+    /** Панель с иконкой и заголовком. */
+    private void panel(DrawContext g, String icon, String title, int x, int y, int w, int h) {
+        g.fill(x, y, x + w, y + h, Theme.PANEL_BG);
+        g.fill(x, y, x + 1, y + h, Theme.ACCENT);
+        g.fill(x + w - 1, y, x + w, y + h, Theme.PANEL_BORDER);
+
+        String head = (Config.showIcons ? icon + " " : "") + title;
+        g.drawTextWithShadow(textRenderer, head, x + 6, y + 5, Theme.TEXT);
+        g.fill(x + 4, y + Theme.TITLE_HEIGHT, x + w - 4, y + Theme.TITLE_HEIGHT + 1, Theme.ACCENT_DIM);
+
+        cx = x + 4;
+        cw = w - 8;
+        cy = y + Theme.TITLE_HEIGHT + 4;
     }
 
-    private boolean module(DrawContext g, String id, String label, String hint, boolean on, int options) {
-        boolean hov = hit(cx, cy, cw, 22);
-        g.fill(cx, cy, cx + cw, cy + 22, hov ? -14410952 : ROW);
-        text(g, label + (hint.isEmpty() ? "" : " [" + hint + "]"), cx + 5, cy + 7, WHITE);
-        if (options > 0) {
-            text(g, open.contains(id) ? "^" : "v", cx + cw - 38, cy + 7, -5592406);
+    /** Модуль-переключатель: строка + галочка справа. */
+    private boolean module(DrawContext g, String id, String label, boolean on, int options) {
+        boolean hov = hit(cx, cy, cw, Theme.ROW_HEIGHT);
+        HudUtils.rowBg(g, cx, cy, cw, Theme.ROW_HEIGHT, hov, on);
+        g.drawTextWithShadow(textRenderer, label, cx + 4, cy + 4, on ? Theme.TEXT : Theme.TEXT_DIM);
+
+        if (Config.showCheckmarks && on) {
+            String check = Theme.CHECK_MARK;
+            g.drawTextWithShadow(textRenderer, check, cx + cw - 10, cy + 4, Theme.CHECK);
+        } else if (options > 0) {
+            String arrow = open.contains(id) ? "^" : "v";
+            g.drawTextWithShadow(textRenderer, arrow, cx + cw - 10, cy + 4, Theme.TEXT_DIM);
         }
-        sw(g, cx + cw - 28, cy + 6, on);
+
         if (clicked && hov) {
-            if (mx >= cx + cw - 32) {
-                on = !on;
-            } else if (options > 0) {
+            if (options > 0 && mx < cx + cw - 14) {
                 if (!open.remove(id)) open.add(id);
+            } else {
+                on = !on;
             }
         }
-        cy += 24;
+        cy += Theme.ROW_HEIGHT;
         return on;
     }
 
     private boolean cbool(DrawContext g, String label, boolean v) {
-        boolean hov = hit(cx, cy, cw, 18);
-        g.fill(cx, cy, cx + cw, cy + 18, hov ? -15002584 : ROW2);
-        text(g, label, cx + 5, cy + 5, -2236963);
-        sw(g, cx + cw - 28, cy + 4, v);
+        boolean hov = hit(cx, cy, cw, Theme.ROW_HEIGHT);
+        HudUtils.rowBg(g, cx, cy, cw, Theme.ROW_HEIGHT, hov, false);
+        g.drawTextWithShadow(textRenderer, label, cx + 4, cy + 4, Theme.TEXT_DIM);
+        if (v) {
+            g.drawTextWithShadow(textRenderer, Theme.CHECK_MARK, cx + cw - 10, cy + 4, Theme.CHECK);
+        }
         if (clicked && hov) v = !v;
-        cy += 20;
+        cy += Theme.ROW_HEIGHT;
         return v;
     }
 
     private double cslider(DrawContext g, String label, double min, double max, double v, boolean isInt) {
         int id = idc++;
-        boolean hov = hit(cx, cy, cw, 18);
+        boolean hov = hit(cx, cy, cw, Theme.ROW_HEIGHT);
         if (clicked && hov) active = id;
         if (active == id && down) {
             double t = Math.max(0.0, Math.min(1.0, (double) (mx - cx) / (double) cw));
@@ -102,41 +92,44 @@ public class MenuScreen extends Screen {
             v = isInt ? (double) Math.round(v) : Math.round(v * 10.0) / 10.0;
         }
         double t = (v - min) / (max - min);
-        g.fill(cx, cy, cx + cw, cy + 18, ROW2);
-        g.fill(cx, cy, cx + (int) (cw * t), cy + 18, ACC_DIM);
+        g.fill(cx, cy, cx + cw, cy + Theme.ROW_HEIGHT, Theme.SLIDER_BG);
+        g.fill(cx, cy, cx + (int) (cw * t), cy + Theme.ROW_HEIGHT, Theme.SLIDER_FILL);
         String val = isInt ? String.valueOf((int) v) : String.valueOf(v);
-        g.drawCenteredTextWithShadow(textRenderer, label + ": " + val, cx + cw / 2, cy + 5, WHITE);
-        cy += 20;
+        String txt = label + ": " + val;
+        int tw = textRenderer.getWidth(txt);
+        g.drawTextWithShadow(textRenderer, txt, cx + (cw - tw) / 2, cy + 4, Theme.TEXT);
+        cy += Theme.ROW_HEIGHT;
         return v;
     }
 
     private int ccycle(DrawContext g, String label, String[] names, int idx) {
-        boolean hov = hit(cx, cy, cw, 18);
-        g.fill(cx, cy, cx + cw, cy + 18, hov ? -15002584 : ROW2);
-        text(g, label + ": " + names[idx], cx + 5, cy + 5, -2236963);
-        g.fill(cx + cw - 16, cy + 4, cx + cw - 6, cy + 14, Config.COLORS[Math.min(idx, Config.COLORS.length - 1)]);
+        boolean hov = hit(cx, cy, cw, Theme.ROW_HEIGHT);
+        HudUtils.rowBg(g, cx, cy, cw, Theme.ROW_HEIGHT, hov, false);
+        g.drawTextWithShadow(textRenderer, label + ": " + names[idx], cx + 4, cy + 4, Theme.TEXT_DIM);
+        g.fill(cx + cw - 12, cy + 4, cx + cw - 4, cy + 12, Config.COLORS[Math.min(idx, Config.COLORS.length - 1)]);
         if (clicked && hov) idx = (idx + 1) % names.length;
-        cy += 20;
+        cy += Theme.ROW_HEIGHT;
         return idx;
     }
 
     private void hint2(DrawContext g, String l1, String l2) {
         int max = cw - 4;
-        text(g, textRenderer.trimToWidth(l1, max), cx + 2, cy + 1, -5592406);
-        text(g, textRenderer.trimToWidth(l2, max), cx + 2, cy + 10, -5592406);
-        cy += 20;
+        g.drawTextWithShadow(textRenderer, textRenderer.trimToWidth(l1, max), cx + 2, cy + 1, Theme.TEXT_DIM);
+        g.drawTextWithShadow(textRenderer, textRenderer.trimToWidth(l2, max), cx + 2, cy + 9, Theme.TEXT_DIM);
+        cy += Theme.ROW_HEIGHT + 4;
     }
 
     private int listRow(DrawContext g, int key, String label) {
-        boolean hov = hit(cx, cy, cw, 18);
-        boolean overX = hit(cx + cw - 16, cy, 16, 18);
-        g.fill(cx, cy, cx + cw, cy + 18, hov ? -15002584 : ROW2);
+        boolean hov = hit(cx, cy, cw, Theme.ROW_HEIGHT);
+        boolean overX = hit(cx + cw - 14, cy, 14, Theme.ROW_HEIGHT);
+        HudUtils.rowBg(g, cx, cy, cw, Theme.ROW_HEIGHT, hov, false);
         String full = "[" + Keys.name(key) + "] " + label;
-        text(g, textRenderer.trimToWidth(full, cw - 22), cx + 4, cy + 5, key == -1 ? -43691 : -2236963);
-        text(g, "x", cx + cw - 11, cy + 5, overX ? -43691 : -5592406);
+        g.drawTextWithShadow(textRenderer, textRenderer.trimToWidth(full, cw - 18),
+                cx + 4, cy + 4, key == -1 ? 0xFFFF5555 : Theme.TEXT_DIM);
+        g.drawTextWithShadow(textRenderer, "x", cx + cw - 10, cy + 4, overX ? 0xFFFF5555 : Theme.TEXT_DIM);
         int result = 0;
         if (clicked && hov) result = overX ? 2 : 1;
-        cy += 20;
+        cy += Theme.ROW_HEIGHT;
         return result;
     }
 
@@ -151,40 +144,22 @@ public class MenuScreen extends Screen {
         if (!down) active = -1;
         idc = 0;
 
-        g.fill(0, 0, width, height, 0x90000000);
+        g.fill(0, 0, width, height, 0x80000000);
 
-        int cols = 4;
-        int colW = Math.max(90, Math.min(150, (width - 30) / cols));
-        int gap = 10;
-        int x0 = (width - (colW * cols + gap * (cols - 1))) / 2;
-        int y0 = 14;
-        int step = colW + gap;
+        int pw = Theme.PANEL_WIDTH;
+        int gap = Theme.PANEL_GAP;
+        int total = pw * 5 + gap * 4;
+        int x0 = (width - total) / 2;
+        int y0 = Theme.TOP_MARGIN;
 
-        // ============ ПЕРВЫЙ РЯД ============
-
-        // --- Utilities (1-я панель) ---
-        int hUtil = 34 + mh("sprint", 1) + mh("zoom", 1);
-        panel(g, "Utilities", x0, y0, colW, hUtil);
-        Config.sprint = module(g, "sprint", "AutoSprint", "", Config.sprint, 1);
-        if (open.contains("sprint")) {
-            Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs);
-            cy += 2;
-        }
-        Config.zoom = module(g, "zoom", "Zoom", "C", Config.zoom, 1);
-        if (open.contains("zoom")) {
-            Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true);
-            cy += 2;
-        }
-
-        // --- Visuals (2-я панель) ---
-        int hVis = 34 + mh("fb", 1) + mh("hud", 9) + mh("arraylist", 5);
-        panel(g, "Visuals", x0 + step, y0, colW, hVis);
-        Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
+        // ========== VISUAL ==========
+        int hVis = mh("fb", 1) + mh("hud", 9) + mh("arraylist", 5);
+        panel(g, Theme.ICON_VISUAL, "Visual", x0, y0, pw, hVis);
+        Config.fullbright = module(g, "fb", "Fullbright", Config.fullbright, 1);
         if (open.contains("fb")) {
             Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false);
-            cy += 2;
         }
-        Config.hud = module(g, "hud", "HUD", "", Config.hud, 9);
+        Config.hud = module(g, "hud", "HUD", Config.hud, 9);
         if (open.contains("hud")) {
             Config.hudFps = cbool(g, "FPS", Config.hudFps);
             Config.hudPing = cbool(g, "Ping", Config.hudPing);
@@ -193,44 +168,63 @@ public class MenuScreen extends Screen {
             Config.hudEffects = cbool(g, "Эффекты", Config.hudEffects);
             Config.hudScale = cslider(g, "Размер", 0.5, 3.0, Config.hudScale, false);
             Config.hudColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.hudColor);
-            Config.hudX = (int) cslider(g, "Позиция X", 0, 400, Config.hudX, true);
-            Config.hudY = (int) cslider(g, "Позиция Y", 0, 250, Config.hudY, true);
-            cy += 2;
+            Config.hudX = (int) cslider(g, "X", 0, 400, Config.hudX, true);
+            Config.hudY = (int) cslider(g, "Y", 0, 250, Config.hudY, true);
         }
-        Config.arrayList = module(g, "arraylist", "ArrayList", "", Config.arrayList, 5);
+        Config.arrayList = module(g, "arraylist", "ArrayList", Config.arrayList, 5);
         if (open.contains("arraylist")) {
             Config.arrayListColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.arrayListColor);
-            Config.arrayListShadow = cbool(g, "Тень текста", Config.arrayListShadow);
-            Config.arrayListX = (int) cslider(g, "Позиция X", 0, 400, Config.arrayListX, true);
-            Config.arrayListY = (int) cslider(g, "Позиция Y", 0, 250, Config.arrayListY, true);
-            cy += 2;
+            Config.arrayListShadow = cbool(g, "Тень", Config.arrayListShadow);
+            Config.arrayListX = (int) cslider(g, "X", 0, 400, Config.arrayListX, true);
+            Config.arrayListY = (int) cslider(g, "Y", 0, 250, Config.arrayListY, true);
         }
 
-        // --- Performance (3-я панель) ---
-        int hPerf = 34 + mh("dist", 1);
-        panel(g, "Performance", x0 + step * 2, y0, colW, hPerf);
-        Config.limitDist = module(g, "dist", "Лимит дальности", "", Config.limitDist, 1);
+        // ========== WORLD ==========
+        int hWorld = mh("dist", 1);
+        panel(g, Theme.ICON_WORLD, "World", x0 + (pw + gap), y0, pw, hWorld);
+        Config.limitDist = module(g, "dist", "Limit Distance", Config.limitDist, 1);
         if (open.contains("dist")) {
             Config.viewDist = cslider(g, "Чанки", 2, 32, Config.viewDist, true);
-            cy += 2;
         }
 
-        // --- Items (4-я панель) ---
-        int hItems = 34 + mh("autoswap", Config.swapPairs.size() + 1) + mh("itembind", Config.binds.size() + 1);
-        panel(g, "Items", x0 + step * 3, y0, colW, hItems);
+        // ========== PARTICLES (заготовка) ==========
+        int hPart = mh("particles", 0);
+        panel(g, Theme.ICON_PARTICLES, "Particles", x0 + (pw + gap) * 2, y0, pw, hPart);
+        cy += 2;
+        g.drawTextWithShadow(textRenderer, "Скоро...", cx + 4, cy, Theme.TEXT_DIM);
 
-        Config.autoswap = module(g, "autoswap", "AutoSwap", ItemFeatures.swapKeyName(), Config.autoswap,
-                Config.swapPairs.size() + 1);
+        // ========== UTILS ==========
+        int hUtil = mh("sprint", 1) + mh("zoom", 1) + mh("reconnect", 1);
+        panel(g, Theme.ICON_UTILS, "Utils", x0 + (pw + gap) * 3, y0, pw, hUtil);
+        Config.sprint = module(g, "sprint", "AutoSprint", Config.sprint, 1);
+        if (open.contains("sprint")) {
+            Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs);
+        }
+        Config.zoom = module(g, "zoom", "Zoom", Config.zoom, 1);
+        if (open.contains("zoom")) {
+            Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true);
+        }
+        Config.autoReconnect = module(g, "reconnect", "AutoReconnect", Config.autoReconnect, 1);
+        if (open.contains("reconnect")) {
+            Config.autoReconnectDelay = cslider(g, "Секунд", 1, 60, Config.autoReconnectDelay, true);
+        }
+
+        // ========== CLIENT ==========
+        int hClient = mh("autoswap", Config.swapPairs.size() + 1)
+                + mh("itembind", Config.binds.size() + 1)
+                + mh("keystrokes", 5)
+                + mh("armor", 5)
+                + mh("theme", 3);
+        panel(g, Theme.ICON_CLIENT, "Client", x0 + (pw + gap) * 4, y0, pw, hClient);
+
+        Config.autoswap = module(g, "autoswap", "AutoSwap", Config.autoswap, Config.swapPairs.size() + 1);
         if (open.contains("autoswap")) {
-            SwapPair toRebind = null;
-            SwapPair toRemove = null;
+            SwapPair toRebind = null, toRemove = null;
             for (SwapPair p : Config.swapPairs) {
-                int r = listRow(g, p.key, p.a + " <-> " + p.b);
-                if (r == 1) toRebind = p;
-                else if (r == 2) toRemove = p;
+                int r = listRow(g, p.key, p.a + "<->" + p.b);
+                if (r == 1) toRebind = p; else if (r == 2) toRemove = p;
             }
-            hint2(g, "Инвентарь: наведи на предмет", "и жми [" + ItemFeatures.swapKeyName() + "] (2 раза)");
-            cy += 2;
+            hint2(g, "Наведи на предмет", "и жми [" + ItemFeatures.swapKeyName() + "]");
             if (toRemove != null) {
                 Config.swapPairs.remove(toRemove);
                 Config.save();
@@ -241,18 +235,14 @@ public class MenuScreen extends Screen {
             }
         }
 
-        Config.itembind = module(g, "itembind", "ItemBind", ItemFeatures.bindKeyName(), Config.itembind,
-                Config.binds.size() + 1);
+        Config.itembind = module(g, "itembind", "ItemBind", Config.itembind, Config.binds.size() + 1);
         if (open.contains("itembind")) {
-            BoundItem toRebind = null;
-            BoundItem toRemove = null;
+            BoundItem toRebind = null, toRemove = null;
             for (BoundItem b : Config.binds) {
                 int r = listRow(g, b.key, b.name);
-                if (r == 1) toRebind = b;
-                else if (r == 2) toRemove = b;
+                if (r == 1) toRebind = b; else if (r == 2) toRemove = b;
             }
-            hint2(g, "Инвентарь: наведи на предмет", "и жми [" + ItemFeatures.bindKeyName() + "]");
-            cy += 2;
+            hint2(g, "Наведи на предмет", "и жми [" + ItemFeatures.bindKeyName() + "]");
             if (toRemove != null) {
                 Config.binds.remove(toRemove);
                 Config.save();
@@ -263,51 +253,39 @@ public class MenuScreen extends Screen {
             }
         }
 
-        // ============ ВТОРОЙ РЯД (снизу, через 20 пикселей после первого) ============
-
-        // Находим максимальную высоту первого ряда
-        int maxH1 = Math.max(Math.max(hUtil, hVis), Math.max(hPerf, hItems));
-        int y1 = y0 + maxH1 + 20;
-
-        // --- Extra HUD ---
-        int hExtra = 34 + mh("keystrokes", 5) + mh("armor", 5) + mh("reconnect", 1);
-        panel(g, "Extra HUD", x0, y1, colW, hExtra);
-
-        Config.keystrokes = module(g, "keystrokes", "Keystrokes", "", Config.keystrokes, 5);
+        Config.keystrokes = module(g, "keystrokes", "Keystrokes", Config.keystrokes, 5);
         if (open.contains("keystrokes")) {
             Config.keystrokesShowMouse = cbool(g, "ЛКМ/ПКМ", Config.keystrokesShowMouse);
             Config.keystrokesShowSpace = cbool(g, "Space", Config.keystrokesShowSpace);
             Config.keystrokesScale = cslider(g, "Размер", 0.5, 2.0, Config.keystrokesScale, false);
             Config.keystrokesColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.keystrokesColor);
-            Config.keystrokesX = (int) cslider(g, "Позиция X", 0, 400, Config.keystrokesX, true);
-            Config.keystrokesY = (int) cslider(g, "Позиция Y", 0, 400, Config.keystrokesY, true);
-            cy += 2;
+            Config.keystrokesX = (int) cslider(g, "X", 0, 400, Config.keystrokesX, true);
         }
 
-        Config.armorHud = module(g, "armor", "Armor + Tool", "", Config.armorHud, 5);
+        Config.armorHud = module(g, "armor", "Armor + Tool", Config.armorHud, 5);
         if (open.contains("armor")) {
             Config.armorHudShowTool = cbool(g, "Инструмент", Config.armorHudShowTool);
             Config.armorHudShowDurability = cbool(g, "Прочность", Config.armorHudShowDurability);
             Config.armorHudScale = cslider(g, "Размер", 0.5, 2.0, Config.armorHudScale, false);
-            Config.armorHudX = (int) cslider(g, "Позиция X", 0, 400, Config.armorHudX, true);
-            Config.armorHudY = (int) cslider(g, "Позиция Y", 0, 400, Config.armorHudY, true);
-            cy += 2;
+            Config.armorHudX = (int) cslider(g, "X", 0, 400, Config.armorHudX, true);
+            Config.armorHudY = (int) cslider(g, "Y", 0, 400, Config.armorHudY, true);
         }
 
-        Config.autoReconnect = module(g, "reconnect", "AutoReconnect", "", Config.autoReconnect, 1);
-        if (open.contains("reconnect")) {
-            Config.autoReconnectDelay = cslider(g, "Секунд", 1, 60, Config.autoReconnectDelay, true);
-            cy += 2;
+        Config.themeColor = module(g, "theme", "Theme Color", Config.themeColor > 0, 3) ? Config.themeColor : -1;
+        if (open.contains("theme")) {
+            Config.themeColor = ccycle(g, "Акцент", Config.COLOR_NAMES, Math.max(0, Config.themeColor));
+            Config.showIcons = cbool(g, "Иконки", Config.showIcons);
+            Config.showCheckmarks = cbool(g, "Галочки", Config.showCheckmarks);
         }
 
-        // --- Кнопка закрытия ---
-        int bw = 140;
-        int bh = 18;
+        // ========== Кнопка закрытия ==========
+        int bw = 120;
+        int bh = 16;
         int bx = (width - bw) / 2;
-        int by = height - bh - 8;
+        int by = height - bh - 6;
         boolean hov = hit(bx, by, bw, bh);
-        box(g, bx, by, bw, bh, hov ? ACC : ACC_DIM, BG);
-        g.drawCenteredTextWithShadow(textRenderer, "Visuals  |  Закрыть", width / 2, by + 5, WHITE);
+        g.fill(bx, by, bx + bw, by + bh, hov ? Theme.ACCENT : Theme.PANEL_BG);
+        g.drawCenteredTextWithShadow(textRenderer, "Закрыть", width / 2, by + 4, Theme.TEXT);
         if (clicked && hov) close();
     }
 
