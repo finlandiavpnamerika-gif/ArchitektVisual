@@ -160,7 +160,9 @@ public class MenuScreen extends Screen {
         int y0 = 14;
         int step = colW + gap;
 
-        // --- Utilities ---
+        // ============ ПЕРВЫЙ РЯД ============
+
+        // --- Utilities (1-я панель) ---
         int hUtil = 34 + mh("sprint", 1) + mh("zoom", 1);
         panel(g, "Utilities", x0, y0, colW, hUtil);
         Config.sprint = module(g, "sprint", "AutoSprint", "", Config.sprint, 1);
@@ -174,8 +176,8 @@ public class MenuScreen extends Screen {
             cy += 2;
         }
 
-        // --- Visuals ---
-        int hVis = 34 + mh("fb", 1) + mh("hud", 9) + mh("arraylist", 6);
+        // --- Visuals (2-я панель) ---
+        int hVis = 34 + mh("fb", 1) + mh("hud", 9) + mh("arraylist", 5);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) {
@@ -195,7 +197,7 @@ public class MenuScreen extends Screen {
             Config.hudY = (int) cslider(g, "Позиция Y", 0, 250, Config.hudY, true);
             cy += 2;
         }
-        Config.arrayList = module(g, "arraylist", "ArrayList", "", Config.arrayList, 6);
+        Config.arrayList = module(g, "arraylist", "ArrayList", "", Config.arrayList, 5);
         if (open.contains("arraylist")) {
             Config.arrayListColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.arrayListColor);
             Config.arrayListShadow = cbool(g, "Тень текста", Config.arrayListShadow);
@@ -204,7 +206,7 @@ public class MenuScreen extends Screen {
             cy += 2;
         }
 
-        // --- Performance ---
+        // --- Performance (3-я панель) ---
         int hPerf = 34 + mh("dist", 1);
         panel(g, "Performance", x0 + step * 2, y0, colW, hPerf);
         Config.limitDist = module(g, "dist", "Лимит дальности", "", Config.limitDist, 1);
@@ -213,7 +215,7 @@ public class MenuScreen extends Screen {
             cy += 2;
         }
 
-        // --- Items (AutoSwap + ItemBind) ---
+        // --- Items (4-я панель) ---
         int hItems = 34 + mh("autoswap", Config.swapPairs.size() + 1) + mh("itembind", Config.binds.size() + 1);
         panel(g, "Items", x0 + step * 3, y0, colW, hItems);
 
@@ -261,15 +263,17 @@ public class MenuScreen extends Screen {
             }
         }
 
-        // --- HUD Elements (NEW panel) ---
-        int hExtra = 34 + mh("keystrokes", 6) + mh("armor", 5) + mh("reconnect", 1);
-        // Рисуем вторым рядом снизу — под первой сеткой
-        int rowY = y0;
-        int colExtra = Math.min(colW, (width - 30) / 4);
-        int xExtra = x0;
+        // ============ ВТОРОЙ РЯД (снизу, через 20 пикселей после первого) ============
 
-        panel(g, "Extra HUD", xExtra, rowY, colExtra, hExtra);
-        Config.keystrokes = module(g, "keystrokes", "Keystrokes", "", Config.keystrokes, 6);
+        // Находим максимальную высоту первого ряда
+        int maxH1 = Math.max(Math.max(hUtil, hVis), Math.max(hPerf, hItems));
+        int y1 = y0 + maxH1 + 20;
+
+        // --- Extra HUD ---
+        int hExtra = 34 + mh("keystrokes", 5) + mh("armor", 5) + mh("reconnect", 1);
+        panel(g, "Extra HUD", x0, y1, colW, hExtra);
+
+        Config.keystrokes = module(g, "keystrokes", "Keystrokes", "", Config.keystrokes, 5);
         if (open.contains("keystrokes")) {
             Config.keystrokesShowMouse = cbool(g, "ЛКМ/ПКМ", Config.keystrokesShowMouse);
             Config.keystrokesShowSpace = cbool(g, "Space", Config.keystrokesShowSpace);
