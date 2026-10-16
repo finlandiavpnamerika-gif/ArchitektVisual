@@ -7,11 +7,11 @@ import net.minecraft.client.option.GameOptions;
 import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
-/** Keystrokes HUD: показывает WASD, Space, ЛКМ/ПКМ и Shift. */
+/** Keystrokes HUD: показывает WASD, Space, ЛКМ/ПКМ и Shift в стиле референса. */
 public final class KeystrokesHud {
     private KeystrokesHud() {}
 
-    private static final int BOX_SIZE = 16;
+    private static final int BOX = 16;
     private static final int GAP = 2;
 
     public static void render(DrawContext g, MinecraftClient mc) {
@@ -43,46 +43,31 @@ public final class KeystrokesHud {
         int y0 = 0;
 
         // WASD
-        drawBox(g, tr, x0 + BOX_SIZE + GAP, y0, BOX_SIZE, "W", w, accent);
-        drawBox(g, tr, x0, y0 + BOX_SIZE + GAP, BOX_SIZE, "A", a, accent);
-        drawBox(g, tr, x0 + BOX_SIZE + GAP, y0 + BOX_SIZE + GAP, BOX_SIZE, "S", s, accent);
-        drawBox(g, tr, x0 + (BOX_SIZE + GAP) * 2, y0 + BOX_SIZE + GAP, BOX_SIZE, "D", d, accent);
+        HudUtils.keyBox(g, tr, x0 + BOX + GAP, y0, BOX, "W", w, accent);
+        HudUtils.keyBox(g, tr, x0, y0 + BOX + GAP, BOX, "A", a, accent);
+        HudUtils.keyBox(g, tr, x0 + BOX + GAP, y0 + BOX + GAP, BOX, "S", s, accent);
+        HudUtils.keyBox(g, tr, x0 + (BOX + GAP) * 2, y0 + BOX + GAP, BOX, "D", d, accent);
 
-        int rowY = y0 + (BOX_SIZE + GAP) * 2;
+        int rowY = y0 + (BOX + GAP) * 2;
+        int wideW = BOX * 3 + GAP * 2;
 
         // Space
         if (Config.keystrokesShowSpace) {
-            int spaceW = BOX_SIZE * 3 + GAP * 2;
-            drawBox(g, tr, x0, rowY, spaceW, "", space, accent);
-            rowY += BOX_SIZE + GAP;
+            HudUtils.keyBox(g, tr, x0, rowY, wideW, "", space, accent);
+            rowY += BOX + GAP;
         }
 
         // Shift
-        int shiftW = BOX_SIZE * 3 + GAP * 2;
-        drawBox(g, tr, x0, rowY, shiftW, "", shift, accent);
-        rowY += BOX_SIZE + GAP;
+        HudUtils.keyBox(g, tr, x0, rowY, wideW, "", shift, accent);
+        rowY += BOX + GAP;
 
         // LMB / RMB
         if (Config.keystrokesShowMouse) {
-            int half = (BOX_SIZE * 3 + GAP * 2 - GAP) / 2;
-            drawBox(g, tr, x0, rowY, half, "LMB", lmb, accent);
-            drawBox(g, tr, x0 + half + GAP, rowY, half, "RMB", rmb, accent);
+            int half = (wideW - GAP) / 2;
+            HudUtils.keyBox(g, tr, x0, rowY, half, "LMB", lmb, accent);
+            HudUtils.keyBox(g, tr, x0 + half + GAP, rowY, half, "RMB", rmb, accent);
         }
 
         m.popMatrix();
-    }
-
-    private static void drawBox(DrawContext g, TextRenderer tr, int x, int y, int w, String label, boolean pressed, int accent) {
-        int bg = pressed ? accent : 0x90000000;
-        int border = pressed ? 0xFFFFFFFF : 0x60FFFFFF;
-
-        g.fill(x, y, x + w, y + BOX_SIZE, border);
-        g.fill(x + 1, y + 1, x + w - 1, y + BOX_SIZE - 1, bg);
-
-        if (!label.isEmpty()) {
-            int color = pressed ? 0xFF000000 : 0xFFFFFFFF;
-            int tw = tr.getWidth(label);
-            g.drawTextWithShadow(tr, label, x + (w - tw) / 2, y + (BOX_SIZE - 8) / 2, color);
-        }
     }
 }
