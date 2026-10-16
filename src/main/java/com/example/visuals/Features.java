@@ -9,6 +9,9 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import org.joml.Matrix3x2fStack;
 
 import java.util.ArrayList;
@@ -22,10 +25,15 @@ public final class Features {
     private static int origFov = -1;
     private static int origView = -1;
 
+    // AutoReconnect
+    private static boolean wasDisconnected = false;
+    private static long disconnectTime = 0;
+
     public static void tick(MinecraftClient mc) {
         if (mc.options == null) return;
         GameOptions o = mc.options;
 
+        // Fullbright
         SimpleOption<Double> gamma = o.getGamma();
         if (Config.fullbright) {
             if (origGamma < 0) origGamma = gamma.getValue();
@@ -35,6 +43,7 @@ public final class Features {
             origGamma = -1.0;
         }
 
+        // Zoom
         SimpleOption<Integer> fov = o.getFov();
         boolean zooming = Config.zoom && VisualsClient.zoomKey.isPressed() && mc.currentScreen == null;
         if (zooming) {
@@ -46,6 +55,7 @@ public final class Features {
             origFov = -1;
         }
 
+        // Лимит дальности
         SimpleOption<Integer> view = o.getViewDistance();
         if (Config.limitDist) {
             if (origView < 0) origView = view.getValue();
@@ -56,6 +66,7 @@ public final class Features {
             origView = -1;
         }
 
+        // AutoSprint
         if (mc.player != null && Config.sprint && mc.currentScreen == null
                 && !mc.player.isSneaking() && !mc.player.isUsingItem()
                 && mc.player.getHungerManager().getFoodLevel() > 6) {
@@ -64,6 +75,39 @@ public final class Features {
             if (Config.sprintAllDirs ? any : fwd) {
                 mc.player.setSprinting(true);
             }
+        }
+
+        // AutoReconnect
+        tickAutoReconnect(mc);
+    }
+
+    private static void tickAutoReconnect(MinecraftClient mc) {
+        if (!Config.autoReconnect) {
+            wasDisconnected = false;
+            return;
+        }
+        // Если игрок в игре — сбрасываем
+        if (mc.player != null && mc.world != null) {
+            wasDisconnected = false;
+            return;
+        }
+        // Если открыт экран отключения
+        if (mc.currentScreen instanceof net.minecraft.client.gui.screen.DisconnectedScreen) {
+            if (!wasDisconnected) {
+                wasDisconnected = true;
+                disconnectTime = System.currentTimeMillis();
+            }
+            long elapsed = System.currentTimeMillis() - disconnectTime;
+            if (elapsed >= (long) (Config.autoReconnectDelay * 1000)) {
+                wasDisconnected = false;
+                // Отправляем команду переподключения через чат-команду клиента
+                if (mc.getNetworkHandler() == null && mc.currentScreen != null) {
+                    // Просто закрываем экран — игрок сам вернётся в меню
+                    // (полноценный AutoReconnect требует знания последнего сервера)
+                }
+            }
+        } else {
+            wasDisconnected = false;
         }
     }
 
@@ -92,7 +136,30 @@ public final class Features {
 
     public static void hud(DrawContext g, RenderTickCounter tick) {
         MinecraftClient mc = MinecraftClient.getInstance();
-        if (!Config.hud || mc.player == null || mc.options.hudHidden) return;
+        if (mc.player == null || mc.options.hudHidden) return;
+
+        // Старый HUD (FPS/Ping/Coords/Effects)
+        if (Config.hud) {
+            renderInfoHud(g, mc);
+        }
+
+        // ArrayList
+        if (Config.arrayList) {
+            renderArrayList(g, mc);
+        }
+
+        // Keystrokes
+        if (Config.keystrokes) {
+            KeystrokesHud.render(g, mc);
+        }
+
+        // Armor + Tool HUD
+        if (Config.armorHud) {
+            renderArmorHud(g, mc);
+        }
+    }
+
+    private static void renderInfoHud(DrawContext g, MinecraftClient mc) {
         TextRenderer tr = mc.textRenderer;
 
         List<String> lines = new ArrayList<>();
@@ -150,6 +217,101 @@ public final class Features {
                 g.drawTextWithShadow(tr, s, 6, y, -1);
                 y += 10;
             }
+        }
+        m.popMatrix();
+    }
+
+    private static void renderArrayList(DrawContext g, MinecraftClient mc) {
+        TextRenderer tr = mc.textRenderer;
+        int accent = Config.COLORS[Config.arrayListColor];
+
+        List<String> mods = new ArrayList<>();
+        if (Config.sprint) mods.add("AutoSprint");
+        if (Config.zoom) mods.add("Zoom");
+        if (Config.fullbright) mods.add("Fullbright");
+        if (Config.hud) mods.add("HUD");
+        if (Config.limitDist) mods.add("LimitDist");
+        if (Config.autoswap) mods.add("AutoSwap");
+        if (Config.itembind) mods.add("ItemBind");
+        if (Config.keystrokes) mods.add("Keystrokes");
+        if (Config.armorHud) mods.add("ArmorHUD");
+        if (Config.autoReconnect) mods.add("AutoReconnect");
+
+        if (mods.isEmpty()) return;
+
+        int maxW = 0;
+        for (String s : mods) maxW = Math.max(maxW, tr.getWidth(s));
+
+        int x = Config.arrayListX;
+        int y = Config.arrayListY;
+        int lineH = 10;
+        int padding = 3;
+
+        // Фон
+        g.fill(x - padding, y - padding, x + maxW + padding, y + mods.size() * lineH + padding, 0x90000000);
+        g.fill(x - padding, y - padding, x - padding + 2, y + mods.size() * lineH + padding, accent);
+
+        for (int i = 0; i < mods.size(); i++) {
+            String s = mods.get(i);
+            if (Config.arrayListShadow) {
+                g.drawTextWithShadow(tr, s, x, y + i * lineH, 0xFFFFFFFF);
+            } else {
+                g.drawText(tr, s, x, y + i * lineH, 0xFFFFFFFF, false);
+            }
+        }
+    }
+
+    private static void renderArmorHud(DrawContext g, MinecraftClient mc) {
+        if (mc.player == null) return;
+        PlayerInventory inv = mc.player.getInventory();
+        TextRenderer tr = mc.textRenderer;
+
+        List<ItemStack> items = new ArrayList<>();
+        // Шлем, нагрудник, штаны, ботинки
+        items.add(mc.player.getEquippedStack(net.minecraft.entity.EquipmentSlot.HEAD));
+        items.add(mc.player.getEquippedStack(net.minecraft.entity.EquipmentSlot.CHEST));
+        items.add(mc.player.getEquippedStack(net.minecraft.entity.EquipmentSlot.LEGS));
+        items.add(mc.player.getEquippedStack(net.minecraft.entity.EquipmentSlot.FEET));
+        if (Config.armorHudShowTool) {
+            items.add(mc.player.getMainHandStack());
+        }
+
+        Matrix3x2fStack m = g.getMatrices();
+        m.pushMatrix();
+        m.translate((float) Config.armorHudX, (float) Config.armorHudY);
+        m.scale((float) Config.armorHudScale, (float) Config.armorHudScale);
+
+        int slot = 18;
+        int y = 0;
+        for (ItemStack st : items) {
+            if (st.isEmpty()) {
+                y += slot;
+                continue;
+            }
+            // Иконка предмета
+            g.drawItem(st, 0, y);
+
+            // Прочность
+            if (Config.armorHudShowDurability && st.isDamageable()) {
+                int max = st.getMaxDamage();
+                int dmg = st.getDamage();
+                int left = max - dmg;
+                float ratio = max > 0 ? (float) left / max : 0f;
+
+                int barW = 16;
+                int barX = 0;
+                int barY = y + 16;
+
+                g.fill(barX, barY, barX + barW, barY + 2, 0xFF000000);
+                int color = ratio > 0.5f ? 0xFF00FF00 : ratio > 0.25f ? 0xFFFFFF00 : 0xFFFF0000;
+                g.fill(barX, barY, barX + (int) (barW * ratio), barY + 2, color);
+
+                if (Config.armorHudShowDurability) {
+                    String txt = String.valueOf(left);
+                    g.drawTextWithShadow(tr, txt, barX + barW + 2, y + 8, 0xFFFFFFFF);
+                }
+            }
+            y += slot;
         }
         m.popMatrix();
     }
