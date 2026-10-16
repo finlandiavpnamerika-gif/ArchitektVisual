@@ -52,8 +52,7 @@ public class MenuScreen extends Screen {
         g.drawTextWithShadow(textRenderer, label, cx + 4, cy + 4, on ? Theme.TEXT : Theme.TEXT_DIM);
 
         if (Config.showCheckmarks && on) {
-            String check = Theme.CHECK_MARK;
-            g.drawTextWithShadow(textRenderer, check, cx + cw - 10, cy + 4, Theme.CHECK);
+            g.drawTextWithShadow(textRenderer, Theme.CHECK_MARK, cx + cw - 10, cy + 4, Theme.CHECK);
         } else if (options > 0) {
             String arrow = open.contains(id) ? "^" : "v";
             g.drawTextWithShadow(textRenderer, arrow, cx + cw - 10, cy + 4, Theme.TEXT_DIM);
@@ -68,6 +67,20 @@ public class MenuScreen extends Screen {
         }
         cy += Theme.ROW_HEIGHT;
         return on;
+    }
+
+    /** Раскрывающаяся категория без тумблера (для Theme). */
+    private boolean expander(DrawContext g, String id, String label) {
+        boolean hov = hit(cx, cy, cw, Theme.ROW_HEIGHT);
+        HudUtils.rowBg(g, cx, cy, cw, Theme.ROW_HEIGHT, hov, false);
+        g.drawTextWithShadow(textRenderer, label, cx + 4, cy + 4, Theme.TEXT_DIM);
+        g.drawTextWithShadow(textRenderer, open.contains(id) ? "^" : "v",
+                cx + cw - 10, cy + 4, Theme.TEXT_DIM);
+        if (clicked && hov) {
+            if (!open.remove(id)) open.add(id);
+        }
+        cy += Theme.ROW_HEIGHT;
+        return open.contains(id);
     }
 
     private boolean cbool(DrawContext g, String label, boolean v) {
@@ -105,9 +118,11 @@ public class MenuScreen extends Screen {
     private int ccycle(DrawContext g, String label, String[] names, int idx) {
         boolean hov = hit(cx, cy, cw, Theme.ROW_HEIGHT);
         HudUtils.rowBg(g, cx, cy, cw, Theme.ROW_HEIGHT, hov, false);
-        g.drawTextWithShadow(textRenderer, label + ": " + names[idx], cx + 4, cy + 4, Theme.TEXT_DIM);
-        g.fill(cx + cw - 12, cy + 4, cx + cw - 4, cy + 12, Config.COLORS[Math.min(idx, Config.COLORS.length - 1)]);
-        if (clicked && hov) idx = (idx + 1) % names.length;
+        int safe = Math.max(0, Math.min(names.length - 1, idx));
+        g.drawTextWithShadow(textRenderer, label + ": " + names[safe], cx + 4, cy + 4, Theme.TEXT_DIM);
+        g.fill(cx + cw - 12, cy + 4, cx + cw - 4, cy + 12,
+                Config.COLORS[Math.min(safe, Config.COLORS.length - 1)]);
+        if (clicked && hov) idx = (safe + 1) % names.length;
         cy += Theme.ROW_HEIGHT;
         return idx;
     }
@@ -271,9 +286,10 @@ public class MenuScreen extends Screen {
             Config.armorHudY = (int) cslider(g, "Y", 0, 400, Config.armorHudY, true);
         }
 
-        Config.themeColor = module(g, "theme", "Theme Color", Config.themeColor > 0, 3) ? Config.themeColor : -1;
-        if (open.contains("theme")) {
-            Config.themeColor = ccycle(g, "Акцент", Config.COLOR_NAMES, Math.max(0, Config.themeColor));
+        // ===== Theme — раскрывающаяся категория без тумблера =====
+        boolean themeOpen = expander(g, "theme", "Theme");
+        if (themeOpen) {
+            Config.themeColor = ccycle(g, "Акцент", Config.COLOR_NAMES, Config.themeColor);
             Config.showIcons = cbool(g, "Иконки", Config.showIcons);
             Config.showCheckmarks = cbool(g, "Галочки", Config.showCheckmarks);
         }
