@@ -41,6 +41,34 @@ public final class Config {
     public static final List<SwapPair> swapPairs = new ArrayList<>();
     public static final List<BoundItem> binds = new ArrayList<>();
 
+    // === NEW: ArrayList ===
+    public static boolean arrayList = true;
+    public static int arrayListColor = 0;
+    public static boolean arrayListShadow = true;
+    public static int arrayListX = 4;
+    public static int arrayListY = 4;
+
+    // === NEW: Keystrokes ===
+    public static boolean keystrokes = true;
+    public static int keystrokesX = 4;
+    public static int keystrokesY = 150;
+    public static double keystrokesScale = 1.0;
+    public static int keystrokesColor = 0;
+    public static boolean keystrokesShowMouse = true;
+    public static boolean keystrokesShowSpace = true;
+
+    // === NEW: Armor + Tool HUD ===
+    public static boolean armorHud = true;
+    public static int armorHudX = 4;
+    public static int armorHudY = 220;
+    public static double armorHudScale = 1.0;
+    public static boolean armorHudShowTool = true;
+    public static boolean armorHudShowDurability = true;
+
+    // === NEW: AutoReconnect ===
+    public static boolean autoReconnect = false;
+    public static double autoReconnectDelay = 5.0;
+
     public static final int[] COLORS = {-4883201, -11141121, -11141291, -171, -43691};
     public static final String[] COLOR_NAMES = {"Фиолетовый", "Голубой", "Зелёный", "Жёлтый", "Красный"};
 
@@ -70,6 +98,30 @@ public final class Config {
             o.addProperty("viewDist", viewDist);
             o.addProperty("autoswap", autoswap);
             o.addProperty("itembind", itembind);
+
+            o.addProperty("arrayList", arrayList);
+            o.addProperty("arrayListColor", arrayListColor);
+            o.addProperty("arrayListShadow", arrayListShadow);
+            o.addProperty("arrayListX", arrayListX);
+            o.addProperty("arrayListY", arrayListY);
+
+            o.addProperty("keystrokes", keystrokes);
+            o.addProperty("keystrokesX", keystrokesX);
+            o.addProperty("keystrokesY", keystrokesY);
+            o.addProperty("keystrokesScale", keystrokesScale);
+            o.addProperty("keystrokesColor", keystrokesColor);
+            o.addProperty("keystrokesShowMouse", keystrokesShowMouse);
+            o.addProperty("keystrokesShowSpace", keystrokesShowSpace);
+
+            o.addProperty("armorHud", armorHud);
+            o.addProperty("armorHudX", armorHudX);
+            o.addProperty("armorHudY", armorHudY);
+            o.addProperty("armorHudScale", armorHudScale);
+            o.addProperty("armorHudShowTool", armorHudShowTool);
+            o.addProperty("armorHudShowDurability", armorHudShowDurability);
+
+            o.addProperty("autoReconnect", autoReconnect);
+            o.addProperty("autoReconnectDelay", autoReconnectDelay);
 
             JsonArray sp = new JsonArray();
             for (SwapPair p : swapPairs) {
@@ -120,6 +172,30 @@ public final class Config {
                 viewDist = Math.max(2.0, Math.min(32.0, d(o, "viewDist", viewDist)));
                 autoswap = b(o, "autoswap", autoswap);
                 itembind = b(o, "itembind", itembind);
+
+                arrayList = b(o, "arrayList", arrayList);
+                arrayListColor = Math.max(0, Math.min(COLORS.length - 1, (int) d(o, "arrayListColor", arrayListColor)));
+                arrayListShadow = b(o, "arrayListShadow", arrayListShadow);
+                arrayListX = (int) d(o, "arrayListX", arrayListX);
+                arrayListY = (int) d(o, "arrayListY", arrayListY);
+
+                keystrokes = b(o, "keystrokes", keystrokes);
+                keystrokesX = (int) d(o, "keystrokesX", keystrokesX);
+                keystrokesY = (int) d(o, "keystrokesY", keystrokesY);
+                keystrokesScale = d(o, "keystrokesScale", keystrokesScale);
+                keystrokesColor = Math.max(0, Math.min(COLORS.length - 1, (int) d(o, "keystrokesColor", keystrokesColor)));
+                keystrokesShowMouse = b(o, "keystrokesShowMouse", keystrokesShowMouse);
+                keystrokesShowSpace = b(o, "keystrokesShowSpace", keystrokesShowSpace);
+
+                armorHud = b(o, "armorHud", armorHud);
+                armorHudX = (int) d(o, "armorHudX", armorHudX);
+                armorHudY = (int) d(o, "armorHudY", armorHudY);
+                armorHudScale = d(o, "armorHudScale", armorHudScale);
+                armorHudShowTool = b(o, "armorHudShowTool", armorHudShowTool);
+                armorHudShowDurability = b(o, "armorHudShowDurability", armorHudShowDurability);
+
+                autoReconnect = b(o, "autoReconnect", autoReconnect);
+                autoReconnectDelay = d(o, "autoReconnectDelay", autoReconnectDelay);
 
                 swapPairs.clear();
                 binds.clear();
