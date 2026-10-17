@@ -4,7 +4,9 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "HandledScreenAccessor",
-    "SimpleOptionAccessor"
+    "SimpleOptionAccessor",
+    "TitleScreenMixin",
+    "ButtonWidgetMixin"
   ],
   "injectors": {
     "defaultRequire": 1
