@@ -22,7 +22,7 @@ public class InventoryScreenMixin {
 
         InventoryScreen self = (InventoryScreen) (Object) this;
 
-        // Новый метод 1.21.11: drawTexture с RenderPipelines
+        // Рисуем картинку на весь экран (правильный метод для 1.21.11)
         g.drawTexture(
                 RenderPipelines.GUI_TEXTURED, 
                 BG, 
