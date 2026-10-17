@@ -16,7 +16,6 @@ public class TitleScreenMixin {
     private static final Identifier BG =
             Identifier.of("visualsmod", "textures/gui/main_menu_bg.png");
 
-    /** Рисуем фон и логотип ПЕРЕД ванильным рендером. */
     @Inject(method = "render", at = @At("HEAD"))
     private void visuals$drawBackground(DrawContext g, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (!Config.customMainMenu) return;
@@ -28,7 +27,7 @@ public class TitleScreenMixin {
         // Затемняем ванильный фон
         g.fill(0, 0, w, h, 0xC0000000);
 
-        // Рисуем свою картинку (растягиваем на весь экран)
-        g.drawTexture(BG, 0, 0, 0, 0, w, h, w, h);
+        // Рисуем свою картинку на весь экран (новый API 1.21.11)
+        g.drawTexture(BG, 0, 0, 0f, 0f, w, h, w, h);
     }
 }
