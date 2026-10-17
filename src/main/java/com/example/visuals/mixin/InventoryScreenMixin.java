@@ -13,23 +13,26 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(InventoryScreen.class)
 public class InventoryScreenMixin {
 
-    // Путь к твоей картинке с девушкой
+    // Твоя картинка с девушкой
     private static final Identifier BG = Identifier.of("visualsmod", "textures/gui/inventory_bg.png");
 
-    @Inject(method = "render", at = @At("HEAD"))
-    private void visuals$drawInventoryBg(DrawContext g, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    // 1. Убираем ванильное затемнение (чтобы не перекрывало нашу картинку)
+    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
+    private void visuals$removeVanillaBg(DrawContext g, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (!Config.customMainMenu) return;
-
-        InventoryScreen self = (InventoryScreen) (Object) this;
-
-        // Рисуем картинку на весь экран (правильный метод для 1.21.11)
+        
+        // Рисуем картинку вместо ванильного размытия
         g.drawTexture(
                 RenderPipelines.GUI_TEXTURED, 
                 BG, 
                 0, 0, 
                 0f, 0f, 
-                self.width, self.height, 
+                ((InventoryScreen)(Object)this).width, 
+                ((InventoryScreen)(Object)this).height, 
                 1376, 768 
         );
+        
+        // Отменяем стандартный рендер фона, чтобы он не рисовал своё
+        ci.cancel(); 
     }
 }
