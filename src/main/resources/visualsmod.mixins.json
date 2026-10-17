@@ -6,7 +6,8 @@
     "HandledScreenAccessor",
     "SimpleOptionAccessor",
     "TitleScreenMixin",
-    "ButtonWidgetMixin"
+    "ButtonWidgetMixin",
+    "InventoryScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
