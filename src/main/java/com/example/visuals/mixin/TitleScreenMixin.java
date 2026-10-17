@@ -3,6 +3,7 @@ package com.example.visuals.mixin;
 import com.example.visuals.Config;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,12 +21,14 @@ public class TitleScreenMixin {
 
         TitleScreen self = (TitleScreen) (Object) this;
         
-        // drawGuiTexture работает стабильнее в 1.21.11
-        g.drawGuiTexture(
-                BG,
-                0, 0,
-                self.width,
-                self.height
+        // ВАЖНО: 10 аргументов (RenderPipeline, Identifier, x, y, u, v, w, h, texW, texH)
+        g.blit(
+                RenderPipelines.GUI_TEXTURED,  // 1. Пайплайн
+                BG,                            // 2. Текстура
+                0, 0,                          // 3, 4. Позиция на экране (x, y)
+                0f, 0f,                        // 5, 6. Откуда брать (u, v)
+                self.width, self.height,       // 7, 8. Размер на экране
+                1376, 768                      // 9, 10. РЕАЛЬНЫЙ размер картинки (ширина, высота)
         );
     }
 }
