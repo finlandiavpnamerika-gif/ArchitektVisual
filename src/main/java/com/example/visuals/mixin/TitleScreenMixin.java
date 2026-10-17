@@ -20,14 +20,12 @@ public class TitleScreenMixin {
 
         TitleScreen self = (TitleScreen) (Object) this;
         
-        // drawTexture с 10 аргументами (текстура, x, y, u, v, width, height, texWidth, texHeight)
-        g.drawTexture(
+        // drawGuiTexture работает стабильнее в 1.21.11
+        g.drawGuiTexture(
                 BG,
-                0, 0,           // x, y на экране
-                0f, 0f,         // u, v (откуда брать)
-                self.width,     // ширина на экране
-                self.height,    // высота на экране
-                1376, 768       // РЕАЛЬНЫЙ размер картинки
+                0, 0,
+                self.width,
+                self.height
         );
     }
 }
