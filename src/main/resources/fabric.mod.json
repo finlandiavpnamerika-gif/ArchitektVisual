@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "visualsmod",
   "version": "${version}",
-  "name": "Visuals",
+  "name": "ArchitektVisuals",
   "description": "Меню с визуальными функциями + AutoSwap + ItemBind",
   "authors": ["me"],
   "license": "MIT",
