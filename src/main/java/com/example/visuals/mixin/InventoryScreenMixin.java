@@ -21,16 +21,13 @@ public class InventoryScreenMixin {
 
         InventoryScreen self = (InventoryScreen) (Object) this;
         
-        // Размеры картинки совпадают с размером инвентаря
         int invWidth = 176;
         int invHeight = 166;
 
-        // Центрируем на экране
         int x = (self.width - invWidth) / 2;
         int y = (self.height - invHeight) / 2;
 
-        // Рисуем картинку ровно 176x166. 
-        // Последние два числа (176, 166) — это РЕАЛЬНЫЙ размер твоей картинки.
+        // 1. Рисуем картинку (она ляжет ровно под инвентарь)
         g.drawTexture(
                 RenderPipelines.GUI_TEXTURED, 
                 BG, 
@@ -39,5 +36,9 @@ public class InventoryScreenMixin {
                 invWidth, invHeight, 
                 176, 166 
         );
+
+        // 2. Накладываем полупрозрачный чёрный фильтр (затемнение), 
+        // чтобы слоты и текст были чётко видны на фоне картинки.
+        g.fill(x, y, x + invWidth, y + invHeight, 0x60000000); 
     }
 }
