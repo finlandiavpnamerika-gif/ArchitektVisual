@@ -19,14 +19,12 @@ public class InventoryScreenMixin {
         if (!Config.customMainMenu) return;
 
         InventoryScreen self = (InventoryScreen) (Object) this;
-
-        g.drawTexture(
+        
+        g.drawGuiTexture(
                 BG,
                 0, 0,
-                0f, 0f,
                 self.width,
-                self.height,
-                1376, 768   // поменяй на размер картинки с девушкой
+                self.height
         );
     }
 }
