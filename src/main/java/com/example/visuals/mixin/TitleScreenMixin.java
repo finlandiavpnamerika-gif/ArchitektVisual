@@ -1,9 +1,9 @@
 package com.example.visuals.mixin;
 
 import com.example.visuals.Config;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,14 +21,14 @@ public class TitleScreenMixin {
 
         TitleScreen self = (TitleScreen) (Object) this;
         
-        // ВАЖНО: 10 аргументов (RenderPipeline, Identifier, x, y, u, v, w, h, texW, texH)
+        // ВАЖНО: RenderPipelines.GUI_TEXTURED — ПЕРВЫЙ аргумент!
         g.blit(
-                RenderPipelines.GUI_TEXTURED,  // 1. Пайплайн
-                BG,                            // 2. Текстура
-                0, 0,                          // 3, 4. Позиция на экране (x, y)
-                0f, 0f,                        // 5, 6. Откуда брать (u, v)
-                self.width, self.height,       // 7, 8. Размер на экране
-                1376, 768                      // 9, 10. РЕАЛЬНЫЙ размер картинки (ширина, высота)
+                RenderPipelines.GUI_TEXTURED, 
+                BG, 
+                0, 0, 
+                0f, 0f, 
+                self.width, self.height, 
+                1376, 768 
         );
     }
 }
