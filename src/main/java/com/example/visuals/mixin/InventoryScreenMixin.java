@@ -25,7 +25,7 @@ public class InventoryScreenMixin {
                 RenderPipelines.GUI_TEXTURED, 
                 BG, 
                 0, 0, 
-                0f, 0f, 
+                0, 0, 
                 self.width, self.height, 
                 1376, 768 
         );
