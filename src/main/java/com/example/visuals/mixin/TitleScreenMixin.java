@@ -20,15 +20,16 @@ public class TitleScreenMixin {
         if (!Config.customMainMenu) return;
 
         TitleScreen self = (TitleScreen) (Object) this;
-        
-        // ВАЖНО: RenderPipelines.GUI_TEXTURED — ПЕРВЫЙ аргумент!
+
+        // ВАЖНО: RenderPipelines.GUI_TEXTURED ПЕРВЫМ аргументом
+        // x, y, u, v, width, height, textureWidth, textureHeight
         g.blit(
-                RenderPipelines.GUI_TEXTURED, 
-                BG, 
-                0, 0, 
-                0f, 0f, 
-                self.width, self.height, 
-                1376, 768 
+                RenderPipelines.GUI_TEXTURED,
+                BG,
+                0, 0,
+                0f, 0f,
+                self.width, self.height,
+                1376, 768
         );
     }
 }
