@@ -1,6 +1,7 @@
 package com.example.visuals.mixin;
 
 import com.example.visuals.Config;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.util.Identifier;
@@ -12,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(TitleScreen.class)
 public class TitleScreenMixin {
 
-    // ВАЖНО: тут "minecraft", а не "visualsmod"!
+    // Путь к картинке внутри мода (внутренний ресурспак)
     private static final Identifier BG = Identifier.of("minecraft", "textures/gui/title/background.png");
 
     @Inject(method = "render", at = @At("HEAD"))
@@ -21,13 +22,14 @@ public class TitleScreenMixin {
 
         TitleScreen self = (TitleScreen) (Object) this;
         
-        // drawTexture без RenderPipeline (работает в 1.21.11)
-        g.drawTexture(
+        // Правильный метод для 1.21.11: blit + RenderPipelines
+        g.blit(
+                RenderPipelines.GUI_TEXTURED, 
                 BG, 
-                0, 0, 
-                0f, 0f, 
-                self.width, self.height, 
-                1376, 768 
+                0, 0,           // x, y
+                0f, 0f,         // u, v
+                self.width, self.height, // width, height
+                1376, 768       // textureWidth, textureHeight
         );
     }
 }
