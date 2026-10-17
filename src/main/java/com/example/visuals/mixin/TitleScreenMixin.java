@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(TitleScreen.class)
 public class TitleScreenMixin {
 
-    // Путь к картинке внутри мода (внутренний ресурспак)
     private static final Identifier BG = Identifier.of("minecraft", "textures/gui/title/background.png");
 
     @Inject(method = "render", at = @At("HEAD"))
@@ -22,14 +21,14 @@ public class TitleScreenMixin {
 
         TitleScreen self = (TitleScreen) (Object) this;
         
-        // Правильный метод для 1.21.11: blit + RenderPipelines
+        // u и v теперь 0, 0 (целые числа, а не 0f, 0f)
         g.blit(
                 RenderPipelines.GUI_TEXTURED, 
                 BG, 
-                0, 0,           // x, y
-                0f, 0f,         // u, v
-                self.width, self.height, // width, height
-                1376, 768       // textureWidth, textureHeight
+                0, 0, 
+                0, 0, 
+                self.width, self.height, 
+                1376, 768 
         );
     }
 }
