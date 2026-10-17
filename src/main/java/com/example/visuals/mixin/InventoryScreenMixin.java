@@ -27,7 +27,7 @@ public class InventoryScreenMixin {
         int x = (self.width - invWidth) / 2;
         int y = (self.height - invHeight) / 2;
 
-        // 1. Рисуем картинку (она ляжет ровно под инвентарь)
+        // 1. Рисуем картинку
         g.drawTexture(
                 RenderPipelines.GUI_TEXTURED, 
                 BG, 
@@ -37,8 +37,8 @@ public class InventoryScreenMixin {
                 176, 166 
         );
 
-        // 2. Накладываем полупрозрачный чёрный фильтр (затемнение), 
-        // чтобы слоты и текст были чётко видны на фоне картинки.
-        g.fill(x, y, x + invWidth, y + invHeight, 0x60000000); 
+        // 2. Накладываем чёрный фильтр с прозрачностью 80% (0xCC)
+        // Если захочешь еще темнее, поставь 0xE6 (90%), если светлее — 0x99 (60%)
+        g.fill(x, y, x + invWidth, y + invHeight, 0xCC000000); 
     }
 }
