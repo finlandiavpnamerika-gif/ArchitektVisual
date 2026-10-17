@@ -15,6 +15,7 @@ public class InventoryScreenMixin {
 
     private static final Identifier BG = Identifier.of("visualsmod", "textures/gui/inventory_bg.png");
 
+    // Внедряемся ПЕРЕД отрисовкой основного интерфейса
     @Inject(method = "render", at = @At("HEAD"))
     private void visuals$drawInventoryBg(DrawContext g, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (!Config.customMainMenu) return;
@@ -27,7 +28,7 @@ public class InventoryScreenMixin {
         int x = (self.width - invWidth) / 2;
         int y = (self.height - invHeight) / 2;
 
-        // 1. Рисуем картинку
+        // Рисуем девушку на весь инвентарь (176x166)
         g.drawTexture(
                 RenderPipelines.GUI_TEXTURED, 
                 BG, 
@@ -36,9 +37,8 @@ public class InventoryScreenMixin {
                 invWidth, invHeight, 
                 176, 166 
         );
-
-        // 2. Накладываем чёрный фильтр с прозрачностью 80% (0xCC)
-        // Если захочешь еще темнее, поставь 0xE6 (90%), если светлее — 0x99 (60%)
-        g.fill(x, y, x + invWidth, y + invHeight, 0xCC000000); 
+        
+        // Накладываем полупрозрачный чёрный фильтр, чтобы слоты и Стив были видны
+        g.fill(x, y, x + invWidth, y + invHeight, 0x60000000); 
     }
 }
