@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(TitleScreen.class)
 public class TitleScreenMixin {
 
-    // ВАЖНО: ссылаемся на ванильную папку minecraft, а не visualsmod!
+    // ВАЖНО: тут "minecraft", а не "visualsmod"!
     private static final Identifier BG = Identifier.of("minecraft", "textures/gui/title/background.png");
 
     @Inject(method = "render", at = @At("HEAD"))
