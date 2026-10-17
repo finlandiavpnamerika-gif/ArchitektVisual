@@ -27,7 +27,25 @@ public class TitleScreenMixin {
         // Затемняем ванильный фон
         g.fill(0, 0, w, h, 0xC0000000);
 
-        // Рисуем свою картинку на весь экран (новый API 1.21.11)
-        g.drawTexture(BG, 0, 0, 0f, 0f, w, h, w, h);
+        // Пробуем новый API — drawGuiTexture с RenderPipeline
+        try {
+            g.drawGuiTexture(
+                    net.minecraft.client.gl.RenderPipelines.GUI_TEXTURED,
+                    BG,
+                    0, 0, w, h
+            );
+        } catch (Throwable t) {
+            // Если не сработало — пробуем другой вариант
+            try {
+                g.drawTexture(
+                        net.minecraft.client.gl.RenderPipelines.GUI_TEXTURED,
+                        BG,
+                        0, 0, 0f, 0f, w, h, w, h
+                );
+            } catch (Throwable t2) {
+                // Фолбэк: просто тёмный фон
+                g.fill(0, 0, w, h, 0xFF101010);
+            }
+        }
     }
 }
