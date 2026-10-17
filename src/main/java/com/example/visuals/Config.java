@@ -17,6 +17,9 @@ import java.util.List;
 public final class Config {
     private Config() {}
 
+    // ================== ГЛАВНОЕ МЕНЮ ==================
+    public static boolean customMainMenu = true;
+
     // ================== UTILITIES ==================
     public static boolean sprint = false;
     public static boolean sprintAllDirs = false;
@@ -35,10 +38,10 @@ public final class Config {
     public static double hudScale = 1.0;
     public static int hudX = 4;
     public static int hudY = 4;
-    public static int hudColor = 0;
+    public static int hudColor = 2; // зелёный
 
     public static boolean arrayList = true;
-    public static int arrayListColor = 0;
+    public static int arrayListColor = 2; // зелёный
     public static boolean arrayListShadow = true;
     public static int arrayListX = 4;
     public static int arrayListY = 4;
@@ -57,7 +60,7 @@ public final class Config {
     public static int keystrokesX = 4;
     public static int keystrokesY = 150;
     public static double keystrokesScale = 1.0;
-    public static int keystrokesColor = 0;
+    public static int keystrokesColor = 2; // зелёный
     public static boolean keystrokesShowMouse = true;
     public static boolean keystrokesShowSpace = true;
 
@@ -72,17 +75,17 @@ public final class Config {
     public static double autoReconnectDelay = 5.0;
 
     // ================== СТИЛЬ ==================
-    public static int themeColor = 0;          // индекс из COLORS
-    public static boolean showIcons = true;    // показывать иконки категорий
-    public static boolean showCheckmarks = true; // показывать ✔ у включённых
+    public static int themeColor = 2;          // зелёный по умолчанию
+    public static boolean showIcons = true;
+    public static boolean showCheckmarks = true;
 
     // ================== ПАЛИТРА ==================
     public static final int[] COLORS = {
-            -4883201,    // фиолетовый (по умолчанию)
-            -11141121,   // голубой
-            -11141291,   // зелёный
-            -171,        // жёлтый
-            -43691       // красный
+            -4883201,    // 0 фиолетовый
+            -11141121,   // 1 голубой
+            -11141291,   // 2 зелёный ← по умолчанию
+            -171,        // 3 жёлтый
+            -43691       // 4 красный
     };
     public static final String[] COLOR_NAMES = {
             "Фиолетовый", "Голубой", "Зелёный", "Жёлтый", "Красный"
@@ -95,13 +98,13 @@ public final class Config {
         try {
             JsonObject o = new JsonObject();
 
-            // Utilities
+            o.addProperty("customMainMenu", customMainMenu);
+
             o.addProperty("sprint", sprint);
             o.addProperty("sprintAllDirs", sprintAllDirs);
             o.addProperty("zoom", zoom);
             o.addProperty("zoomFov", zoomFov);
 
-            // Visual
             o.addProperty("fullbright", fullbright);
             o.addProperty("gamma", gamma);
             o.addProperty("hud", hud);
@@ -120,11 +123,9 @@ public final class Config {
             o.addProperty("arrayListX", arrayListX);
             o.addProperty("arrayListY", arrayListY);
 
-            // World
             o.addProperty("limitDist", limitDist);
             o.addProperty("viewDist", viewDist);
 
-            // Client
             o.addProperty("autoswap", autoswap);
             o.addProperty("itembind", itembind);
             o.addProperty("keystrokes", keystrokes);
@@ -143,12 +144,10 @@ public final class Config {
             o.addProperty("autoReconnect", autoReconnect);
             o.addProperty("autoReconnectDelay", autoReconnectDelay);
 
-            // Стиль
             o.addProperty("themeColor", themeColor);
             o.addProperty("showIcons", showIcons);
             o.addProperty("showCheckmarks", showCheckmarks);
 
-            // Списки
             JsonArray sp = new JsonArray();
             for (SwapPair p : swapPairs) {
                 JsonObject e = new JsonObject();
@@ -178,6 +177,8 @@ public final class Config {
         try {
             if (Files.exists(FILE)) {
                 JsonObject o = JsonParser.parseString(Files.readString(FILE)).getAsJsonObject();
+
+                customMainMenu = b(o, "customMainMenu", customMainMenu);
 
                 sprint = b(o, "sprint", sprint);
                 sprintAllDirs = b(o, "sprintAllDirs", sprintAllDirs);
