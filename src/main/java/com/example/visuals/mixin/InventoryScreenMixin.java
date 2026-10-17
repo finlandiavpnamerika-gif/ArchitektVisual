@@ -13,23 +13,31 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(InventoryScreen.class)
 public class InventoryScreenMixin {
 
-    // Путь к твоей картинке с девушкой (проверь, что она лежит в этой папке!)
     private static final Identifier BG = Identifier.of("visualsmod", "textures/gui/inventory_bg.png");
 
-    @Inject(method = "render", at = @At("HEAD"))
+    // Отключаем повторение текстуры (чтобы не было плитки)
+    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
     private void visuals$drawInventoryBg(DrawContext g, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (!Config.customMainMenu) return;
 
         InventoryScreen self = (InventoryScreen) (Object) this;
+        
+        // Размер окна инвентаря (стандарт)
+        int invWidth = 176;
+        int invHeight = 166;
 
-        // Рисуем картинку. В 1.21.11 правильный метод — drawTexture с RenderPipelines
-        g.drawTexture(
-                RenderPipelines.GUI_TEXTURED, 
+        // Центрируем
+        int x = (self.width - invWidth) / 2;
+        int y = (self.height - invHeight) / 2;
+
+        // ВАЖНО: Вместо drawTexture используем drawGuiTexture, 
+        // он не повторяет картинку, если она больше или меньше нужного размера
+        g.drawGuiTexture(
                 BG, 
-                0, 0, 
-                0f, 0f, 
-                self.width, self.height, 
-                176, 166 
+                x, y, 
+                invWidth, invHeight
         );
+        
+        ci.cancel(); 
     }
 }
