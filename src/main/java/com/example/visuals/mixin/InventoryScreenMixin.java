@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(InventoryScreen.class)
 public class InventoryScreenMixin {
 
+    // Тут тоже "minecraft"
     private static final Identifier BG = Identifier.of("minecraft", "textures/gui/title/inventory_bg.png");
 
     @Inject(method = "render", at = @At("HEAD"))
