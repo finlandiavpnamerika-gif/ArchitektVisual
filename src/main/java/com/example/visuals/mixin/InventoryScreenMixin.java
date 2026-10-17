@@ -29,7 +29,7 @@ public class InventoryScreenMixin {
                 0, 0, 
                 0f, 0f, 
                 self.width, self.height, 
-                1376, 768 
+                176, 166 
         );
     }
 }
