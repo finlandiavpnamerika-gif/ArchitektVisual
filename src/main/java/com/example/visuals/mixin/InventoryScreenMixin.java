@@ -1,7 +1,6 @@
 package com.example.visuals.mixin;
 
 import com.example.visuals.Config;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.util.Identifier;
@@ -21,8 +20,7 @@ public class InventoryScreenMixin {
 
         InventoryScreen self = (InventoryScreen) (Object) this;
         
-        g.blit(
-                RenderPipelines.GUI_TEXTURED, 
+        g.drawTexture(
                 BG, 
                 0, 0, 
                 0f, 0f, 
