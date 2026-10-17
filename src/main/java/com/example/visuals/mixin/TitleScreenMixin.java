@@ -1,7 +1,6 @@
 package com.example.visuals.mixin;
 
 import com.example.visuals.Config;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.util.Identifier;
@@ -21,14 +20,13 @@ public class TitleScreenMixin {
 
         TitleScreen self = (TitleScreen) (Object) this;
         
-        // Тот самый рабочий код с blit
-        g.blit(
-                RenderPipelines.GUI_TEXTURED, 
+        // В 1.21.11 метод называется drawTexture, а не blit
+        g.drawTexture(
                 BG, 
-                0, 0, 
-                0f, 0f, 
-                self.width, self.height, 
-                1376, 768 
+                0, 0,           // x, y
+                0f, 0f,         // u, v
+                self.width, self.height, // width, height
+                1376, 768       // textureWidth, textureHeight
         );
     }
 }
