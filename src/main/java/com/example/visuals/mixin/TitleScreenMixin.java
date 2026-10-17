@@ -3,7 +3,6 @@ package com.example.visuals.mixin;
 import com.example.visuals.Config;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,14 +20,14 @@ public class TitleScreenMixin {
 
         TitleScreen self = (TitleScreen) (Object) this;
         
-        // Рисуем картинку. Внизу справа стоят 1376 и 768 — это точный размер твоей картинки!
-        g.blit(
-                RenderPipelines.GUI_TEXTURED, 
-                BG, 
-                0, 0, 
-                0f, 0f, 
-                self.width, self.height, 
-                1376, 768 // <--- РАЗМЕР ТВОЕЙ КАРТИНКИ
+        // drawTexture с 10 аргументами (текстура, x, y, u, v, width, height, texWidth, texHeight)
+        g.drawTexture(
+                BG,
+                0, 0,           // x, y на экране
+                0f, 0f,         // u, v (откуда брать)
+                self.width,     // ширина на экране
+                self.height,    // высота на экране
+                1376, 768       // РЕАЛЬНЫЙ размер картинки
         );
     }
 }
