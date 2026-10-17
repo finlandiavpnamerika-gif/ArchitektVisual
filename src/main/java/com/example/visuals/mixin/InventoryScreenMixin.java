@@ -3,6 +3,7 @@ package com.example.visuals.mixin;
 import com.example.visuals.Config;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,12 +20,14 @@ public class InventoryScreenMixin {
         if (!Config.customMainMenu) return;
 
         InventoryScreen self = (InventoryScreen) (Object) this;
-        
-        g.drawGuiTexture(
+
+        g.blit(
+                RenderPipelines.GUI_TEXTURED,
                 BG,
                 0, 0,
-                self.width,
-                self.height
+                0f, 0f,
+                self.width, self.height,
+                1376, 768   // <--- ЗАМЕНИ НА РАЗМЕР ДЕВУШКИ
         );
     }
 }
