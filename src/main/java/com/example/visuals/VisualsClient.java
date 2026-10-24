@@ -37,13 +37,16 @@ public class VisualsClient implements ClientModInitializer {
             }
             Features.tick(client);
             ItemFeatures.tick(client);
-            TrailRenderer.tick(); // ТИК ТРЕЙЛОВ
+            TrailRenderer.tick();
         });
 
-        // Рендер трейлов в мире
+        // Рендер трейлов (используем контекст без consumers)
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
             if (Config.trails) {
-                TrailRenderer.render(context.matrixStack(), context.consumers(), context.camera().getPos().x, context.camera().getPos().y, context.camera().getPos().z);
+                TrailRenderer.render(context.matrixStack(), null, 
+                        context.camera().getPos().x, 
+                        context.camera().getPos().y, 
+                        context.camera().getPos().z);
             }
         });
 
