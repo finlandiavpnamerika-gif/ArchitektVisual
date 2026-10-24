@@ -1,113 +1,59 @@
 package com.example.visuals;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
-import org.lwjgl.glfw.GLFW;
 
 public class FriendsScreen extends Screen {
     private final Screen parent;
-    private String inputName = "";
-    private boolean typing = false;
-    private int cx, cy;
+    private TextFieldWidget nameField;
 
     public FriendsScreen(Screen parent) {
-        super(Text.literal("Friends"));
+        super(Text.literal("Friends Manager"));
         this.parent = parent;
     }
 
     @Override
-    public void render(DrawContext g, int mouseX, int mouseY, float delta) {
-        g.fill(0, 0, width, height, 0x90000000);
+    protected void init() {
+        super.init();
         
-        int panelW = 250;
-        int panelH = 220;
-        int px = (width - panelW) / 2;
-        int py = (height - panelH) / 2;
-        
-        // Фон
-        g.fill(px, py, px + panelW, py + panelH, 0xFF1A1A1A);
-        g.fill(px, py, px + panelW, py + 2, 0xFF7CE38B);
-        
-        g.drawCenteredTextWithShadow(textRenderer, "Friends Manager", width / 2, py + 10, -1);
-        
-        // Список друзей
-        cy = py + 30;
-        cx = px + 10;
-        for (String f : Config.friends) {
-            g.drawTextWithShadow(textRenderer, f, cx, cy, 0xFF7CE38B);
-            cy += 12;
-        }
-        
-        // Поле ввода (внизу)
-        int inputY = py + panelH - 40;
-        g.fill(px + 10, inputY, px + panelW - 50, inputY + 20, 0xFF333333);
-        g.drawTextWithShadow(textRenderer, inputName + (typing ? "_" : ""), px + 15, inputY + 6, -1);
-        
+        // Поле ввода (по центру сверху)
+        this.nameField = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 50, 200, 20, Text.literal("Введите ник"));
+        this.nameField.setMaxLength(16);
+        this.addDrawableChild(this.nameField);
+
         // Кнопка "Добавить"
-        boolean hov = mouseX >= px + panelW - 45 && mouseX <= px + panelW - 10 && mouseY >= inputY && mouseY <= inputY + 20;
-        g.fill(px + panelW - 45, inputY, px + panelW - 10, inputY + 20, hov ? 0xFF7CE38B : 0xFF555555);
-        g.drawCenteredTextWithShadow(textRenderer, "Add", px + panelW - 27, inputY + 6, -1);
-        
-        // Кнопка "Назад"
-        g.drawCenteredTextWithShadow(textRenderer, "Press ESC to go back", width / 2, py + panelH - 15, 0xFFAAAAAA);
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int panelW = 250;
-        int panelH = 220;
-        int px = (width - panelW) / 2;
-        int py = (height - panelH) / 2;
-        int inputY = py + panelH - 40;
-
-        // Клик по полю ввода
-        if (mouseX >= px + 10 && mouseX <= px + panelW - 50 && mouseY >= inputY && mouseY <= inputY + 20) {
-            typing = true;
-            return true;
-        }
-        // Клик по кнопке Add
-        if (mouseX >= px + panelW - 45 && mouseX <= px + panelW - 10 && mouseY >= inputY && mouseY <= inputY + 20) {
-            if (!inputName.isEmpty() && !Config.friends.contains(inputName)) {
-                Config.friends.add(inputName);
-                inputName = "";
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Добавить друга"), button -> {
+            String name = nameField.getText().trim();
+            if (!name.isEmpty() && !Config.friends.contains(name)) {
+                Config.friends.add(name);
                 Config.save();
+                nameField.setText("");
             }
-            return true;
-        }
-        return super.mouseClicked(mouseX, mouseY, button);
+        }).dimensions(this.width / 2 - 100, 80, 200, 20).build());
+
+        // Кнопка "Назад"
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Назад"), button -> {
+            if (this.client != null) this.client.setScreen(parent);
+        }).dimensions(this.width / 2 - 100, this.height - 40, 200, 20).build());
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (typing) {
-            if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
-                if (!inputName.isEmpty()) inputName = inputName.substring(0, inputName.length() - 1);
-                return true;
-            }
-            if (keyCode == GLFW.GLFW_KEY_ENTER) {
-                if (!inputName.isEmpty() && !Config.friends.contains(inputName)) {
-                    Config.friends.add(inputName);
-                    inputName = "";
-                    Config.save();
-                }
-                return true;
-            }
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta); // Рисует фон и кнопки
+        
+        // Рисуем список друзей вручную
+        int startY = 120;
+        for (String friend : Config.friends) {
+            context.drawTextWithShadow(this.textRenderer, friend, this.width / 2 - 100, startY, 0xFF7CE38B);
+            startY += 12;
         }
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            MinecraftClient.getInstance().setScreen(parent);
-            return true;
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public boolean charTyped(char chr, int modifiers) {
-        if (typing && inputName.length() < 16) {
-            inputName += chr;
-            return true;
-        }
-        return super.charTyped(chr, modifiers);
+    public boolean shouldPause() {
+        return false;
     }
 }
