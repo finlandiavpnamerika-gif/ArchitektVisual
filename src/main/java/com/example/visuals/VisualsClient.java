@@ -7,7 +7,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -37,17 +36,6 @@ public class VisualsClient implements ClientModInitializer {
             }
             Features.tick(client);
             ItemFeatures.tick(client);
-            TrailRenderer.tick();
-        });
-
-        // Рендер трейлов (используем контекст без consumers)
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            if (Config.trails) {
-                TrailRenderer.render(context.matrixStack(), null, 
-                        context.camera().getPos().x, 
-                        context.camera().getPos().y, 
-                        context.camera().getPos().z);
-            }
         });
 
         HudRenderCallback.EVENT.register((drawContext, tickCounter) -> Features.hud(drawContext, tickCounter));
