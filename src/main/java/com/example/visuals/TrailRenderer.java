@@ -4,7 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.ColorHelper;
-import net.minecraft.gizmos.Gizmos; // Новый класс Gizmos
+import net.minecraft.gizmos.Gizmos; // ПРАВИЛЬНЫЙ ПАКЕТ
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,11 +30,10 @@ public class TrailRenderer {
         }
     }
 
-    // Вызывается из LevelRenderEvents (новый API 1.21.11)
+    // Вызывается из события рендера
     public static void render() {
         if (!Config.trails || TRAILS.isEmpty()) return;
 
-        // Gizmos использует ARGB (Alpha, Red, Green, Blue)
         int color = Config.COLORS[Config.trailsColor];
         int a = (color >> 24) & 0xFF;
         int r = (color >> 16) & 0xFF;
@@ -47,7 +46,7 @@ public class TrailRenderer {
                 Vec3d p1 = trail.get(i);
                 Vec3d p2 = trail.get(i + 1);
                 
-                // Рисуем линию через Gizmos
+                // Gizmos.line(start, end, color) - правильный метод
                 Gizmos.line(p1, p2, argbColor);
             }
         }
