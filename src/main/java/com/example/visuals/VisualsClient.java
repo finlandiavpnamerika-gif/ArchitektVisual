@@ -7,7 +7,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents; // ПРАВИЛЬНЫЙ ПАКЕТ
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -35,14 +34,7 @@ public class VisualsClient implements ClientModInitializer {
             while (menuKey.wasPressed()) client.setScreen(new MenuScreen());
             Features.tick(client);
             ItemFeatures.tick(client);
-            TrailRenderer.tick();
-        });
-
-        // НОВОЕ СОБЫТИЕ РЕНДЕРА (LevelRenderEvents) - точно есть в 1.21.11
-        LevelRenderEvents.AFTER_ENTITIES.register(context -> {
-            if (Config.trails) {
-                TrailRenderer.render();
-            }
+            TrailRenderer.tick(); // Тик для частиц
         });
 
         HudRenderCallback.EVENT.register((drawContext, tickCounter) -> Features.hud(drawContext, tickCounter));
@@ -71,10 +63,34 @@ public class VisualsClient implements ClientModInitializer {
                                             Config.friends.add(name);
                                             Config.save();
                                             ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§aДруг " + name + " добавлен!"));
+                                        } else {
+                                            ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§cЭтот игрок уже в друзьях!"));
                                         }
                                         return 1;
                                     })
                             )
+                    )
+                    .then(ClientCommandManager.literal("remove")
+                            .then(ClientCommandManager.argument("name", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                    .executes(ctx -> {
+                                        String name = com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "name");
+                                        if (Config.friends.remove(name)) {
+                                            Config.save();
+                                            ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§aДруг " + name + " удален!"));
+                                        } else {
+                                            ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§cЭтого игрока нет в друзьях!"));
+                                        }
+                                        return 1;
+                                    })
+                            )
+                    )
+                    .then(ClientCommandManager.literal("clear")
+                            .executes(ctx -> {
+                                Config.friends.clear();
+                                Config.save();
+                                ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§aСписок друзей очищен!"));
+                                return 1;
+                            })
                     )
             );
         });
