@@ -13,7 +13,7 @@ public class TrailRenderer {
 
     public static void tick() {
         MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.world == null || !Config.trails) return;
+        if (mc.world == null || mc.player == null || !Config.trails) return;
 
         long now = System.currentTimeMillis();
 
@@ -25,12 +25,9 @@ public class TrailRenderer {
                 long last = lastSpawn.getOrDefault(player.getUuid(), 0L);
                 
                 if (now - last > 50) {
-                    // В 1.21.11 метод addParticle требует boolean флаги
-                    // Используем addParticle с флагами false, false (не всегда спавнить, не важно)
-                    mc.world.addParticle(
+                    // Используем particleManager.addParticle - публичный метод
+                    mc.particleManager.addParticle(
                             ParticleTypes.END_ROD,
-                            false, // alwaysSpawn
-                            false, // important
                             player.getX(),
                             player.getY() + 0.1,
                             player.getZ(),
