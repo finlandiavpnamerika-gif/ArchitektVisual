@@ -57,11 +57,10 @@ public class AltManagerScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         
         int startY = 100;
-        context.drawTextWithShadow(this.textRenderer, "Сохраненные ники (нажми 'Войти'):", this.width / 2 - 100, startY, 0xFFFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, "Сохраненные ники:", this.width / 2 - 100, startY, 0xFFFFFFFF);
         startY += 15;
         
         for (String alt : Config.alts) {
-            // Рисуем кнопку для каждого ника
             int finalStartY = startY;
             this.addDrawableChild(ButtonWidget.builder(Text.literal("Войти: " + alt), button -> {
                 changeUsername(alt);
@@ -78,13 +77,11 @@ public class AltManagerScreen extends Screen {
 
             UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + newName).getBytes());
             
-            // 1. Создаем новую сессию (с Optional)
-            Session newSession = new Session(newName, uuid, "0", Optional.empty(), Optional.empty(), Session.AccountType.LEGACY);
+            // Убрали AccountType.LEGACY, так как его больше нет в 1.21.11
+            Session newSession = new Session(newName, uuid, "0", Optional.empty(), Optional.empty());
             
-            // 2. Меняем сессию через аксессор
             ((MinecraftClientAccessor) mc).setSession(newSession);
             
-            // 3. Меняем профиль игрока
             Field gameProfileField = mc.player.getClass().getDeclaredField("gameProfile");
             gameProfileField.setAccessible(true);
             GameProfile profile = (GameProfile) gameProfileField.get(mc.player);
