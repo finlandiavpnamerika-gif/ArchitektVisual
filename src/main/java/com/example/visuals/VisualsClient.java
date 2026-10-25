@@ -36,6 +36,7 @@ public class VisualsClient implements ClientModInitializer {
             }
             Features.tick(client);
             ItemFeatures.tick(client);
+            TrailRenderer.tick(); // <-- ДОБАВЛЕНО
         });
 
         HudRenderCallback.EVENT.register((drawContext, tickCounter) -> Features.hud(drawContext, tickCounter));
@@ -48,7 +49,6 @@ public class VisualsClient implements ClientModInitializer {
         });
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            // Меню
             dispatcher.register(ClientCommandManager.literal("visuals")
                     .executes(ctx -> {
                         MinecraftClient mc = ctx.getSource().getClient();
@@ -57,7 +57,6 @@ public class VisualsClient implements ClientModInitializer {
                     })
             );
 
-            // Друзья (без точки)
             dispatcher.register(ClientCommandManager.literal("friends")
                     .then(ClientCommandManager.literal("add")
                             .then(ClientCommandManager.argument("name", com.mojang.brigadier.arguments.StringArgumentType.word())
