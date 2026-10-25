@@ -7,8 +7,7 @@
     "SimpleOptionAccessor",
     "TitleScreenMixin",
     "InventoryScreenMixin",
-    "ChatHudMixin",
-    "PlayerListHudMixin"
+    "ChatHudMixin"
   ],
   "injectors": {
     "defaultRequire": 1
