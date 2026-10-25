@@ -57,36 +57,30 @@ public class AltManagerScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         
         int startY = 100;
-        context.drawTextWithShadow(this.textRenderer, "Сохраненные ники:", this.width / 2 - 100, startY, 0xFFFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, "Сохраненные ники (нажми на ник):", this.width / 2 - 100, startY, 0xFFFFFFFF);
         startY += 15;
+        
+        // Рисуем список ников и кнопки для них
+        int buttonY = startY;
         for (String alt : Config.alts) {
-            boolean hov = mouseX >= this.width / 2 - 100 && mouseX <= this.width / 2 + 100 && mouseY >= startY - 2 && mouseY <= startY + 10;
-            context.drawTextWithShadow(this.textRenderer, (hov ? "§a> " : "§7- ") + alt, this.width / 2 - 100, startY, 0xFFFFFFFF);
-            startY += 12;
+            // Рисуем текст
+            context.drawTextWithShadow(this.textRenderer, "- " + alt, this.width / 2 - 100, buttonY + 5, 0xFF7CE38B);
+            
+            // Добавляем кнопку "Войти" рядом с ником
+            final String finalAlt = alt;
+            this.addDrawableChild(ButtonWidget.builder(Text.literal("Войти"), button -> {
+                changeLocalUsername(finalAlt);
+            }).dimensions(this.width / 2 + 50, buttonY, 50, 16).build());
+            
+            buttonY += 20;
         }
     }
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int startY = 115;
-        for (String alt : Config.alts) {
-            boolean hov = mouseX >= this.width / 2 - 100 && mouseX <= this.width / 2 + 100 && mouseY >= startY - 2 && mouseY <= startY + 10;
-            if (hov && button == 0) {
-                changeLocalUsername(alt);
-                return true;
-            }
-            startY += 12;
-        }
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    // ЛОКАЛЬНАЯ СМЕНА НИКА
     private void changeLocalUsername(String newName) {
         try {
             MinecraftClient mc = MinecraftClient.getInstance();
             if (mc.player == null) return;
 
-            // Меняем ник в профиле игрока (только клиент)
             Field gameProfileField = mc.player.getClass().getDeclaredField("gameProfile");
             gameProfileField.setAccessible(true);
             GameProfile profile = (GameProfile) gameProfileField.get(mc.player);
