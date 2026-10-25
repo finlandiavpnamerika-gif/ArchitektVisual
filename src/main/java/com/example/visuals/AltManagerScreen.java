@@ -9,7 +9,6 @@ import net.minecraft.client.session.Session;
 import net.minecraft.text.Text;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.UUID;
 
 public class AltManagerScreen extends Screen {
@@ -63,13 +62,7 @@ public class AltManagerScreen extends Screen {
         context.drawTextWithShadow(this.textRenderer, "Сохраненные ники (нажми на ник):", this.width / 2 - 100, startY, 0xFFFFFFFF);
         startY += 15;
         for (String alt : Config.alts) {
-            boolean hov = mouseX >= this.width / 2 - 100 && mouseX <= this.width / 2 + 100 && mouseY >= startY - 2 && mouseY <= startY + 10;
-            context.drawTextWithShadow(this.textRenderer, (hov ? "§a> " : "§7- ") + alt, this.width / 2 - 100, startY, 0xFFFFFFFF);
-            
-            // Если нажали на ник — меняем
-            if (hov && net.minecraft.client.gui.screen.Screen.hasShiftDown() && this.client != null && this.client.getWindow() != null) {
-                // Проверяем зажата ли ЛКМ (через стандартный клик ниже)
-            }
+            context.drawTextWithShadow(this.textRenderer, "- " + alt, this.width / 2 - 100, startY, 0xFF7CE38B);
             startY += 12;
         }
     }
@@ -97,24 +90,23 @@ public class AltManagerScreen extends Screen {
             UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + newName).getBytes());
             Session newSession = new Session(newName, uuid, "0", "legacy");
             
-            // 2. Внедряем её в MinecraftClient через рефлексию (так как поле private)
+            // 2. Внедряем её в MinecraftClient через рефлексию
             Field sessionField = MinecraftClient.class.getDeclaredField("session");
             sessionField.setAccessible(true);
             sessionField.set(mc, newSession);
             
-            // 3. Обновляем ник в текущем профиле игрока (чтобы в табе отображалось)
+            // 3. Обновляем ник в текущем профиле игрока
             if (mc.player != null) {
                 Field gameProfileField = mc.player.getClass().getDeclaredField("gameProfile");
                 gameProfileField.setAccessible(true);
                 com.mojang.authlib.GameProfile profile = (com.mojang.authlib.GameProfile) gameProfileField.get(mc.player);
-                // Меняем имя в профиле
                 Field nameField = com.mojang.authlib.GameProfile.class.getDeclaredField("name");
                 nameField.setAccessible(true);
                 nameField.set(profile, newName);
             }
 
             if (mc.player != null) {
-                mc.player.sendMessage(Text.literal("§aНик изменен на: " + newName + " (Требуется перезаход на сервер!)"), false);
+                mc.player.sendMessage(Text.literal("§aНик изменен на: " + newName + " (Перезайди на сервер!)"), false);
             }
         } catch (Exception e) {
             if (MinecraftClient.getInstance().player != null) {
