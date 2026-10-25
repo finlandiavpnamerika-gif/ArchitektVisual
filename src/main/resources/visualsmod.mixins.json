@@ -8,8 +8,7 @@
     "TitleScreenMixin",
     "InventoryScreenMixin",
     "ChatHudMixin",
-    "PlayerListHudMixin",
-    "EntityRendererMixin"
+    "PlayerListHudMixin"
   ],
   "injectors": {
     "defaultRequire": 1
