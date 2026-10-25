@@ -48,7 +48,7 @@ public class VisualsClient implements ClientModInitializer {
         });
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            // Команда /visuals
+            // Меню
             dispatcher.register(ClientCommandManager.literal("visuals")
                     .executes(ctx -> {
                         MinecraftClient mc = ctx.getSource().getClient();
@@ -57,8 +57,8 @@ public class VisualsClient implements ClientModInitializer {
                     })
             );
 
-            // Команда .friends
-            dispatcher.register(ClientCommandManager.literal(".friends")
+            // Друзья (без точки)
+            dispatcher.register(ClientCommandManager.literal("friends")
                     .then(ClientCommandManager.literal("add")
                             .then(ClientCommandManager.argument("name", com.mojang.brigadier.arguments.StringArgumentType.word())
                                     .executes(ctx -> {
