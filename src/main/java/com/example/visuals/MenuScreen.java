@@ -154,10 +154,11 @@ public class MenuScreen extends Screen {
         if (open.contains("zoom")) { Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true); cy += 2; }
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("hud", 9) + mh("arraylist", 5) + mh("trails", 2);
+        int hVis = 34 + mh("fb", 1) + mh("hud", 9) + mh("arraylist", 5) + mh("trails", 2) + mh("sky", 2) + mh("time", 2) + mh("weather", 1);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
+        
         Config.hud = module(g, "hud", "HUD", "", Config.hud, 9);
         if (open.contains("hud")) {
             Config.hudFps = cbool(g, "FPS", Config.hudFps);
@@ -171,6 +172,7 @@ public class MenuScreen extends Screen {
             Config.hudY = (int) cslider(g, "Y", 0, 250, Config.hudY, true);
             cy += 2;
         }
+        
         Config.arrayList = module(g, "arraylist", "ArrayList", "", Config.arrayList, 5);
         if (open.contains("arraylist")) {
             Config.arrayListColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.arrayListColor);
@@ -179,10 +181,30 @@ public class MenuScreen extends Screen {
             Config.arrayListY = (int) cslider(g, "Y", 0, 250, Config.arrayListY, true);
             cy += 2;
         }
+
         Config.trails = module(g, "trails", "Trails", "", Config.trails, 2);
         if (open.contains("trails")) {
             Config.trailsColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.trailsColor);
             Config.trailsLength = cslider(g, "Длина", 0.5, 3.0, Config.trailsLength, false);
+            cy += 2;
+        }
+
+        Config.customSky = module(g, "sky", "Custom Sky", "", Config.customSky, 2);
+        if (open.contains("sky")) {
+            Config.skyLines = cbool(g, "Линии", Config.skyLines);
+            Config.skySpeed = cslider(g, "Скорость", 0.5, 5.0, Config.skySpeed, false);
+            cy += 2;
+        }
+
+        Config.customTime = module(g, "time", "Время", "", Config.customTime, 2);
+        if (open.contains("time")) {
+            Config.timeValue = (int) cslider(g, "Время (0-24000)", 0, 24000, Config.timeValue, true);
+            cy += 2;
+        }
+
+        Config.customWeather = module(g, "weather", "Погода", "", Config.customWeather, 1);
+        if (open.contains("weather")) {
+            Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
             cy += 2;
         }
 
