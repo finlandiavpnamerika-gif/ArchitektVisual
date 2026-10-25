@@ -32,17 +32,15 @@ public class VisualsClient implements ClientModInitializer {
         bindSelectKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.visualsmod.bind_select", InputUtil.Type.KEYSYM, 66, category));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (menuKey.wasPressed()) {
-                client.setScreen(new MenuScreen());
-            }
+            while (menuKey.wasPressed()) client.setScreen(new MenuScreen());
             Features.tick(client);
             ItemFeatures.tick(client);
-            TrailRenderer.tick(); // Тик для записи позиций
+            TrailRenderer.tick();
         });
 
-        // Рендер 3D-линий (AFTER_ENTITIES - безопасное событие в 1.21.11)
+        // Новый WorldRenderEvents (Fabric 1.21.11)
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            if (Config.trails && context.consumers() != null) {
+            if (Config.trails) {
                 TrailRenderer.render(
                         context.matrixStack(),
                         context.consumers(),
@@ -70,7 +68,6 @@ public class VisualsClient implements ClientModInitializer {
                         return 1;
                     })
             );
-
             dispatcher.register(ClientCommandManager.literal("friends")
                     .then(ClientCommandManager.literal("add")
                             .then(ClientCommandManager.argument("name", com.mojang.brigadier.arguments.StringArgumentType.word())
@@ -80,34 +77,10 @@ public class VisualsClient implements ClientModInitializer {
                                             Config.friends.add(name);
                                             Config.save();
                                             ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§aДруг " + name + " добавлен!"));
-                                        } else {
-                                            ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§cЭтот игрок уже в друзьях!"));
                                         }
                                         return 1;
                                     })
                             )
-                    )
-                    .then(ClientCommandManager.literal("remove")
-                            .then(ClientCommandManager.argument("name", com.mojang.brigadier.arguments.StringArgumentType.word())
-                                    .executes(ctx -> {
-                                        String name = com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "name");
-                                        if (Config.friends.remove(name)) {
-                                            Config.save();
-                                            ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§aДруг " + name + " удален!"));
-                                        } else {
-                                            ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§cЭтого игрока нет в друзьях!"));
-                                        }
-                                        return 1;
-                                    })
-                            )
-                    )
-                    .then(ClientCommandManager.literal("clear")
-                            .executes(ctx -> {
-                                Config.friends.clear();
-                                Config.save();
-                                ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§aСписок друзей очищен!"));
-                                return 1;
-                            })
                     )
             );
         });
