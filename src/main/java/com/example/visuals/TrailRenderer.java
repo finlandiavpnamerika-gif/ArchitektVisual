@@ -3,7 +3,7 @@ package com.example.visuals;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.debug.gizmo.GizmoDrawing; // Новый класс Gizmos
+import net.minecraft.gizmos.Gizmos; // Новый класс
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +29,6 @@ public class TrailRenderer {
         }
     }
 
-    // Вызывается из события рендера
     public static void render() {
         if (!Config.trails || TRAILS.isEmpty()) return;
 
@@ -40,8 +39,8 @@ public class TrailRenderer {
                 Vec3d p1 = trail.get(i);
                 Vec3d p2 = trail.get(i + 1);
 
-                // GizmoDrawing.line(start, end, color) - самый простой способ
-                GizmoDrawing.line(p1, p2, color);
+                // Gizmos.line(start, end, color)
+                Gizmos.line(p1, p2, color);
             }
         }
     }
