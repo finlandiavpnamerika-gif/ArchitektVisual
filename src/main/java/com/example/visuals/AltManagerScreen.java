@@ -26,12 +26,11 @@ public class AltManagerScreen extends Screen {
     protected void init() {
         super.init();
         
-        // Поле ввода
         this.nameField = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 40, 200, 20, Text.literal("Введите ник"));
         this.nameField.setMaxLength(16);
         this.addDrawableChild(this.nameField);
 
-        // Кнопка "Добавить в список"
+        // Кнопка "Добавить"
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Добавить"), button -> {
             String name = nameField.getText().trim();
             if (!name.isEmpty() && !Config.alts.contains(name)) {
@@ -41,7 +40,7 @@ public class AltManagerScreen extends Screen {
             }
         }).dimensions(this.width / 2 - 100, 65, 95, 20).build());
 
-        // Кнопка "Сменить ник"
+        // Кнопка "Войти" (смена ника)
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Войти"), button -> {
             String name = nameField.getText().trim();
             if (!name.isEmpty()) {
@@ -59,29 +58,13 @@ public class AltManagerScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         
-        // Список сохраненных альтов
         int startY = 100;
-        context.drawTextWithShadow(this.textRenderer, "Сохраненные ники (нажми, чтобы войти):", this.width / 2 - 100, startY, 0xFFFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, "Сохраненные ники (введи и нажми Войти):", this.width / 2 - 100, startY, 0xFFFFFFFF);
         startY += 15;
         for (String alt : Config.alts) {
-            boolean hov = mouseX >= this.width / 2 - 100 && mouseX <= this.width / 2 + 100 && mouseY >= startY - 2 && mouseY <= startY + 10;
-            context.drawTextWithShadow(this.textRenderer, (hov ? "§a> " : "§7- ") + alt, this.width / 2 - 100, startY, 0xFFFFFFFF);
+            context.drawTextWithShadow(this.textRenderer, "- " + alt, this.width / 2 - 100, startY, 0xFF7CE38B);
             startY += 12;
         }
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int startY = 115; // 100 + 15
-        for (String alt : Config.alts) {
-            boolean hov = mouseX >= this.width / 2 - 100 && mouseX <= this.width / 2 + 100 && mouseY >= startY - 2 && mouseY <= startY + 10;
-            if (hov && button == 0) {
-                changeUsername(alt);
-                return true;
-            }
-            startY += 12;
-        }
-        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     // МЕТОД СМЕНЫ НИКА
@@ -89,18 +72,15 @@ public class AltManagerScreen extends Screen {
         try {
             MinecraftClient mc = MinecraftClient.getInstance();
             
-            // Создаем UUID для оффлайн режима
             UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + newName).getBytes());
             
             // В 1.21.11 конструктор требует Optional
             Session newSession = new Session(newName, uuid, "0", Optional.empty(), Optional.empty(), Session.AccountType.LEGACY);
             
-            // Подменяем сессию через рефлексию
             Field sessionField = MinecraftClient.class.getDeclaredField("session");
             sessionField.setAccessible(true);
             sessionField.set(mc, newSession);
             
-            // Меняем ник в профиле игрока (чтобы отображалось над головой)
             if (mc.player != null) {
                 Field gameProfileField = mc.player.getClass().getDeclaredField("gameProfile");
                 gameProfileField.setAccessible(true);
