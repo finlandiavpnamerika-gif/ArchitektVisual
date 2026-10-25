@@ -12,9 +12,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TrailRenderer {
-    // Храним историю позиций для каждого игрока
     private static final Map<UUID, List<Vec3d>> TRAILS = new ConcurrentHashMap<>();
-    private static final int MAX_POINTS = 60; // Длина трейла
+    private static final int MAX_POINTS = 60;
 
     public static void tick() {
         MinecraftClient mc = MinecraftClient.getInstance();
@@ -24,21 +23,15 @@ public class TrailRenderer {
             if (Config.friends.contains(player.getName().getString()) || player == mc.player) {
                 List<Vec3d> trail = TRAILS.computeIfAbsent(player.getUuid(), k -> new ArrayList<>());
                 Vec3d pos = new Vec3d(player.getX(), player.getY() + 0.1, player.getZ());
-                
-                // Добавляем точку, если игрок сдвинулся
                 if (trail.isEmpty() || trail.get(trail.size() - 1).squaredDistanceTo(pos) > 0.01) {
                     trail.add(pos);
                 }
-                
-                // Ограничиваем длину
-                while (trail.size() > MAX_POINTS) {
-                    trail.remove(0);
-                }
+                while (trail.size() > MAX_POINTS) trail.remove(0);
             }
         }
     }
 
-    // Вызывается из события WorldRenderEvents.AFTER_ENTITIES
+    // Вызывается из нового WorldRenderEvents (AFTER_ENTITIES)
     public static void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double camX, double camY, double camZ) {
         if (!Config.trails || TRAILS.isEmpty() || vertexConsumers == null) return;
 
@@ -48,7 +41,8 @@ public class TrailRenderer {
         float b = (color & 0xFF) / 255f;
         float a = 1.0f;
 
-        // В 1.21.11 используем RenderLayer.getLines() для линий
+        // В 1.21.11 используем RenderLayer.getLines() ЕСТЬ! (В новых маппингах он называется иначе)
+        // Но чтобы точно работало, используем VertexFormat.Mode.LINES
         VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getLines());
         Matrix4f matrix = matrices.peek().getPositionMatrix();
 
@@ -57,18 +51,15 @@ public class TrailRenderer {
                 Vec3d p1 = trail.get(i);
                 Vec3d p2 = trail.get(i + 1);
 
-                // Координаты ОТНОСИТЕЛЬНО камеры (важно для 1.21.11)
                 float x1 = (float) (p1.x - camX);
                 float y1 = (float) (p1.y - camY);
                 float z1 = (float) (p1.z - camZ);
-                
                 float x2 = (float) (p2.x - camX);
                 float y2 = (float) (p2.y - camY);
                 float z2 = (float) (p2.z - camZ);
 
-                // Рисуем линию (цвет + нормаль для линий)
-                buffer.vertex(matrix, x1, y1, z1).color(r, g, b, a).normal(0, 1, 0);
-                buffer.vertex(matrix, x2, y2, z2).color(r, g, b, a).normal(0, 1, 0);
+                buffer.vertex(matrix, x1, y1, z1).color(r, g, b, a);
+                buffer.vertex(matrix, x2, y2, z2).color(r, g, b, a);
             }
         }
     }
