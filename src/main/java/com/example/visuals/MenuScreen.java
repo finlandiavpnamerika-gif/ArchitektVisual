@@ -154,7 +154,7 @@ public class MenuScreen extends Screen {
         if (open.contains("zoom")) { Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true); cy += 2; }
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("hud", 9) + mh("arraylist", 5);
+        int hVis = 34 + mh("fb", 1) + mh("hud", 9) + mh("arraylist", 5) + mh("trails", 2);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
@@ -179,6 +179,12 @@ public class MenuScreen extends Screen {
             Config.arrayListY = (int) cslider(g, "Y", 0, 250, Config.arrayListY, true);
             cy += 2;
         }
+        Config.trails = module(g, "trails", "Trails", "", Config.trails, 2);
+        if (open.contains("trails")) {
+            Config.trailsColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.trailsColor);
+            Config.trailsLength = cslider(g, "Длина", 0.5, 3.0, Config.trailsLength, false);
+            cy += 2;
+        }
 
         // 3. Performance
         int hPerf = 34 + mh("dist", 1);
@@ -186,7 +192,7 @@ public class MenuScreen extends Screen {
         Config.limitDist = module(g, "dist", "Лимит дальности", "", Config.limitDist, 1);
         if (open.contains("dist")) { Config.viewDist = cslider(g, "Чанки", 2, 32, Config.viewDist, true); cy += 2; }
 
-        // 4. Client (Только софт)
+        // 4. Client
         int hItems = 34 + mh("autoswap", Config.swapPairs.size() + 1) + mh("itembind", Config.binds.size() + 1);
         panel(g, "Client", x0 + step * 3, y0, colW, hItems);
 
@@ -226,7 +232,7 @@ public class MenuScreen extends Screen {
         int maxH1 = Math.max(Math.max(hUtil, hVis), Math.max(hPerf, hItems));
         int y1 = y0 + maxH1 + 10;
 
-        // 5. Extra HUD (Keystrokes + Armor)
+        // 5. Extra HUD
         int hExtra = 34 + mh("keystrokes", 5) + mh("armor", 5);
         panel(g, "Extra HUD", x0, y1, colW, hExtra);
 
@@ -251,12 +257,9 @@ public class MenuScreen extends Screen {
             cy += 2;
         }
 
-        // 6. Social (Alts + Friends)
-        int hSocial = 34 + 24 + 24; // Место под две кнопки
+        // 6. Social
+        int hSocial = 34 + 24; 
         panel(g, "Social", x0 + step, y1, colW, hSocial);
-        
-        module(g, "alts", "Alt Manager", "", true, 0);
-        screenButton(g, "-> Открыть Alts", new AltManagerScreen(this));
         
         module(g, "friends", "Friends", "", true, 0);
         screenButton(g, "-> Открыть Friends", new FriendsScreen(this));
