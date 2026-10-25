@@ -6,7 +6,8 @@
     "HandledScreenAccessor",
     "SimpleOptionAccessor",
     "TitleScreenMixin",
-    "InventoryScreenMixin"
+    "InventoryScreenMixin",
+    "MinecraftClientAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
