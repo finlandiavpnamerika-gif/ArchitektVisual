@@ -2,52 +2,56 @@ package com.example.visuals;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.gizmos.Gizmos; // ПРАВИЛЬНЫЙ ПАКЕТ
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class TrailRenderer {
-    private static final Map<UUID, List<Vec3d>> TRAILS = new ConcurrentHashMap<>();
-    private static final int MAX_POINTS = 60;
+    private static final Map<UUID, Long> lastSpawn = new HashMap<>();
 
     public static void tick() {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.world == null || mc.player == null || !Config.trails) return;
 
-        for (PlayerEntity player : mc.world.getPlayers()) {
-            if (Config.friends.contains(player.getName().getString()) || player == mc.player) {
-                List<Vec3d> trail = TRAILS.computeIfAbsent(player.getUuid(), k -> new ArrayList<>());
-                Vec3d pos = new Vec3d(player.getX(), player.getY() + 0.1, player.getZ());
-                
-                if (trail.isEmpty() || trail.get(trail.size() - 1).squaredDistanceTo(pos) > 0.01) {
-                    trail.add(pos);
-                }
-                while (trail.size() > MAX_POINTS) trail.remove(0);
-            }
+        long now = System.currentTimeMillis();
+
+        // Выбор цвета частиц
+        ParticleEffect particle;
+        switch (Config.trailsColor) {
+            case 0: particle = ParticleTypes.DRAGON_BREATH; break; // Фиолетовый
+            case 1: particle = ParticleTypes.ELECTRIC_SPARK; break; // Голубой
+            case 2: particle = ParticleTypes.HAPPY_VILLAGER; break; // Зелёный
+            case 3: particle = ParticleTypes.FIREWORK; break;       // Жёлтый
+            case 4: particle = ParticleTypes.CRIT; break;           // Красный
+            default: particle = ParticleTypes.END_ROD; break;
         }
-    }
 
-    // Вызывается из события рендера
-    public static void render() {
-        if (!Config.trails || TRAILS.isEmpty()) return;
+        for (PlayerEntity player : mc.world.getPlayers()) {
+            boolean isMoving = player.getVelocity().lengthSquared() > 0.001;
+            if (!isMoving) continue;
 
-        int color = Config.COLORS[Config.trailsColor];
-        int a = (color >> 24) & 0xFF;
-        int r = (color >> 16) & 0xFF;
-        int g = (color >> 8) & 0xFF;
-        int b = color & 0xFF;
-        int argbColor = ColorHelper.getArgb(a, r, g, b);
-
-        for (List<Vec3d> trail : TRAILS.values()) {
-            for (int i = 0; i < trail.size() - 1; i++) {
-                Vec3d p1 = trail.get(i);
-                Vec3d p2 = trail.get(i + 1);
+            if (Config.friends.contains(player.getName().getString()) || player == mc.player) {
+                long last = lastSpawn.getOrDefault(player.getUuid(), 0L);
                 
-                // Gizmos.line(start, end, color) - правильный метод
-                Gizmos.line(p1, p2, argbColor);
+                // Спавним каждые 5 мс
+                if (now - last > 5) {
+                    // Заполняем весь рост (от 0 до 1.8 блока)
+                    for (int i = 0; i < 6; i++) {
+                        double yOffset = Math.random() * 1.8;
+                        
+                        mc.particleManager.addParticle(
+                                particle,
+                                player.getX() + (Math.random() - 0.5) * 0.3,
+                                player.getY() + yOffset,
+                                player.getZ() + (Math.random() - 0.5) * 0.3,
+                                0, 0, 0
+                        );
+                    }
+                    lastSpawn.put(player.getUuid(), now);
+                }
             }
         }
     }
