@@ -1,14 +1,17 @@
 package com.example.visuals;
 
+import com.example.visuals.mixin.MinecraftClientAccessor;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.session.Session;
 import net.minecraft.text.Text;
 
 import java.lang.reflect.Field;
+import java.util.Optional;
 import java.util.UUID;
 
 public class AltManagerScreen extends Screen {
@@ -28,7 +31,6 @@ public class AltManagerScreen extends Screen {
         this.nameField.setMaxLength(16);
         this.addDrawableChild(this.nameField);
 
-        // Кнопка "Добавить в список"
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Добавить"), button -> {
             String name = nameField.getText().trim();
             if (!name.isEmpty() && !Config.alts.contains(name)) {
@@ -38,15 +40,13 @@ public class AltManagerScreen extends Screen {
             }
         }).dimensions(this.width / 2 - 100, 65, 95, 20).build());
 
-        // Кнопка "Войти" (Смена ника)
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Войти"), button -> {
             String name = nameField.getText().trim();
             if (!name.isEmpty()) {
-                changeLocalUsername(name);
+                changeUsername(name);
             }
         }).dimensions(this.width / 2 + 5, 65, 95, 20).build());
 
-        // Кнопка "Назад"
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Назад"), button -> {
             if (this.client != null) this.client.setScreen(parent);
         }).dimensions(this.width / 2 - 100, this.height - 40, 200, 20).build());
@@ -57,30 +57,34 @@ public class AltManagerScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         
         int startY = 100;
-        context.drawTextWithShadow(this.textRenderer, "Сохраненные ники (нажми на ник):", this.width / 2 - 100, startY, 0xFFFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, "Сохраненные ники (нажми 'Войти'):", this.width / 2 - 100, startY, 0xFFFFFFFF);
         startY += 15;
         
-        // Рисуем список ников и кнопки для них
-        int buttonY = startY;
         for (String alt : Config.alts) {
-            // Рисуем текст
-            context.drawTextWithShadow(this.textRenderer, "- " + alt, this.width / 2 - 100, buttonY + 5, 0xFF7CE38B);
+            // Рисуем кнопку для каждого ника
+            int finalStartY = startY;
+            this.addDrawableChild(ButtonWidget.builder(Text.literal("Войти: " + alt), button -> {
+                changeUsername(alt);
+            }).dimensions(this.width / 2 - 100, finalStartY, 200, 16).build());
             
-            // Добавляем кнопку "Войти" рядом с ником
-            final String finalAlt = alt;
-            this.addDrawableChild(ButtonWidget.builder(Text.literal("Войти"), button -> {
-                changeLocalUsername(finalAlt);
-            }).dimensions(this.width / 2 + 50, buttonY, 50, 16).build());
-            
-            buttonY += 20;
+            startY += 20;
         }
     }
 
-    private void changeLocalUsername(String newName) {
+    private void changeUsername(String newName) {
         try {
             MinecraftClient mc = MinecraftClient.getInstance();
             if (mc.player == null) return;
 
+            UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + newName).getBytes());
+            
+            // 1. Создаем новую сессию (с Optional)
+            Session newSession = new Session(newName, uuid, "0", Optional.empty(), Optional.empty(), Session.AccountType.LEGACY);
+            
+            // 2. Меняем сессию через аксессор
+            ((MinecraftClientAccessor) mc).setSession(newSession);
+            
+            // 3. Меняем профиль игрока
             Field gameProfileField = mc.player.getClass().getDeclaredField("gameProfile");
             gameProfileField.setAccessible(true);
             GameProfile profile = (GameProfile) gameProfileField.get(mc.player);
@@ -91,9 +95,9 @@ public class AltManagerScreen extends Screen {
             
             Field idField = GameProfile.class.getDeclaredField("id");
             idField.setAccessible(true);
-            idField.set(profile, UUID.nameUUIDFromBytes(("OfflinePlayer:" + newName).getBytes()));
+            idField.set(profile, uuid);
 
-            mc.player.sendMessage(Text.literal("§aНик (локально) изменен на: " + newName), false);
+            mc.player.sendMessage(Text.literal("§aНик изменен на: " + newName + ". Перезайди на сервер!"), false);
         } catch (Exception e) {
             if (MinecraftClient.getInstance().player != null) {
                 MinecraftClient.getInstance().player.sendMessage(Text.literal("§cОшибка: " + e.getMessage()), false);
