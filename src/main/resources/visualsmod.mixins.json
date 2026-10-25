@@ -6,7 +6,8 @@
     "HandledScreenAccessor",
     "SimpleOptionAccessor",
     "TitleScreenMixin",
-    "InventoryScreenMixin"
+    "InventoryScreenMixin",
+    "ChatHudMixin"
   ],
   "injectors": {
     "defaultRequire": 1
