@@ -1,40 +1,74 @@
 package com.example.visuals;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.*;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.ParticleTypes;
+import net.minecraft.util.math.Vec3d;
+import org.joml.Matrix4f;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TrailRenderer {
-    private static final Map<UUID, Long> lastSpawn = new HashMap<>();
+    // Храним историю позиций для каждого игрока
+    private static final Map<UUID, List<Vec3d>> TRAILS = new ConcurrentHashMap<>();
+    private static final int MAX_POINTS = 60; // Длина трейла
 
     public static void tick() {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.world == null || mc.player == null || !Config.trails) return;
 
-        long now = System.currentTimeMillis();
-
         for (PlayerEntity player : mc.world.getPlayers()) {
-            boolean isMoving = player.getVelocity().lengthSquared() > 0.001;
-            if (!isMoving) continue;
-
             if (Config.friends.contains(player.getName().getString()) || player == mc.player) {
-                long last = lastSpawn.getOrDefault(player.getUuid(), 0L);
+                List<Vec3d> trail = TRAILS.computeIfAbsent(player.getUuid(), k -> new ArrayList<>());
+                Vec3d pos = new Vec3d(player.getX(), player.getY() + 0.1, player.getZ());
                 
-                if (now - last > 50) {
-                    // Используем particleManager.addParticle - публичный метод
-                    mc.particleManager.addParticle(
-                            ParticleTypes.END_ROD,
-                            player.getX(),
-                            player.getY() + 0.1,
-                            player.getZ(),
-                            0, 0, 0
-                    );
-                    lastSpawn.put(player.getUuid(), now);
+                // Добавляем точку, если игрок сдвинулся
+                if (trail.isEmpty() || trail.get(trail.size() - 1).squaredDistanceTo(pos) > 0.01) {
+                    trail.add(pos);
                 }
+                
+                // Ограничиваем длину
+                while (trail.size() > MAX_POINTS) {
+                    trail.remove(0);
+                }
+            }
+        }
+    }
+
+    // Вызывается из события WorldRenderEvents.AFTER_ENTITIES
+    public static void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double camX, double camY, double camZ) {
+        if (!Config.trails || TRAILS.isEmpty() || vertexConsumers == null) return;
+
+        int color = Config.COLORS[Config.trailsColor];
+        float r = ((color >> 16) & 0xFF) / 255f;
+        float g = ((color >> 8) & 0xFF) / 255f;
+        float b = (color & 0xFF) / 255f;
+        float a = 1.0f;
+
+        // В 1.21.11 используем RenderLayer.getLines() для линий
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getLines());
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
+
+        for (List<Vec3d> trail : TRAILS.values()) {
+            for (int i = 0; i < trail.size() - 1; i++) {
+                Vec3d p1 = trail.get(i);
+                Vec3d p2 = trail.get(i + 1);
+
+                // Координаты ОТНОСИТЕЛЬНО камеры (важно для 1.21.11)
+                float x1 = (float) (p1.x - camX);
+                float y1 = (float) (p1.y - camY);
+                float z1 = (float) (p1.z - camZ);
+                
+                float x2 = (float) (p2.x - camX);
+                float y2 = (float) (p2.y - camY);
+                float z2 = (float) (p2.z - camZ);
+
+                // Рисуем линию (цвет + нормаль для линий)
+                buffer.vertex(matrix, x1, y1, z1).color(r, g, b, a).normal(0, 1, 0);
+                buffer.vertex(matrix, x2, y2, z2).color(r, g, b, a).normal(0, 1, 0);
             }
         }
     }
