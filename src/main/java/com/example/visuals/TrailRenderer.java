@@ -1,12 +1,10 @@
 package com.example.visuals;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
-import org.joml.Matrix4f;
+import net.minecraft.util.math.ColorHelper;
+import net.minecraft.gizmos.Gizmos; // Новый класс Gizmos
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +21,7 @@ public class TrailRenderer {
             if (Config.friends.contains(player.getName().getString()) || player == mc.player) {
                 List<Vec3d> trail = TRAILS.computeIfAbsent(player.getUuid(), k -> new ArrayList<>());
                 Vec3d pos = new Vec3d(player.getX(), player.getY() + 0.1, player.getZ());
+                
                 if (trail.isEmpty() || trail.get(trail.size() - 1).squaredDistanceTo(pos) > 0.01) {
                     trail.add(pos);
                 }
@@ -31,41 +30,26 @@ public class TrailRenderer {
         }
     }
 
-    // Рисуем линии через BufferBuilder (стандартный метод, работает в 1.21.11)
-    public static void render(MatrixStack matrices, double camX, double camY, double camZ) {
+    // Вызывается из LevelRenderEvents (новый API 1.21.11)
+    public static void render() {
         if (!Config.trails || TRAILS.isEmpty()) return;
 
+        // Gizmos использует ARGB (Alpha, Red, Green, Blue)
         int color = Config.COLORS[Config.trailsColor];
-        float r = ((color >> 16) & 0xFF) / 255f;
-        float g = ((color >> 8) & 0xFF) / 255f;
-        float b = (color & 0xFF) / 255f;
-        float a = 1.0f;
-
-        // Стандартный BufferBuilder для линий
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-        
-        Matrix4f matrix = matrices.peek().getPositionMatrix();
+        int a = (color >> 24) & 0xFF;
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+        int argbColor = ColorHelper.getArgb(a, r, g, b);
 
         for (List<Vec3d> trail : TRAILS.values()) {
             for (int i = 0; i < trail.size() - 1; i++) {
                 Vec3d p1 = trail.get(i);
                 Vec3d p2 = trail.get(i + 1);
-
-                // Координаты относительно камеры
-                float x1 = (float) (p1.x - camX);
-                float y1 = (float) (p1.y - camY);
-                float z1 = (float) (p1.z - camZ);
-                float x2 = (float) (p2.x - camX);
-                float y2 = (float) (p2.y - camY);
-                float z2 = (float) (p2.z - camZ);
-
-                buffer.vertex(matrix, x1, y1, z1).color(r, g, b, a);
-                buffer.vertex(matrix, x2, y2, z2).color(r, g, b, a);
+                
+                // Рисуем линию через Gizmos
+                Gizmos.line(p1, p2, argbColor);
             }
         }
-
-        // Завершаем и рисуем
-        BufferRenderer.drawWithGlobalProgram(buffer.end());
     }
 }
