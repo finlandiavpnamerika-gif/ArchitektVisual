@@ -47,12 +47,57 @@ public class VisualsClient implements ClientModInitializer {
             }
         });
 
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-                dispatcher.register(ClientCommandManager.literal("visuals").executes(ctx -> {
-                    MinecraftClient mc = ctx.getSource().getClient();
-                    mc.send(() -> mc.setScreen(new MenuScreen()));
-                    return 1;
-                })));
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            // Команда /visuals
+            dispatcher.register(ClientCommandManager.literal("visuals")
+                    .executes(ctx -> {
+                        MinecraftClient mc = ctx.getSource().getClient();
+                        mc.send(() -> mc.setScreen(new MenuScreen()));
+                        return 1;
+                    })
+            );
+
+            // Команда .friends
+            dispatcher.register(ClientCommandManager.literal(".friends")
+                    .then(ClientCommandManager.literal("add")
+                            .then(ClientCommandManager.argument("name", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                    .executes(ctx -> {
+                                        String name = com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "name");
+                                        if (!Config.friends.contains(name)) {
+                                            Config.friends.add(name);
+                                            Config.save();
+                                            ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§aДруг " + name + " добавлен!"));
+                                        } else {
+                                            ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§cЭтот игрок уже в друзьях!"));
+                                        }
+                                        return 1;
+                                    })
+                            )
+                    )
+                    .then(ClientCommandManager.literal("remove")
+                            .then(ClientCommandManager.argument("name", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                    .executes(ctx -> {
+                                        String name = com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "name");
+                                        if (Config.friends.remove(name)) {
+                                            Config.save();
+                                            ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§aДруг " + name + " удален!"));
+                                        } else {
+                                            ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§cЭтого игрока нет в друзьях!"));
+                                        }
+                                        return 1;
+                                    })
+                            )
+                    )
+                    .then(ClientCommandManager.literal("clear")
+                            .executes(ctx -> {
+                                Config.friends.clear();
+                                Config.save();
+                                ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§aСписок друзей очищен!"));
+                                return 1;
+                            })
+                    )
+            );
+        });
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
             Features.restore(client);
