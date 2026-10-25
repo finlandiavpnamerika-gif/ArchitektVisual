@@ -22,10 +22,6 @@ public final class Features {
     private static int origFov = -1;
     private static int origView = -1;
 
-    // AutoReconnect
-    private static boolean wasDisconnected = false;
-    private static long disconnectTime = 0;
-
     public static void tick(MinecraftClient mc) {
         if (mc.options == null) return;
         GameOptions o = mc.options;
@@ -74,28 +70,23 @@ public final class Features {
             }
         }
 
-        // AutoReconnect
-        tickAutoReconnect(mc);
-    }
+        // Время
+        if (mc.world != null && Config.customTime) {
+            mc.world.setTimeOfDay(Config.timeValue);
+        }
 
-    private static void tickAutoReconnect(MinecraftClient mc) {
-        if (!Config.autoReconnect) {
-            wasDisconnected = false;
-            return;
-        }
-        if (mc.player != null && mc.world != null) {
-            wasDisconnected = false;
-            return;
-        }
-        if (mc.currentScreen instanceof net.minecraft.client.gui.screen.DisconnectedScreen) {
-            if (!wasDisconnected) {
-                wasDisconnected = true;
-                disconnectTime = System.currentTimeMillis();
+        // Погода
+        if (mc.world != null && Config.customWeather) {
+            if (Config.weatherType == 0) {
+                mc.world.setRainGradient(0f);
+                mc.world.setThunderGradient(0f);
+            } else if (Config.weatherType == 1) {
+                mc.world.setRainGradient(1f);
+                mc.world.setThunderGradient(0f);
+            } else if (Config.weatherType == 2) {
+                mc.world.setRainGradient(1f);
+                mc.world.setThunderGradient(1f);
             }
-            // Заготовка под будущий AutoReconnect
-            // (полноценный требует запоминания последнего IP)
-        } else {
-            wasDisconnected = false;
         }
     }
 
@@ -109,8 +100,7 @@ public final class Features {
             if (origGamma >= 0) mc.options.getGamma().setValue(origGamma);
             if (origFov >= 0) mc.options.getFov().setValue(origFov);
             if (origView >= 0) mc.options.getViewDistance().setValue(origView);
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
         origGamma = -1.0;
         origFov = -1;
         origView = -1;
@@ -122,26 +112,30 @@ public final class Features {
         return String.format(Locale.ROOT, "%02d:%02d", s / 60, s % 60);
     }
 
-    /** Главный HUD — вызывается из VisualsClient через HudElementRegistry. */
     public static void hud(DrawContext g, RenderTickCounter tick) {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null || mc.options.hudHidden) return;
 
-        if (Config.hud) {
-            renderInfoHud(g, mc);
-        }
-        if (Config.arrayList) {
-            ArrayListHud.render(g, mc);
-        }
-        if (Config.keystrokes) {
-            KeystrokesHud.render(g, mc);
-        }
-        if (Config.armorHud) {
-            ArmorHud.render(g, mc);
-        }
-    }
+        // === КАСТОМНОЕ НЕБО ===
+        if (Config.customSky && mc.player.getPitch() < -45.0f) {
+            int w = mc.getWindow().getScaledWidth();
+            int h = mc.getWindow().getScaledHeight();
+            
+            g.fillGradient(0, 0, w, h / 2, Config.skyColor1, Config.skyColor2);
+            g.fillGradient(0, h / 2, w, h, Config.skyColor2, Config.skyColor1);
 
-    private static void renderInfoHud(DrawContext g, MinecraftClient mc) {
+            if (Config.skyLines) {
+                long time = System.currentTimeMillis();
+                int offset = (int) ((time / 50) * Config.skySpeed % w);
+                for (int i = 0; i < w; i += 100) {
+                    int x = (i + offset) % w;
+                    g.fill(x, 0, x + 2, h, 0x30FFFFFF); 
+                }
+            }
+        }
+
+        if (!Config.hud) return;
+
         TextRenderer tr = mc.textRenderer;
 
         List<String> lines = new ArrayList<>();
@@ -173,7 +167,7 @@ public final class Features {
         int w = tr.getWidth(title);
         for (String s : lines) w = Math.max(w, tr.getWidth(s));
         for (String s : effects) w = Math.max(w, tr.getWidth(s));
-        int h = 12 + lines.size() * 10 + (effects.isEmpty() ? 0 : 12 + effects.size() * 10) + 4;
+        int h = 14 + lines.size() * 10 + (effects.isEmpty() ? 0 : 14 + effects.size() * 10) + 4;
 
         Matrix3x2fStack m = g.getMatrices();
         m.pushMatrix();
@@ -181,24 +175,22 @@ public final class Features {
         m.scale((float) Config.hudScale, (float) Config.hudScale);
 
         int color = Config.COLORS[Config.hudColor];
-
-        // Фон + полоса слева
-        g.fill(0, 0, w + 10, h, Theme.HUD_BG);
+        g.fill(0, 0, w + 10, h, 0x90000000);
         g.fill(0, 0, 2, h, color);
 
         int y = 3;
         g.drawTextWithShadow(tr, title, 6, y, color);
-        y += 11;
+        y += 12;
         for (String s : lines) {
-            g.drawTextWithShadow(tr, s, 6, y, Theme.TEXT);
+            g.drawTextWithShadow(tr, s, 6, y, -1);
             y += 10;
         }
         if (!effects.isEmpty()) {
-            y += 2;
+            y += 3;
             g.drawTextWithShadow(tr, "EFFECTS", 6, y, color);
             y += 11;
             for (String s : effects) {
-                g.drawTextWithShadow(tr, s, 6, y, Theme.TEXT);
+                g.drawTextWithShadow(tr, s, 6, y, -1);
                 y += 10;
             }
         }
