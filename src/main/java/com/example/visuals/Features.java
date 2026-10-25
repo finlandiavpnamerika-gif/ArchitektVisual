@@ -70,9 +70,9 @@ public final class Features {
             }
         }
 
-        // Время
+        // Время (исправлено для 1.21.11)
         if (mc.world != null && Config.customTime) {
-            mc.world.setTimeOfDay(Config.timeValue);
+            mc.world.getLevelProperties().setTimeOfDay(Config.timeValue);
         }
 
         // Погода
