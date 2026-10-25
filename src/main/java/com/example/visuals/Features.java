@@ -70,7 +70,7 @@ public final class Features {
             }
         }
 
-        // Время (исправлено для 1.21.11)
+        // Время
         if (mc.world != null && Config.customTime) {
             mc.world.getLevelProperties().setTimeOfDay(Config.timeValue);
         }
@@ -116,23 +116,7 @@ public final class Features {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null || mc.options.hudHidden) return;
 
-        // === КАСТОМНОЕ НЕБО ===
-        if (Config.customSky && mc.player.getPitch() < -45.0f) {
-            int w = mc.getWindow().getScaledWidth();
-            int h = mc.getWindow().getScaledHeight();
-            
-            g.fillGradient(0, 0, w, h / 2, Config.skyColor1, Config.skyColor2);
-            g.fillGradient(0, h / 2, w, h, Config.skyColor2, Config.skyColor1);
-
-            if (Config.skyLines) {
-                long time = System.currentTimeMillis();
-                int offset = (int) ((time / 50) * Config.skySpeed % w);
-                for (int i = 0; i < w; i += 100) {
-                    int x = (i + offset) % w;
-                    g.fill(x, 0, x + 2, h, 0x30FFFFFF); 
-                }
-            }
-        }
+        // УБРАНО КАСТОМНОЕ НЕБО
 
         if (!Config.hud) return;
 
