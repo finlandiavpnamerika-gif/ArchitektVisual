@@ -38,16 +38,10 @@ public class VisualsClient implements ClientModInitializer {
             TrailRenderer.tick();
         });
 
-        // Новый WorldRenderEvents (Fabric 1.21.11)
+        // Новый WorldRenderEvents (1.21.10+)
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
             if (Config.trails) {
-                TrailRenderer.render(
-                        context.matrixStack(),
-                        context.consumers(),
-                        context.camera().getPos().x,
-                        context.camera().getPos().y,
-                        context.camera().getPos().z
-                );
+                TrailRenderer.render();
             }
         });
 
