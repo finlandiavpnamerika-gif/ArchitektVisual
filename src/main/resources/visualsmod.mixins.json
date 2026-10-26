@@ -6,8 +6,10 @@
     "HandledScreenAccessor",
     "SimpleOptionAccessor",
     "TitleScreenMixin",
+    "InventoryScreenMixin",
     "ChatHudMixin",
-    "InGameHudMixin"
+    "InGameHudMixin",
+    "ScreenInvokerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
