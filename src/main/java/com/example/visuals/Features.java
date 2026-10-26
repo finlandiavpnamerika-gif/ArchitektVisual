@@ -26,6 +26,7 @@ public final class Features {
         if (mc.options == null) return;
         GameOptions o = mc.options;
 
+        // Fullbright
         SimpleOption<Double> gamma = o.getGamma();
         if (Config.fullbright) {
             if (origGamma < 0) origGamma = gamma.getValue();
@@ -35,6 +36,7 @@ public final class Features {
             origGamma = -1.0;
         }
 
+        // Zoom
         SimpleOption<Integer> fov = o.getFov();
         boolean zooming = Config.zoom && VisualsClient.zoomKey.isPressed() && mc.currentScreen == null;
         if (zooming) {
@@ -46,6 +48,7 @@ public final class Features {
             origFov = -1;
         }
 
+        // Лимит дальности
         SimpleOption<Integer> view = o.getViewDistance();
         if (Config.limitDist) {
             if (origView < 0) origView = view.getValue();
@@ -56,6 +59,7 @@ public final class Features {
             origView = -1;
         }
 
+        // AutoSprint
         if (mc.player != null && Config.sprint && mc.currentScreen == null
                 && !mc.player.isSneaking() && !mc.player.isUsingItem()
                 && mc.player.getHungerManager().getFoodLevel() > 6) {
@@ -66,10 +70,12 @@ public final class Features {
             }
         }
 
+        // Время
         if (mc.world != null && Config.customTime) {
             mc.world.getLevelProperties().setTimeOfDay(Config.timeValue);
         }
 
+        // Погода
         if (mc.world != null && Config.customWeather) {
             if (Config.weatherType == 0) {
                 mc.world.setRainGradient(0f);
@@ -118,18 +124,12 @@ public final class Features {
             int size = Config.crosshairSize;
             int thick = Config.crosshairThickness;
 
-            // Центральная точка
             if (Config.crosshairDot) {
                 g.fill(cx - thick / 2, cy - thick / 2, cx + thick / 2, cy + thick / 2, color);
             }
-
-            // Верхняя палочка
             g.fill(cx - thick / 2, cy - size, cx + thick / 2, cy - thick, color);
-            // Нижняя палочка
             g.fill(cx - thick / 2, cy + thick, cx + thick / 2, cy + size, color);
-            // Левая палочка
             g.fill(cx - size, cy - thick / 2, cx - thick, cy + thick / 2, color);
-            // Правая палочка
             g.fill(cx + thick, cy - thick / 2, cx + size, cy + thick / 2, color);
         }
 
@@ -145,54 +145,4 @@ public final class Features {
             lines.add("Ping: " + (entry == null ? 0 : entry.getLatency()) + " ms");
         }
         if (Config.hudCoords) {
-            lines.add(String.format(Locale.ROOT, "X: %.1f / Y: %.1f / Z: %.1f",
-                    mc.player.getX(), mc.player.getY(), mc.player.getZ()));
-        }
-        if (Config.hudFacing) {
-            String f = mc.player.getHorizontalFacing().name().toLowerCase(Locale.ROOT);
-            lines.add(Character.toUpperCase(f.charAt(0)) + f.substring(1));
-        }
-
-        List<String> effects = new ArrayList<>();
-        if (Config.hudEffects) {
-            for (StatusEffectInstance e : mc.player.getStatusEffects()) {
-                String name = e.getEffectType().value().getName().getString();
-                if (e.getAmplifier() > 0) name = name + " " + (e.getAmplifier() + 1);
-                effects.add(name + "  " + time(e));
-            }
-        }
-
-        String title = "ArchitektVisuals";
-        int w = tr.getWidth(title);
-        for (String s : lines) w = Math.max(w, tr.getWidth(s));
-        for (String s : effects) w = Math.max(w, tr.getWidth(s));
-        int h = 14 + lines.size() * 10 + (effects.isEmpty() ? 0 : 14 + effects.size() * 10) + 4;
-
-        Matrix3x2fStack m = g.getMatrices();
-        m.pushMatrix();
-        m.translate((float) Config.hudX, (float) Config.hudY);
-        m.scale((float) Config.hudScale, (float) Config.hudScale);
-
-        int color = Config.COLORS[Config.hudColor];
-        g.fill(0, 0, w + 10, h, 0x90000000);
-        g.fill(0, 0, 2, h, color);
-
-        int y = 3;
-        g.drawTextWithShadow(tr, title, 6, y, color);
-        y += 12;
-        for (String s : lines) {
-            g.drawTextWithShadow(tr, s, 6, y, -1);
-            y += 10;
-        }
-        if (!effects.isEmpty()) {
-            y += 3;
-            g.drawTextWithShadow(tr, "EFFECTS", 6, y, color);
-            y += 11;
-            for (String s : effects) {
-                g.drawTextWithShadow(tr, s, 6, y, -1);
-                y += 10;
-            }
-        }
-        m.popMatrix();
-    }
-}
+            lines.add(String.format
