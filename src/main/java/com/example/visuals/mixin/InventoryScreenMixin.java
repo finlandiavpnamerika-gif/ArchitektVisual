@@ -1,7 +1,6 @@
 package com.example.visuals.mixin;
 
 import com.example.visuals.Config;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.util.Identifier;
@@ -15,30 +14,24 @@ public class InventoryScreenMixin {
 
     private static final Identifier BG = Identifier.of("visualsmod", "textures/gui/inventory_bg.png");
 
-    // Внедряемся ПЕРЕД отрисовкой основного интерфейса
     @Inject(method = "render", at = @At("HEAD"))
     private void visuals$drawInventoryBg(DrawContext g, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (!Config.customMainMenu) return;
 
         InventoryScreen self = (InventoryScreen) (Object) this;
         
-        int invWidth = 176;
-        int invHeight = 166;
+        // Делаем картинку побольше (250x250), чтобы она обрамляла инвентарь
+        int size = 250;
+        int x = (self.width - size) / 2;
+        int y = (self.height - size) / 2;
 
-        int x = (self.width - invWidth) / 2;
-        int y = (self.height - invHeight) / 2;
-
-        // Рисуем девушку на весь инвентарь (176x166)
+        // Рисуем. (1376, 768 - это реальный размер твоего файла, чтобы он не искажался)
         g.drawTexture(
-                RenderPipelines.GUI_TEXTURED, 
                 BG, 
                 x, y, 
                 0f, 0f, 
-                invWidth, invHeight, 
-                176, 166 
+                size, size, 
+                1376, 768 
         );
-        
-        // Накладываем полупрозрачный чёрный фильтр, чтобы слоты и Стив были видны
-        g.fill(x, y, x + invWidth, y + invHeight, 0x60000000); 
     }
 }
