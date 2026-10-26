@@ -2,7 +2,7 @@ package com.example.visuals;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.DefaultParticleType;
+import net.minecraft.particle.SimpleParticleType; // ПРАВИЛЬНЫЙ КЛАСС
 import net.minecraft.particle.ParticleTypes;
 
 import java.util.HashMap;
@@ -18,8 +18,8 @@ public class TrailRenderer {
 
         long now = System.currentTimeMillis();
 
-        // Используем DefaultParticleType, который подходит для всех базовых частиц
-        DefaultParticleType particle;
+        // Используем SimpleParticleType (бывший DefaultParticleType)
+        SimpleParticleType particle;
         switch (Config.trailsColor) {
             case 0: particle = ParticleTypes.DRAGON_BREATH; break; // Фиолетовый
             case 1: particle = ParticleTypes.ELECTRIC_SPARK; break; // Голубой
