@@ -2,7 +2,7 @@ package com.example.visuals;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.SimpleParticleType; // ПРАВИЛЬНЫЙ КЛАСС
+import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.particle.ParticleTypes;
 
 import java.util.HashMap;
@@ -18,16 +18,15 @@ public class TrailRenderer {
 
         long now = System.currentTimeMillis();
 
-        // Используем SimpleParticleType (бывший DefaultParticleType)
-        SimpleParticleType particle;
-        switch (Config.trailsColor) {
-            case 0: particle = ParticleTypes.DRAGON_BREATH; break; // Фиолетовый
-            case 1: particle = ParticleTypes.ELECTRIC_SPARK; break; // Голубой
-            case 2: particle = ParticleTypes.HAPPY_VILLAGER; break; // Зелёный
-            case 3: particle = ParticleTypes.FIREWORK; break;       // Жёлтый
-            case 4: particle = ParticleTypes.CRIT; break;           // Красный
-            default: particle = ParticleTypes.END_ROD; break;
-        }
+        // Берем частицу по индексу цвета, но БЕЗ switch, чтобы не было ошибок
+        SimpleParticleType particle = ParticleTypes.END_ROD;
+        int color = Config.trailsColor;
+        
+        if (color == 0) particle = ParticleTypes.WITCH;
+        else if (color == 1) particle = ParticleTypes.ELECTRIC_SPARK;
+        else if (color == 2) particle = ParticleTypes.HAPPY_VILLAGER;
+        else if (color == 3) particle = ParticleTypes.FIREWORK;
+        else if (color == 4) particle = ParticleTypes.CRIT;
 
         for (PlayerEntity player : mc.world.getPlayers()) {
             boolean isMoving = player.getVelocity().lengthSquared() > 0.001;
@@ -36,9 +35,7 @@ public class TrailRenderer {
             if (Config.friends.contains(player.getName().getString()) || player == mc.player) {
                 long last = lastSpawn.getOrDefault(player.getUuid(), 0L);
                 
-                // Спавним каждые 5 мс
                 if (now - last > 5) {
-                    // Заполняем весь рост (от 0 до 1.8 блока)
                     for (int i = 0; i < 6; i++) {
                         double yOffset = Math.random() * 1.8;
                         
