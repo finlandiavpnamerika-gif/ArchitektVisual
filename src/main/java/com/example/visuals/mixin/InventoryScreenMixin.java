@@ -1,6 +1,7 @@
 package com.example.visuals.mixin;
 
 import com.example.visuals.Config;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.util.Identifier;
@@ -20,13 +21,13 @@ public class InventoryScreenMixin {
 
         InventoryScreen self = (InventoryScreen) (Object) this;
         
-        // Делаем картинку побольше (250x250), чтобы она обрамляла инвентарь
         int size = 250;
         int x = (self.width - size) / 2;
         int y = (self.height - size) / 2;
 
-        // Рисуем. (1376, 768 - это реальный размер твоего файла, чтобы он не искажался)
+        // ДОБАВЛЕН RenderPipelines.GUI_TEXTURED
         g.drawTexture(
+                RenderPipelines.GUI_TEXTURED, 
                 BG, 
                 x, y, 
                 0f, 0f, 
