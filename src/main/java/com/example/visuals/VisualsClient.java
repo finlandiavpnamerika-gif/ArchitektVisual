@@ -35,7 +35,7 @@ public class VisualsClient implements ClientModInitializer {
             Features.tick(client);
             ItemFeatures.tick(client);
             TrailRenderer.tick();
-            FriendGlow.tick(client); // <-- ДОБАВЛЕНО
+            // FriendGlow убран
         });
 
         HudRenderCallback.EVENT.register((drawContext, tickCounter) -> Features.hud(drawContext, tickCounter));
@@ -64,8 +64,6 @@ public class VisualsClient implements ClientModInitializer {
                                             Config.friends.add(name);
                                             Config.save();
                                             ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§aДруг " + name + " добавлен!"));
-                                        } else {
-                                            ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§cЭтот игрок уже в друзьях!"));
                                         }
                                         return 1;
                                     })
@@ -78,20 +76,10 @@ public class VisualsClient implements ClientModInitializer {
                                         if (Config.friends.remove(name)) {
                                             Config.save();
                                             ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§aДруг " + name + " удален!"));
-                                        } else {
-                                            ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§cЭтого игрока нет в друзьях!"));
                                         }
                                         return 1;
                                     })
                             )
-                    )
-                    .then(ClientCommandManager.literal("clear")
-                            .executes(ctx -> {
-                                Config.friends.clear();
-                                Config.save();
-                                ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§aСписок друзей очищен!"));
-                                return 1;
-                            })
                     )
             );
         });
