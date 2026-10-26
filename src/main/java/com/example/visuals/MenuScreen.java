@@ -30,7 +30,6 @@ public class MenuScreen extends Screen {
     private boolean hit(int x, int y, int w, int h) { return mx >= x && mx < x + w && my >= y && my < y + h; }
     private void text(DrawContext g, String s, int x, int y, int color) { g.drawTextWithShadow(textRenderer, s, x, y, color); }
     private void box(DrawContext g, int x, int y, int w, int h, int outer, int inner) { g.fill(x, y, x + w, y + h, outer); g.fill(x + 1, y + 1, x + w - 1, y + h - 1, inner); }
-    
     private void sw(DrawContext g, int x, int y, boolean on) {
         g.fill(x, y, x + 22, y + 10, on ? ACC : OFF);
         int k = on ? x + 12 : x + 2;
@@ -135,14 +134,11 @@ public class MenuScreen extends Screen {
         if (open.contains("zoom")) { Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true); cy += 2; }
 
         // 2. Visuals
-        int hVis = 34 + mh("trails", 2) + mh("crosshair", 4) + mh("time", 2) + mh("weather", 1);
+        int hVis = 34 + mh("fb", 1) + mh("crosshair", 4) + mh("trails", 2) + mh("time", 2) + mh("weather", 1);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         
-        Config.trails = module(g, "trails", "Trails", "", Config.trails, 2);
-        if (open.contains("trails")) {
-            Config.trailsColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.trailsColor);
-            cy += 20;
-        }
+        Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
+        if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
 
         Config.customCrosshair = module(g, "crosshair", "Crosshair", "", Config.customCrosshair, 4);
         if (open.contains("crosshair")) {
@@ -150,6 +146,12 @@ public class MenuScreen extends Screen {
             Config.crosshairSize = (int) cslider(g, "Размер", 2, 20, Config.crosshairSize, true);
             Config.crosshairThickness = (int) cslider(g, "Толщина", 1, 5, Config.crosshairThickness, true);
             Config.crosshairDot = cbool(g, "Точка", Config.crosshairDot);
+        }
+
+        Config.trails = module(g, "trails", "Trails", "", Config.trails, 2);
+        if (open.contains("trails")) {
+            Config.trailsColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.trailsColor);
+            cy += 20;
         }
 
         Config.customTime = module(g, "time", "Время", "", Config.customTime, 2);
@@ -211,14 +213,12 @@ public class MenuScreen extends Screen {
             cy += 2;
         }
 
-        // 4. Client / Social
+        // 4. Social (Только друзья)
         int hItems = 34 + 24; 
         panel(g, "Social", x0 + step * 3, y0, colW, hItems);
         
         module(g, "friends", "Friends", "", true, 0);
         screenButton(g, "-> Открыть Friends", new FriendsScreen(this));
-
-        Config.friendGlow = module(g, "glow", "Friend Glow", "", Config.friendGlow, 0);
 
         // Кнопка закрытия
         int bw = 140; int bh = 18;
