@@ -21,23 +21,25 @@ public class TrailRenderer {
         int color = Config.trailsColor;
         if (color == 0) particle = ParticleTypes.WITCH;
         else if (color == 1) particle = ParticleTypes.ELECTRIC_SPARK;
-        else if (color == 2) particle = ParticleTypes.HAPPY_VILLAGER; // Если выберешь зелёный, будет много частиц
+        else if (color == 2) particle = ParticleTypes.HAPPY_VILLAGER;
         else if (color == 3) particle = ParticleTypes.FIREWORK;
         else if (color == 4) particle = ParticleTypes.CRIT;
 
         for (PlayerEntity player : mc.world.getPlayers()) {
-            // Проверка на движение (если игрок не двигается, пропускаем)
-            boolean isMoving = player.prevX != player.getX() || player.prevZ != player.getZ() || player.prevY != player.getY();
+            // САМАЯ СТРОГАЯ ПРОВЕРКА: если скорость 0, значит стоим
+            boolean isMoving = player.getVelocity().lengthSquared() > 0.001;
             
+            // Если игрок стоит на месте, сбрасываем таймер и ПРОПУСКАЕМ его
             if (!isMoving) {
                 lastSpawn.remove(player.getUuid());
                 continue;
             }
 
+            // Если движется, то спавним частицы
             if (Config.friends.contains(player.getName().getString()) || player == mc.player) {
                 long last = lastSpawn.getOrDefault(player.getUuid(), 0L);
                 
-                // Спавним раз в 100 мс (очень редко, чтобы не лагало)
+                // Спавним каждые 100 мс (чтобы не лагало)
                 if (now - last > 100) {
                     mc.particleManager.addParticle(
                             particle,
