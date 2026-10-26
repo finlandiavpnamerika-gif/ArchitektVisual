@@ -21,17 +21,21 @@ public class InventoryScreenMixin {
 
         InventoryScreen self = (InventoryScreen) (Object) this;
         
-        int size = 250;
-        int x = (self.width - size) / 2;
-        int y = (self.height - size) / 2;
+        // Классический размер окна инвентаря в Minecraft
+        int invWidth = 176;
+        int invHeight = 166;
 
-        // ДОБАВЛЕН RenderPipelines.GUI_TEXTURED
+        // Центрируем ровно по экрану
+        int x = (self.width - invWidth) / 2;
+        int y = (self.height - invHeight) / 2;
+
+        // Рисуем картинку. 1376x768 - это реальный размер твоего файла.
         g.drawTexture(
                 RenderPipelines.GUI_TEXTURED, 
                 BG, 
                 x, y, 
                 0f, 0f, 
-                size, size, 
+                invWidth, invHeight, 
                 1376, 768 
         );
     }
