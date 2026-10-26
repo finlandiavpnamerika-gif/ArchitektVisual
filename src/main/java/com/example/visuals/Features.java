@@ -26,7 +26,6 @@ public final class Features {
         if (mc.options == null) return;
         GameOptions o = mc.options;
 
-        // Fullbright
         SimpleOption<Double> gamma = o.getGamma();
         if (Config.fullbright) {
             if (origGamma < 0) origGamma = gamma.getValue();
@@ -36,7 +35,6 @@ public final class Features {
             origGamma = -1.0;
         }
 
-        // Zoom
         SimpleOption<Integer> fov = o.getFov();
         boolean zooming = Config.zoom && VisualsClient.zoomKey.isPressed() && mc.currentScreen == null;
         if (zooming) {
@@ -48,7 +46,6 @@ public final class Features {
             origFov = -1;
         }
 
-        // Лимит дальности
         SimpleOption<Integer> view = o.getViewDistance();
         if (Config.limitDist) {
             if (origView < 0) origView = view.getValue();
@@ -59,7 +56,6 @@ public final class Features {
             origView = -1;
         }
 
-        // AutoSprint
         if (mc.player != null && Config.sprint && mc.currentScreen == null
                 && !mc.player.isSneaking() && !mc.player.isUsingItem()
                 && mc.player.getHungerManager().getFoodLevel() > 6) {
@@ -70,12 +66,10 @@ public final class Features {
             }
         }
 
-        // Время
         if (mc.world != null && Config.customTime) {
             mc.world.getLevelProperties().setTimeOfDay(Config.timeValue);
         }
 
-        // Погода
         if (mc.world != null && Config.customWeather) {
             if (Config.weatherType == 0) {
                 mc.world.setRainGradient(0f);
@@ -116,7 +110,28 @@ public final class Features {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null || mc.options.hudHidden) return;
 
-        // УБРАНО КАСТОМНОЕ НЕБО
+        // ===== CUSTOM CROSSHAIR =====
+        if (Config.customCrosshair) {
+            int cx = mc.getWindow().getScaledWidth() / 2;
+            int cy = mc.getWindow().getScaledHeight() / 2;
+            int color = Config.COLORS[Config.crosshairColor];
+            int size = Config.crosshairSize;
+            int thick = Config.crosshairThickness;
+
+            // Центральная точка
+            if (Config.crosshairDot) {
+                g.fill(cx - thick / 2, cy - thick / 2, cx + thick / 2, cy + thick / 2, color);
+            }
+
+            // Верхняя палочка
+            g.fill(cx - thick / 2, cy - size, cx + thick / 2, cy - thick, color);
+            // Нижняя палочка
+            g.fill(cx - thick / 2, cy + thick, cx + thick / 2, cy + size, color);
+            // Левая палочка
+            g.fill(cx - size, cy - thick / 2, cx - thick, cy + thick / 2, color);
+            // Правая палочка
+            g.fill(cx + thick, cy - thick / 2, cx + size, cy + thick / 2, color);
+        }
 
         if (!Config.hud) return;
 
