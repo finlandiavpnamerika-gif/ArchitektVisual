@@ -67,6 +67,9 @@ public final class Config {
     public static final List<String> alts = new ArrayList<>();
     public static final List<String> friends = new ArrayList<>();
     
+    // Свечение друзей (Outline)
+    public static boolean friendGlow = true; 
+    
     public static boolean trails = true;
     public static int trailsColor = 2;
     public static double trailsLength = 1.0;
@@ -109,12 +112,88 @@ public final class Config {
             o.addProperty("customSky", customSky);
             o.addProperty("skyLines", skyLines);
             o.addProperty("skySpeed", skySpeed);
-            // Остальные сохранения (упрощенно для примера)
+            o.addProperty("friendGlow", friendGlow);
+            o.addProperty("trails", trails);
+            o.addProperty("trailsColor", trailsColor);
+            
+            // Сохранение остальных настроек
+            o.addProperty("sprint", sprint);
+            o.addProperty("sprintAllDirs", sprintAllDirs);
+            o.addProperty("zoom", zoom);
+            o.addProperty("zoomFov", zoomFov);
+            o.addProperty("fullbright", fullbright);
+            o.addProperty("gamma", gamma);
+            o.addProperty("hud", hud);
+            o.addProperty("hudFps", hudFps);
+            o.addProperty("hudPing", hudPing);
+            o.addProperty("hudCoords", hudCoords);
+            o.addProperty("hudFacing", hudFacing);
+            o.addProperty("hudEffects", hudEffects);
+            o.addProperty("hudScale", hudScale);
+            o.addProperty("hudX", hudX);
+            o.addProperty("hudY", hudY);
+            o.addProperty("hudColor", hudColor);
+            o.addProperty("arrayList", arrayList);
+            o.addProperty("arrayListColor", arrayListColor);
+            o.addProperty("arrayListShadow", arrayListShadow);
+            o.addProperty("arrayListX", arrayListX);
+            o.addProperty("arrayListY", arrayListY);
+            o.addProperty("limitDist", limitDist);
+            o.addProperty("viewDist", viewDist);
+            o.addProperty("autoswap", autoswap);
+            o.addProperty("itembind", itembind);
+            o.addProperty("keystrokes", keystrokes);
+            o.addProperty("keystrokesX", keystrokesX);
+            o.addProperty("keystrokesY", keystrokesY);
+            o.addProperty("keystrokesScale", keystrokesScale);
+            o.addProperty("keystrokesColor", keystrokesColor);
+            o.addProperty("keystrokesShowMouse", keystrokesShowMouse);
+            o.addProperty("keystrokesShowSpace", keystrokesShowSpace);
+            o.addProperty("armorHud", armorHud);
+            o.addProperty("armorHudX", armorHudX);
+            o.addProperty("armorHudY", armorHudY);
+            o.addProperty("armorHudScale", armorHudScale);
+            o.addProperty("armorHudShowTool", armorHudShowTool);
+            o.addProperty("armorHudShowDurability", armorHudShowDurability);
+            o.addProperty("autoReconnect", autoReconnect);
+            o.addProperty("autoReconnectDelay", autoReconnectDelay);
+            o.addProperty("themeColor", themeColor);
+            o.addProperty("showIcons", showIcons);
+            o.addProperty("showCheckmarks", showCheckmarks);
+
+            JsonArray sp = new JsonArray();
+            for (SwapPair p : swapPairs) {
+                JsonObject e = new JsonObject();
+                e.addProperty("a", p.a);
+                e.addProperty("b", p.b);
+                e.addProperty("key", p.key);
+                sp.add(e);
+            }
+            o.add("swapPairs", sp);
+
+            JsonArray bl = new JsonArray();
+            for (BoundItem b : binds) {
+                JsonObject e = new JsonObject();
+                e.addProperty("name", b.name);
+                e.addProperty("key", b.key);
+                bl.add(e);
+            }
+            o.add("binds", bl);
+
+            JsonArray altsArray = new JsonArray();
+            for (String alt : alts) altsArray.add(alt);
+            o.add("alts", altsArray);
+
+            JsonArray friendsArray = new JsonArray();
+            for (String f : friends) friendsArray.add(f);
+            o.add("friends", friendsArray);
+
             Files.writeString(FILE, GSON.toJson(o));
         } catch (Exception ignored) {}
     }
 
     public static void load() {
+        boolean hadLists = false;
         try {
             if (Files.exists(FILE)) {
                 JsonObject o = JsonParser.parseString(Files.readString(FILE)).getAsJsonObject();
@@ -126,10 +205,82 @@ public final class Config {
                 customSky = b(o, "customSky", customSky);
                 skyLines = b(o, "skyLines", skyLines);
                 skySpeed = d(o, "skySpeed", skySpeed);
+                friendGlow = b(o, "friendGlow", friendGlow);
+                trails = b(o, "trails", trails);
+                trailsColor = clampColor((int) d(o, "trailsColor", trailsColor));
+
+                sprint = b(o, "sprint", sprint);
+                sprintAllDirs = b(o, "sprintAllDirs", sprintAllDirs);
+                zoom = b(o, "zoom", zoom);
+                zoomFov = d(o, "zoomFov", zoomFov);
+                fullbright = b(o, "fullbright", fullbright);
+                gamma = d(o, "gamma", gamma);
+                hud = b(o, "hud", hud);
+                hudFps = b(o, "hudFps", hudFps);
+                hudPing = b(o, "hudPing", hudPing);
+                hudCoords = b(o, "hudCoords", hudCoords);
+                hudFacing = b(o, "hudFacing", hudFacing);
+                hudEffects = b(o, "hudEffects", hudEffects);
+                hudScale = d(o, "hudScale", hudScale);
+                hudX = (int) d(o, "hudX", hudX);
+                hudY = (int) d(o, "hudY", hudY);
+                hudColor = clampColor((int) d(o, "hudColor", hudColor));
+                arrayList = b(o, "arrayList", arrayList);
+                arrayListColor = clampColor((int) d(o, "arrayListColor", arrayListColor));
+                arrayListShadow = b(o, "arrayListShadow", arrayListShadow);
+                arrayListX = (int) d(o, "arrayListX", arrayListX);
+                arrayListY = (int) d(o, "arrayListY", arrayListY);
+                limitDist = b(o, "limitDist", limitDist);
+                viewDist = Math.max(2.0, Math.min(32.0, d(o, "viewDist", viewDist)));
+                autoswap = b(o, "autoswap", autoswap);
+                itembind = b(o, "itembind", itembind);
+                keystrokes = b(o, "keystrokes", keystrokes);
+                keystrokesX = (int) d(o, "keystrokesX", keystrokesX);
+                keystrokesY = (int) d(o, "keystrokesY", keystrokesY);
+                keystrokesScale = d(o, "keystrokesScale", keystrokesScale);
+                keystrokesColor = clampColor((int) d(o, "keystrokesColor", keystrokesColor));
+                keystrokesShowMouse = b(o, "keystrokesShowMouse", keystrokesShowMouse);
+                keystrokesShowSpace = b(o, "keystrokesShowSpace", keystrokesShowSpace);
+                armorHud = b(o, "armorHud", armorHud);
+                armorHudX = (int) d(o, "armorHudX", armorHudX);
+                armorHudY = (int) d(o, "armorHudY", armorHudY);
+                armorHudScale = d(o, "armorHudScale", armorHudScale);
+                armorHudShowTool = b(o, "armorHudShowTool", armorHudShowTool);
+                armorHudShowDurability = b(o, "armorHudShowDurability", armorHudShowDurability);
+                autoReconnect = b(o, "autoReconnect", autoReconnect);
+                autoReconnectDelay = d(o, "autoReconnectDelay", autoReconnectDelay);
+                themeColor = clampColor((int) d(o, "themeColor", themeColor));
+                showIcons = b(o, "showIcons", showIcons);
+                showCheckmarks = b(o, "showCheckmarks", showCheckmarks);
+
+                swapPairs.clear();
+                binds.clear();
+                alts.clear();
+                friends.clear();
+                
+                if (o.has("swapPairs")) {
+                    hadLists = true;
+                    for (JsonElement el : o.getAsJsonArray("swapPairs")) {
+                        JsonObject e = el.getAsJsonObject();
+                        swapPairs.add(new SwapPair(e.get("a").getAsString(), e.get("b").getAsString(),
+                                e.has("key") ? e.get("key").getAsInt() : -1));
+                    }
+                }
+                if (o.has("binds")) {
+                    hadLists = true;
+                    for (JsonElement el : o.getAsJsonArray("binds")) {
+                        JsonObject e = el.getAsJsonObject();
+                        binds.add(new BoundItem(e.get("name").getAsString(),
+                                e.has("key") ? e.get("key").getAsInt() : -1));
+                    }
+                }
+                if (o.has("alts")) for (JsonElement el : o.getAsJsonArray("alts")) alts.add(el.getAsString());
+                if (o.has("friends")) for (JsonElement el : o.getAsJsonArray("friends")) friends.add(el.getAsString());
             }
         } catch (Exception ignored) {}
     }
-    
+
+    private static int clampColor(int v) { return Math.max(0, Math.min(COLORS.length - 1, v)); }
     private static boolean b(JsonObject o, String k, boolean def) { return o.has(k) ? o.get(k).getAsBoolean() : def; }
     private static double d(JsonObject o, String k, double def) { return o.has(k) ? o.get(k).getAsDouble() : def; }
 }
