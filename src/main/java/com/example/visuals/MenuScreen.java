@@ -30,6 +30,7 @@ public class MenuScreen extends Screen {
     private boolean hit(int x, int y, int w, int h) { return mx >= x && mx < x + w && my >= y && my < y + h; }
     private void text(DrawContext g, String s, int x, int y, int color) { g.drawTextWithShadow(textRenderer, s, x, y, color); }
     private void box(DrawContext g, int x, int y, int w, int h, int outer, int inner) { g.fill(x, y, x + w, y + h, outer); g.fill(x + 1, y + 1, x + w - 1, y + h - 1, inner); }
+    
     private void sw(DrawContext g, int x, int y, boolean on) {
         g.fill(x, y, x + 22, y + 10, on ? ACC : OFF);
         int k = on ? x + 12 : x + 2;
@@ -90,31 +91,11 @@ public class MenuScreen extends Screen {
     private int ccycle(DrawContext g, String label, String[] names, int idx) {
         boolean hov = hit(cx, cy, cw, 18);
         g.fill(cx, cy, cx + cw, cy + 18, hov ? -15002584 : ROW2);
-        text(g, label + ": " + names[idx], cx + 5, cy + 5, -2236963);
+        text(g, label + ": " + names[Math.max(0, Math.min(idx, names.length - 1))], cx + 5, cy + 5, -2236963);
         g.fill(cx + cw - 16, cy + 4, cx + cw - 6, cy + 14, Config.COLORS[Math.min(idx, Config.COLORS.length - 1)]);
         if (clicked && hov) idx = (idx + 1) % names.length;
         cy += 20;
         return idx;
-    }
-
-    private void hint2(DrawContext g, String l1, String l2) {
-        int max = cw - 4;
-        text(g, textRenderer.trimToWidth(l1, max), cx + 2, cy + 1, -5592406);
-        text(g, textRenderer.trimToWidth(l2, max), cx + 2, cy + 10, -5592406);
-        cy += 20;
-    }
-
-    private int listRow(DrawContext g, int key, String label) {
-        boolean hov = hit(cx, cy, cw, 18);
-        boolean overX = hit(cx + cw - 16, cy, 16, 18);
-        g.fill(cx, cy, cx + cw, cy + 18, hov ? -15002584 : ROW2);
-        String full = "[" + Keys.name(key) + "] " + label;
-        text(g, textRenderer.trimToWidth(full, cw - 22), cx + 4, cy + 5, key == -1 ? -43691 : -2236963);
-        text(g, "x", cx + cw - 11, cy + 5, overX ? -43691 : -5592406);
-        int result = 0;
-        if (clicked && hov) result = overX ? 2 : 1;
-        cy += 20;
-        return result;
     }
 
     private boolean screenButton(DrawContext g, String label, Screen screen) {
@@ -154,13 +135,39 @@ public class MenuScreen extends Screen {
         if (open.contains("zoom")) { Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true); cy += 2; }
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("hud", 9) + mh("arraylist", 5) + mh("trails", 2) + mh("sky", 2) + mh("time", 2) + mh("weather", 1) + mh("crosshair", 4);
+        int hVis = 34 + mh("trails", 2) + mh("crosshair", 4) + mh("time", 2) + mh("weather", 1);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         
-        Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
-        if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
-        
-        Config.hud = module(g, "hud", "HUD", "", Config.hud, 9);
+        Config.trails = module(g, "trails", "Trails", "", Config.trails, 2);
+        if (open.contains("trails")) {
+            Config.trailsColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.trailsColor);
+            cy += 20;
+        }
+
+        Config.customCrosshair = module(g, "crosshair", "Crosshair", "", Config.customCrosshair, 4);
+        if (open.contains("crosshair")) {
+            Config.crosshairColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.crosshairColor);
+            Config.crosshairSize = (int) cslider(g, "Размер", 2, 20, Config.crosshairSize, true);
+            Config.crosshairThickness = (int) cslider(g, "Толщина", 1, 5, Config.crosshairThickness, true);
+            Config.crosshairDot = cbool(g, "Точка", Config.crosshairDot);
+        }
+
+        Config.customTime = module(g, "time", "Время", "", Config.customTime, 2);
+        if (open.contains("time")) {
+            Config.timeValue = (int) cslider(g, "Время", 0, 24000, Config.timeValue, true);
+            cy += 20;
+        }
+
+        Config.customWeather = module(g, "weather", "Погода", "", Config.customWeather, 1);
+        if (open.contains("weather")) {
+            Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
+        }
+
+        // 3. HUD
+        int hHud = 34 + mh("hud", 9) + mh("arraylist", 4) + mh("armor", 5) + mh("keys", 5);
+        panel(g, "HUD", x0 + step * 2, y0, colW, hHud);
+
+        Config.hud = module(g, "hud", "Info HUD", "", Config.hud, 9);
         if (open.contains("hud")) {
             Config.hudFps = cbool(g, "FPS", Config.hudFps);
             Config.hudPing = cbool(g, "Ping", Config.hudPing);
@@ -173,8 +180,8 @@ public class MenuScreen extends Screen {
             Config.hudY = (int) cslider(g, "Y", 0, 250, Config.hudY, true);
             cy += 2;
         }
-        
-        Config.arrayList = module(g, "arraylist", "ArrayList", "", Config.arrayList, 5);
+
+        Config.arrayList = module(g, "arraylist", "ArrayList", "", Config.arrayList, 4);
         if (open.contains("arraylist")) {
             Config.arrayListColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.arrayListColor);
             Config.arrayListShadow = cbool(g, "Тень", Config.arrayListShadow);
@@ -183,93 +190,45 @@ public class MenuScreen extends Screen {
             cy += 2;
         }
 
-        Config.trails = module(g, "trails", "Trails", "", Config.trails, 2);
-        if (open.contains("trails")) {
-            Config.trailsColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.trailsColor);
-            Config.trailsLength = cslider(g, "Длина", 0.5, 3.0, Config.trailsLength, false);
+        Config.armorHud = module(g, "armor", "Armor", "", Config.armorHud, 5);
+        if (open.contains("armor")) {
+            Config.armorHudShowTool = cbool(g, "Инструмент", Config.armorHudShowTool);
+            Config.armorHudShowDurability = cbool(g, "Прочность", Config.armorHudShowDurability);
+            Config.armorHudScale = cslider(g, "Размер", 0.5, 2.0, Config.armorHudScale, false);
+            Config.armorHudX = (int) cslider(g, "X", 0, 400, Config.armorHudX, true);
+            Config.armorHudY = (int) cslider(g, "Y", 0, 400, Config.armorHudY, true);
             cy += 2;
         }
 
-        Config.customSky = module(g, "sky", "Custom Sky", "", Config.customSky, 2);
-        if (open.contains("sky")) {
-            Config.skyLines = cbool(g, "Линии", Config.skyLines);
-            Config.skySpeed = cslider(g, "Скорость", 0.5, 5.0, Config.skySpeed, false);
-            cy += 2;
-        }
-
-        Config.customTime = module(g, "time", "Время", "", Config.customTime, 2);
-        if (open.contains("time")) {
-            Config.timeValue = (int) cslider(g, "Время (0-24000)", 0, 24000, Config.timeValue, true);
-            cy += 2;
-        }
-
-        Config.customWeather = module(g, "weather", "Погода", "", Config.customWeather, 1);
-        if (open.contains("weather")) {
-            Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
-            cy += 2;
-        }
-
-        // Crosshair
-        Config.customCrosshair = module(g, "crosshair", "Crosshair", "", Config.customCrosshair, 4);
-        if (open.contains("crosshair")) {
-            Config.crosshairColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.crosshairColor);
-            Config.crosshairSize = (int) cslider(g, "Размер", 2, 20, Config.crosshairSize, true);
-            Config.crosshairThickness = (int) cslider(g, "Толщина", 1, 5, Config.crosshairThickness, true);
-            Config.crosshairDot = cbool(g, "Точка", Config.crosshairDot);
-            cy += 2;
-        }
-
-        // 3. Performance
-        int hPerf = 34 + mh("dist", 1);
-        panel(g, "Performance", x0 + step * 2, y0, colW, hPerf);
-        Config.limitDist = module(g, "dist", "Лимит дальности", "", Config.limitDist, 1);
-        if (open.contains("dist")) { Config.viewDist = cslider(g, "Чанки", 2, 32, Config.viewDist, true); cy += 2; }
-
-        // 4. Client
-        int hItems = 34 + mh("autoswap", Config.swapPairs.size() + 1) + mh("itembind", Config.binds.size() + 1);
-        panel(g, "Client", x0 + step * 3, y0, colW, hItems);
-
-        Config.autoswap = module(g, "autoswap", "AutoSwap", ItemFeatures.swapKeyName(), Config.autoswap, Config.swapPairs.size() + 1);
-        if (open.contains("autoswap")) {
-            SwapPair toRebind = null, toRemove = null;
-            for (SwapPair p : Config.swapPairs) {
-                int r = listRow(g, p.key, p.a + " <-> " + p.b);
-                if (r == 1) toRebind = p; else if (r == 2) toRemove = p;
-            }
-            hint2(g, "Наведи на предмет", "и жми [" + ItemFeatures.swapKeyName() + "]");
-            cy += 2;
-            if (toRemove != null) { Config.swapPairs.remove(toRemove); Config.save(); }
-            else if (toRebind != null) {
-                final SwapPair p = toRebind;
-                client.send(() -> client.setScreen(new BindScreen(this, "AutoSwap: " + p.a + " <-> " + p.b, k -> ItemFeatures.setKey(p, k))));
-            }
-        }
-
-        Config.itembind = module(g, "itembind", "ItemBind", ItemFeatures.bindKeyName(), Config.itembind, Config.binds.size() + 1);
-        if (open.contains("itembind")) {
-            BoundItem toRebind = null, toRemove = null;
-            for (BoundItem b : Config.binds) {
-                int r = listRow(g, b.key, b.name);
-                if (r == 1) toRebind = b; else if (r == 2) toRemove = b;
-            }
-            hint2(g, "Наведи на предмет", "и жми [" + ItemFeatures.bindKeyName() + "]");
-            cy += 2;
-            if (toRemove != null) { Config.binds.remove(toRemove); Config.save(); }
-            else if (toRebind != null) {
-                final BoundItem b = toRebind;
-                client.send(() -> client.setScreen(new BindScreen(this, "ItemBind: " + b.name, k -> ItemFeatures.setKey(b, k))));
-            }
-        }
-
-        // === ВТОРОЙ РЯД ===
-        int maxH1 = Math.max(Math.max(hUtil, hVis), Math.max(hPerf, hItems));
-        int y1 = y0 + maxH1 + 10;
-
-        // 5. Extra HUD
-        int hExtra = 34 + mh("keystrokes", 5) + mh("armor", 5);
-        panel(g, "Extra HUD", x0, y1, colW, hExtra);
-
-        Config.keystrokes = module(g, "keystrokes", "Keystrokes", "", Config.keystrokes, 5);
-        if (open.contains("keystrokes")) {
+        Config.keystrokes = module(g, "keys", "Keystrokes", "", Config.keystrokes, 5);
+        if (open.contains("keys")) {
             Config.keystrokesShowMouse = cbool(g, "ЛКМ/ПКМ", Config.keystrokesShowMouse);
-            Config.
+            Config.keystrokesShowSpace = cbool(g, "Space", Config.keystrokesShowSpace);
+            Config.keystrokesScale = cslider(g, "Размер", 0.5, 2.0, Config.keystrokesScale, false);
+            Config.keystrokesColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.keystrokesColor);
+            Config.keystrokesX = (int) cslider(g, "X", 0, 400, Config.keystrokesX, true);
+            Config.keystrokesY = (int) cslider(g, "Y", 0, 400, Config.keystrokesY, true);
+            cy += 2;
+        }
+
+        // 4. Client / Social
+        int hItems = 34 + 24; 
+        panel(g, "Social", x0 + step * 3, y0, colW, hItems);
+        
+        module(g, "friends", "Friends", "", true, 0);
+        screenButton(g, "-> Открыть Friends", new FriendsScreen(this));
+
+        Config.friendGlow = module(g, "glow", "Friend Glow", "", Config.friendGlow, 0);
+
+        // Кнопка закрытия
+        int bw = 140; int bh = 18;
+        int bx = (width - bw) / 2; int by = height - bh - 8;
+        boolean hov = hit(bx, by, bw, bh);
+        box(g, bx, by, bw, bh, hov ? ACC : ACC_DIM, BG);
+        g.drawCenteredTextWithShadow(textRenderer, "ArchitektVisuals | Закрыть", width / 2, by + 5, WHITE);
+        if (clicked && hov) close();
+    }
+
+    @Override
+    public void removed() { Config.save(); }
+}
