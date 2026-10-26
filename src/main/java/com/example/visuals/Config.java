@@ -76,6 +76,8 @@ public final class Config {
     public static double gamma = 10.0;
     public static boolean limitDist = false;
     public static double viewDist = 8.0;
+    public static boolean autoReconnect = false; // <-- ДОБАВИЛ ОБРАТНО
+    public static double autoReconnectDelay = 5.0;
 
     // AutoSwap & ItemBind
     public static boolean autoswap = true;
@@ -88,6 +90,7 @@ public final class Config {
     public static boolean trails = true;
     public static int trailsColor = 2;
     public static final List<String> friends = new ArrayList<>();
+    public static final List<String> alts = new ArrayList<>();
     
     public static final int[] COLORS = {-4883201, -11141121, -11141291, -171, -43691};
     public static final String[] COLOR_NAMES = {"Фиолетовый", "Голубой", "Зелёный", "Жёлтый", "Красный"};
@@ -152,6 +155,8 @@ public final class Config {
             o.addProperty("gamma", gamma);
             o.addProperty("limitDist", limitDist);
             o.addProperty("viewDist", viewDist);
+            o.addProperty("autoReconnect", autoReconnect);
+            o.addProperty("autoReconnectDelay", autoReconnectDelay);
             o.addProperty("autoswap", autoswap);
             o.addProperty("itembind", itembind);
 
@@ -221,6 +226,8 @@ public final class Config {
                 gamma = d(o, "gamma", gamma);
                 limitDist = b(o, "limitDist", limitDist);
                 viewDist = Math.max(2.0, Math.min(32.0, d(o, "viewDist", viewDist)));
+                autoReconnect = b(o, "autoReconnect", autoReconnect);
+                autoReconnectDelay = d(o, "autoReconnectDelay", autoReconnectDelay);
                 autoswap = b(o, "autoswap", autoswap);
                 itembind = b(o, "itembind", itembind);
 
