@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Mixin(TitleScreen.class)
@@ -23,23 +23,22 @@ public class TitleScreenMixin {
         int w = self.width;
         int h = self.height;
 
-        // Получаем реальное время (часы:минуты)
-        LocalTime now = LocalTime.now();
+        // Берем ПОЛНУЮ дату и время (LocalDateTime), а не только время
+        LocalDateTime now = LocalDateTime.now();
+        
+        // Время (часы:минуты)
         String timeString = now.format(DateTimeFormatter.ofPattern("HH:mm"));
-
-        // Получаем дату (как на скрине)
+        
+        // Дата (День недели, число, месяц)
         String dateString = now.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", new java.util.Locale("ru")));
         dateString = dateString.substring(0, 1).toUpperCase() + dateString.substring(1); // Первая буква заглавная
 
-        // Настраиваем матрицу для масштабирования текста (делаем его большим)
+        // Масштабируем и рисуем часы (x3)
         Matrix3x2fStack matrices = g.getMatrices();
         matrices.pushMatrix();
-        
-        // Масштаб x3.0 для часов
         matrices.translate(w / 2.0f, h / 2.0f - 40);
         matrices.scale(3.0f, 3.0f);
 
-        // Рисуем часы по центру (с учетом масштаба)
         int timeWidth = self.getTextRenderer().getWidth(timeString);
         g.drawTextWithShadow(self.getTextRenderer(), timeString, -timeWidth / 2, 0, 0xFFFFFFFF);
         
