@@ -145,4 +145,54 @@ public final class Features {
             lines.add("Ping: " + (entry == null ? 0 : entry.getLatency()) + " ms");
         }
         if (Config.hudCoords) {
-            lines.add(String.format
+            lines.add(String.format(Locale.ROOT, "X: %.1f / Y: %.1f / Z: %.1f",
+                    mc.player.getX(), mc.player.getY(), mc.player.getZ()));
+        }
+        if (Config.hudFacing) {
+            String f = mc.player.getHorizontalFacing().name().toLowerCase(Locale.ROOT);
+            lines.add(Character.toUpperCase(f.charAt(0)) + f.substring(1));
+        }
+
+        List<String> effects = new ArrayList<>();
+        if (Config.hudEffects) {
+            for (StatusEffectInstance e : mc.player.getStatusEffects()) {
+                String name = e.getEffectType().value().getName().getString();
+                if (e.getAmplifier() > 0) name = name + " " + (e.getAmplifier() + 1);
+                effects.add(name + "  " + time(e));
+            }
+        }
+
+        String title = "ArchitektVisuals";
+        int w = tr.getWidth(title);
+        for (String s : lines) w = Math.max(w, tr.getWidth(s));
+        for (String s : effects) w = Math.max(w, tr.getWidth(s));
+        int h = 14 + lines.size() * 10 + (effects.isEmpty() ? 0 : 14 + effects.size() * 10) + 4;
+
+        Matrix3x2fStack m = g.getMatrices();
+        m.pushMatrix();
+        m.translate((float) Config.hudX, (float) Config.hudY);
+        m.scale((float) Config.hudScale, (float) Config.hudScale);
+
+        int color = Config.COLORS[Config.hudColor];
+        g.fill(0, 0, w + 10, h, 0x90000000);
+        g.fill(0, 0, 2, h, color);
+
+        int y = 3;
+        g.drawTextWithShadow(tr, title, 6, y, color);
+        y += 12;
+        for (String s : lines) {
+            g.drawTextWithShadow(tr, s, 6, y, -1);
+            y += 10;
+        }
+        if (!effects.isEmpty()) {
+            y += 3;
+            g.drawTextWithShadow(tr, "EFFECTS", 6, y, color);
+            y += 11;
+            for (String s : effects) {
+                g.drawTextWithShadow(tr, s, 6, y, -1);
+                y += 10;
+            }
+        }
+        m.popMatrix();
+    }
+}
