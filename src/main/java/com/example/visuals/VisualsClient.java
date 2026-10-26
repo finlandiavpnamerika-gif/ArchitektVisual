@@ -34,7 +34,8 @@ public class VisualsClient implements ClientModInitializer {
             while (menuKey.wasPressed()) client.setScreen(new MenuScreen());
             Features.tick(client);
             ItemFeatures.tick(client);
-            TrailRenderer.tick(); // Тик для частиц
+            TrailRenderer.tick();
+            FriendGlow.tick(client); // <-- ДОБАВЛЕНО
         });
 
         HudRenderCallback.EVENT.register((drawContext, tickCounter) -> Features.hud(drawContext, tickCounter));
