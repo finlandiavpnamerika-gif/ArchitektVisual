@@ -154,8 +154,9 @@ public class MenuScreen extends Screen {
         if (open.contains("zoom")) { Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true); cy += 2; }
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("hud", 9) + mh("arraylist", 5) + mh("trails", 2) + mh("sky", 2) + mh("time", 2) + mh("weather", 1);
+        int hVis = 34 + mh("fb", 1) + mh("hud", 9) + mh("arraylist", 5) + mh("trails", 2) + mh("sky", 2) + mh("time", 2) + mh("weather", 1) + mh("crosshair", 4);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
+        
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
         
@@ -205,6 +206,16 @@ public class MenuScreen extends Screen {
         Config.customWeather = module(g, "weather", "Погода", "", Config.customWeather, 1);
         if (open.contains("weather")) {
             Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
+            cy += 2;
+        }
+
+        // Crosshair
+        Config.customCrosshair = module(g, "crosshair", "Crosshair", "", Config.customCrosshair, 4);
+        if (open.contains("crosshair")) {
+            Config.crosshairColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.crosshairColor);
+            Config.crosshairSize = (int) cslider(g, "Размер", 2, 20, Config.crosshairSize, true);
+            Config.crosshairThickness = (int) cslider(g, "Толщина", 1, 5, Config.crosshairThickness, true);
+            Config.crosshairDot = cbool(g, "Точка", Config.crosshairDot);
             cy += 2;
         }
 
@@ -261,40 +272,4 @@ public class MenuScreen extends Screen {
         Config.keystrokes = module(g, "keystrokes", "Keystrokes", "", Config.keystrokes, 5);
         if (open.contains("keystrokes")) {
             Config.keystrokesShowMouse = cbool(g, "ЛКМ/ПКМ", Config.keystrokesShowMouse);
-            Config.keystrokesShowSpace = cbool(g, "Space", Config.keystrokesShowSpace);
-            Config.keystrokesScale = cslider(g, "Размер", 0.5, 2.0, Config.keystrokesScale, false);
-            Config.keystrokesColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.keystrokesColor);
-            Config.keystrokesX = (int) cslider(g, "X", 0, 400, Config.keystrokesX, true);
-            Config.keystrokesY = (int) cslider(g, "Y", 0, 400, Config.keystrokesY, true);
-            cy += 2;
-        }
-
-        Config.armorHud = module(g, "armor", "Armor + Tool", "", Config.armorHud, 5);
-        if (open.contains("armor")) {
-            Config.armorHudShowTool = cbool(g, "Инструмент", Config.armorHudShowTool);
-            Config.armorHudShowDurability = cbool(g, "Прочность", Config.armorHudShowDurability);
-            Config.armorHudScale = cslider(g, "Размер", 0.5, 2.0, Config.armorHudScale, false);
-            Config.armorHudX = (int) cslider(g, "X", 0, 400, Config.armorHudX, true);
-            Config.armorHudY = (int) cslider(g, "Y", 0, 400, Config.armorHudY, true);
-            cy += 2;
-        }
-
-        // 6. Social
-        int hSocial = 34 + 24; 
-        panel(g, "Social", x0 + step, y1, colW, hSocial);
-        
-        module(g, "friends", "Friends", "", true, 0);
-        screenButton(g, "-> Открыть Friends", new FriendsScreen(this));
-
-        // Кнопка закрытия
-        int bw = 140; int bh = 18;
-        int bx = (width - bw) / 2; int by = height - bh - 8;
-        boolean hov = hit(bx, by, bw, bh);
-        box(g, bx, by, bw, bh, hov ? ACC : ACC_DIM, BG);
-        g.drawCenteredTextWithShadow(textRenderer, "ArchitektVisuals | Закрыть", width / 2, by + 5, WHITE);
-        if (clicked && hov) close();
-    }
-
-    @Override
-    public void removed() { Config.save(); }
-}
+            Config.
