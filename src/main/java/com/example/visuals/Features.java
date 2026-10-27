@@ -120,14 +120,9 @@ public final class Features {
             int size = Config.crosshairSize;
             int thick = Config.crosshairThickness;
 
-            // Адаптивность: если игрок бежит, прицел расширяется
-            if (mc.player.isSprinting()) {
-                size += 4;
-            }
+            if (mc.player.isSprinting()) size += 4;
 
-            if (Config.crosshairDot) {
-                g.fill(cx - thick / 2, cy - thick / 2, cx + thick / 2, cy + thick / 2, color);
-            }
+            if (Config.crosshairDot) g.fill(cx - thick / 2, cy - thick / 2, cx + thick / 2, cy + thick / 2, color);
             g.fill(cx - thick / 2, cy - size, cx + thick / 2, cy - thick, color);
             g.fill(cx - thick / 2, cy + thick, cx + thick / 2, cy + size, color);
             g.fill(cx - size, cy - thick / 2, cx - thick, cy + thick / 2, color);
