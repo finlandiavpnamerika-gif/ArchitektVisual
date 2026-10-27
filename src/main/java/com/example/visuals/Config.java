@@ -17,6 +17,10 @@ public class Config {
     public static boolean adaptiveCrosshair = true;
     public static int crosshairColor = 0xFFFFFFFF;
     public static boolean hudEnabled = true;
+    
+    // Восстановленное поле цвета из MenuScreen
+    public static int arrayListColor = 0;
+    public static final String[] COLOR_NAMES = {"Красный", "Синий", "Зеленый", "Белый"};
 
     // ===== Trails =====
     public static boolean trails = true;
