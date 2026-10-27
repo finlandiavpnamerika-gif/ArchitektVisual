@@ -1,18 +1,18 @@
 package com.example.visuals.mixin;
 
-import com.example.visuals.ShulkerPreview;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.screen.slot.Slot;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(HandledScreen.class)
-public class HandledScreenMixin {
-    
-    @Inject(method = "render", at = @At("TAIL"))
-    private void visuals$renderShulker(DrawContext g, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        ShulkerPreview.render(g, (HandledScreen<?>) (Object) this, mouseX, mouseY);
-    }
+public interface HandledScreenAccessor {
+    @Accessor("focusedSlot")
+    Slot visuals$getFocusedSlot();
+
+    @Accessor("x")
+    int visuals$getX();
+
+    @Accessor("y")
+    int visuals$getY();
 }
