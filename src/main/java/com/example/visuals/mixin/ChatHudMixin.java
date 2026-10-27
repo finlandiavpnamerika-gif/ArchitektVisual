@@ -1,10 +1,9 @@
 package com.example.visuals.mixin;
 
 import com.example.visuals.Config;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -17,14 +16,24 @@ public class ChatHudMixin {
         if (message == null) return null;
         
         String text = message.getString();
+        String result = text;
         
-        // Ищем друзей в тексте сообщения
-        for (String friend : Config.friends) {
-            if (text.contains(friend)) {
-                // Если нашли друга — красим весь текст в зелёный
-                return Text.literal(text).formatted(Formatting.GREEN);
+        // Streamer Mode
+        if (Config.streamerMode && MinecraftClient.getInstance().player != null) {
+            String myName = MinecraftClient.getInstance().player.getName().getString();
+            result = result.replaceAll("(?i)" + myName, "Protected");
+            for (String friend : Config.friends) {
+                result = result.replaceAll("(?i)" + friend, "Protected");
             }
         }
-        return message;
+
+        // Подсветка друзей
+        for (String friend : Config.friends) {
+            if (text.contains(friend)) {
+                return Text.literal(result).formatted(net.minecraft.util.Formatting.GREEN);
+            }
+        }
+        
+        return Text.literal(result);
     }
 }
