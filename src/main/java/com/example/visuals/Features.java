@@ -9,7 +9,9 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.client.gui.screen.DeathScreen;
 import org.joml.Matrix3x2fStack;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,34 @@ public final class Features {
     public static void tick(MinecraftClient mc) {
         if (mc.options == null) return;
         GameOptions o = mc.options;
+
+        // --- ЛОГИКА МОДУЛЕЙ ---
+        
+        // AutoRespawn
+        if (mc.currentScreen instanceof DeathScreen && Config.autoRespawn && mc.player != null) {
+            mc.player.requestRespawn();
+            mc.setScreen(null);
+        }
+
+        // Macros (проверяем нажатия клавиш из конфига)
+        long window = mc.getWindow().getHandle();
+        if (mc.currentScreen == null && mc.player != null) {
+            for (String macro : Config.macros) {
+                try {
+                    String[] parts = macro.split(":");
+                    if (parts.length == 2) {
+                        int key = Integer.parseInt(parts[0]);
+                        String cmd = parts[1];
+                        if (GLFW.glfwGetKey(window, key) == GLFW.GLFW_PRESS) {
+                            // Очень простая защита от спама (сработает раз в 500 мс)
+                            if (System.currentTimeMillis() % 500 < 50) {
+                                mc.player.networkHandler.sendChatCommand(cmd.startsWith("/") ? cmd.substring(1) : cmd);
+                            }
+                        }
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
 
         // Fullbright
         SimpleOption<Double> gamma = o.getGamma();
@@ -46,28 +76,6 @@ public final class Features {
         } else if (origFov >= 0) {
             fov.setValue(origFov);
             origFov = -1;
-        }
-
-        // Лимит дальности
-        SimpleOption<Integer> view = o.getViewDistance();
-        if (Config.limitDist) {
-            if (origView < 0) origView = view.getValue();
-            int target = (int) Config.viewDist;
-            if (view.getValue() != target) view.setValue(target);
-        } else if (origView >= 0) {
-            view.setValue(origView);
-            origView = -1;
-        }
-
-        // AutoSprint
-        if (mc.player != null && Config.sprint && mc.currentScreen == null
-                && !mc.player.isSneaking() && !mc.player.isUsingItem()
-                && mc.player.getHungerManager().getFoodLevel() > 6) {
-            boolean fwd = o.forwardKey.isPressed();
-            boolean any = fwd || o.backKey.isPressed() || o.leftKey.isPressed() || o.rightKey.isPressed();
-            if (Config.sprintAllDirs ? any : fwd) {
-                mc.player.setSprinting(true);
-            }
         }
 
         // Время
