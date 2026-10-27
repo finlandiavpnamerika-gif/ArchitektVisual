@@ -12,6 +12,23 @@ import org.joml.Matrix4f;
 
 public class ChinaHatRenderer {
     
+    // Создаем свой пайплайн для линий (обходной путь для 1.21.11)
+    private static final RenderPipeline DEBUG_LINES_PIPELINE = RenderPipelines.register(
+            RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
+                    .withLocation("pipeline/visuals_debug_lines")
+                    .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.DEBUG_LINES)
+                    .build()
+    );
+    
+    private static final RenderLayer LINES_LAYER = RenderLayer.of(
+            "visuals_lines",
+            1536,
+            DEBUG_LINES_PIPELINE,
+            RenderLayer.MultiPhaseParameters.builder()
+                    .lineWidth(new RenderPhase.LineWidth(java.util.OptionalDouble.of(1.0)))
+                    .build(false)
+    );
+
     public static void render(PlayerEntity player, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         if (!Config.chinaHat) return;
         
@@ -27,7 +44,7 @@ public class ChinaHatRenderer {
 
         Matrix4f matrix = matrices.peek().getPositionMatrix();
         
-        // Используем Tesselator и BufferBuilder (официальный способ 1.21.11)
+        // Инициализируем BufferBuilder через Tesselator (как в документации)
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         
@@ -63,8 +80,8 @@ public class ChinaHatRenderer {
             buffer.vertex(matrix, x2, 0, z2).color(color);
         }
         
-        // Завершаем и рисуем
-        BufferRenderer.drawWithGlobalProgram(buffer.end());
+        // Завершаем и рисуем через наш RenderLayer (вместо BufferRenderer)
+        LINES_LAYER.draw(buffer.end());
         
         matrices.pop();
     }
