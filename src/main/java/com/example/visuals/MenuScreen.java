@@ -146,23 +146,26 @@ public class MenuScreen extends Screen {
         int y0 = 14;
         int step = colW + gap;
 
+        // ========== ПЕРВЫЙ РЯД ==========
+
         // 1. Utilities
-        int hUtil = 34 + mh("sprint", 1) + mh("zoom", 1);
+        int hUtil = 34 + mh("sprint", 1) + mh("zoom", 1) + mh("respawn", 0) + mh("freelook", 0);
         panel(g, "Utilities", x0, y0, colW, hUtil);
         Config.sprint = module(g, "sprint", "AutoSprint", "", Config.sprint, 1);
         if (open.contains("sprint")) { Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs); cy += 2; }
         Config.zoom = module(g, "zoom", "Zoom", "C", Config.zoom, 1);
         if (open.contains("zoom")) { Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true); cy += 2; }
+        Config.autoRespawn = module(g, "respawn", "AutoRespawn", "", Config.autoRespawn, 0);
+        Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("crosshair", 4) + mh("trails", 2) + mh("time", 2) + mh("weather", 1);
+        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", 2);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
-        
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
 
-        Config.customCrosshair = module(g, "crosshair", "Crosshair", "", Config.customCrosshair, 4);
-        if (open.contains("crosshair")) {
+        Config.customCrosshair = module(g, "cross", "Crosshair", "", Config.customCrosshair, 4);
+        if (open.contains("cross")) {
             Config.crosshairColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.crosshairColor);
             Config.crosshairSize = (int) cslider(g, "Размер", 2, 20, Config.crosshairSize, true);
             Config.crosshairThickness = (int) cslider(g, "Толщина", 1, 5, Config.crosshairThickness, true);
@@ -175,19 +178,8 @@ public class MenuScreen extends Screen {
             cy += 20;
         }
 
-        Config.customTime = module(g, "time", "Время", "", Config.customTime, 2);
-        if (open.contains("time")) {
-            Config.timeValue = (int) cslider(g, "Время", 0, 24000, Config.timeValue, true);
-            cy += 20;
-        }
-
-        Config.customWeather = module(g, "weather", "Погода", "", Config.customWeather, 1);
-        if (open.contains("weather")) {
-            Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
-        }
-
         // 3. HUD
-        int hHud = 34 + mh("hud", 9) + mh("arraylist", 4) + mh("armor", 5) + mh("keys", 5);
+        int hHud = 34 + mh("hud", 9) + mh("array", 4) + mh("armor", 5) + mh("keys", 5);
         panel(g, "HUD", x0 + step * 2, y0, colW, hHud);
 
         Config.hud = module(g, "hud", "Info HUD", "", Config.hud, 9);
@@ -204,8 +196,8 @@ public class MenuScreen extends Screen {
             cy += 2;
         }
 
-        Config.arrayList = module(g, "arraylist", "ArrayList", "", Config.arrayList, 4);
-        if (open.contains("arraylist")) {
+        Config.arrayList = module(g, "array", "ArrayList", "", Config.arrayList, 4);
+        if (open.contains("array")) {
             Config.arrayListColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.arrayListColor);
             Config.arrayListShadow = cbool(g, "Тень", Config.arrayListShadow);
             Config.arrayListX = (int) cslider(g, "X", 0, 400, Config.arrayListX, true);
@@ -272,6 +264,45 @@ public class MenuScreen extends Screen {
         
         module(g, "friends", "Friends", "", true, 0);
         screenButton(g, "-> Открыть Friends", new FriendsScreen(this));
+
+        // ========== ВТОРОЙ РЯД ==========
+        int maxH1 = Math.max(Math.max(hUtil, hVis), Math.max(hHud, hClient));
+        int y1 = y0 + maxH1 + 10;
+
+        // 5. Time & Weather
+        int hTw = 34 + mh("time", 2) + mh("weather", 1);
+        panel(g, "Time & Weather", x0, y1, colW, hTw);
+        Config.customTime = module(g, "time", "Время", "", Config.customTime, 2);
+        if (open.contains("time")) {
+            Config.timeValue = (int) cslider(g, "Время", 0, 24000, Config.timeValue, true);
+            cy += 20;
+        }
+        Config.customWeather = module(g, "weather", "Погода", "", Config.customWeather, 1);
+        if (open.contains("weather")) {
+            Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
+        }
+
+        // 6. Extra Visuals 1
+        int hEx1 = 34 + mh("hat", 0) + mh("box", 0) + mh("pred", 0);
+        panel(g, "Extra Visuals 1", x0 + step, y1, colW, hEx1);
+        Config.chinaHat = module(g, "hat", "China Hat", "", Config.chinaHat, 0);
+        Config.entityBox = module(g, "box", "Entity Box", "", Config.entityBox, 0);
+        Config.predictions = module(g, "pred", "Predictions", "", Config.predictions, 0);
+
+        // 7. Extra Visuals 2
+        int hEx2 = 34 + mh("physic", 0) + mh("shulker", 0);
+        panel(g, "Extra Visuals 2", x0 + step * 2, y1, colW, hEx2);
+        Config.itemPhysic = module(g, "physic", "Item Physic", "", Config.itemPhysic, 0);
+        Config.shulkerPreview = module(g, "shulker", "Shulker Prev", "", Config.shulkerPreview, 0);
+
+        // 8. Misc
+        int hMisc = 34 + mh("macro", 0) + mh("stream", 0) + mh("board", 0) + mh("sounds", 0);
+        panel(g, "Misc", x0 + step * 3, y1, colW, hMisc);
+        module(g, "macro", "Macros", "", true, 0);
+        screenButton(g, "-> Настроить макросы", new MacrosScreen(this));
+        Config.streamerMode = module(g, "stream", "StreamerMode", "", Config.streamerMode, 0);
+        Config.boardSpoofer = module(g, "board", "BoardSpoofer", "", Config.boardSpoofer, 0);
+        Config.sounds = module(g, "sounds", "Sounds", "", Config.sounds, 0);
 
         // Кнопка закрытия
         int bw = 140; int bh = 18;
