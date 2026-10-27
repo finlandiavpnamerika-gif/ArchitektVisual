@@ -8,7 +8,8 @@
     "TitleScreenMixin",
     "ChatHudMixin",
     "InGameHudMixin",
-    "ScreenInvokerMixin"
+    "ScreenInvokerMixin",
+    "MinecraftClientAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
