@@ -9,7 +9,8 @@
     "ChatHudMixin",
     "InGameHudMixin",
     "ScreenInvokerMixin",
-    "ScoreboardMixin"
+    "ScoreboardMixin",
+    "HandledScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
