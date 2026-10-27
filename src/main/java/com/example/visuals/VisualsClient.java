@@ -35,7 +35,7 @@ public class VisualsClient implements ClientModInitializer {
             Features.tick(client);
             ItemFeatures.tick(client);
             TrailRenderer.tick();
-            // FriendGlow убран
+            // ShulkerPreview.tick() можно добавить сюда, если нужно обновление
         });
 
         HudRenderCallback.EVENT.register((drawContext, tickCounter) -> Features.hud(drawContext, tickCounter));
@@ -54,33 +54,6 @@ public class VisualsClient implements ClientModInitializer {
                         mc.send(() -> mc.setScreen(new MenuScreen()));
                         return 1;
                     })
-            );
-            dispatcher.register(ClientCommandManager.literal("friends")
-                    .then(ClientCommandManager.literal("add")
-                            .then(ClientCommandManager.argument("name", com.mojang.brigadier.arguments.StringArgumentType.word())
-                                    .executes(ctx -> {
-                                        String name = com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "name");
-                                        if (!Config.friends.contains(name)) {
-                                            Config.friends.add(name);
-                                            Config.save();
-                                            ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§aДруг " + name + " добавлен!"));
-                                        }
-                                        return 1;
-                                    })
-                            )
-                    )
-                    .then(ClientCommandManager.literal("remove")
-                            .then(ClientCommandManager.argument("name", com.mojang.brigadier.arguments.StringArgumentType.word())
-                                    .executes(ctx -> {
-                                        String name = com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "name");
-                                        if (Config.friends.remove(name)) {
-                                            Config.save();
-                                            ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("§aДруг " + name + " удален!"));
-                                        }
-                                        return 1;
-                                    })
-                            )
-                    )
             );
         });
 
