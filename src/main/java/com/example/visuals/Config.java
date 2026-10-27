@@ -30,19 +30,19 @@ public class Config {
     public static boolean boardSpoofer = false;
     public static boolean shulkerPreview = true;
 
-    // ===== Восстановленные поля из MenuScreen =====
-    // Если MenuScreen ожидает конкретный тип (класс BoundItem/SwapPair), 
-    // убедись, что он импортирован. Иначе замени Object на нужный класс.
-    public static List<Object> binds = new ArrayList<>(); 
-    public static List<Object> swapPairs = new ArrayList<>();
-    
+    // ===== Weather & Time (ИСПРАВЛЕНО) =====
     public static int timeValue = 0;
     public static boolean customWeather = false;
-    public static String weatherType = "Ясно";
+    public static int weatherType = 0; // 0 = Ясно, 1 = Дождь, 2 = Гроза (исходя из Features.java)
+
+    // ===== Bind & Swap (ИСПРАВЛЕНО) =====
+    // Если у вас в проекте есть отдельные классы BoundItem и SwapPair, 
+    // убедитесь, что они импортированы выше.
+    public static List<BoundItem> binds = new ArrayList<>();
+    public static List<SwapPair> swapPairs = new ArrayList<>();
 
     // ===== Метод сохранения =====
     public static void save() {
-        // Заглушка, чтобы компилятор не ругался.
-        // Если у тебя есть реальный код сохранения в JSON/NBT — вставь его здесь.
+        // Заглушка для компиляции
     }
 }
