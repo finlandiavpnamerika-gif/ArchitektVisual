@@ -1,5 +1,6 @@
 package com.example.visuals;
 
+import com.example.visuals.mixin.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -14,11 +15,16 @@ public class ShulkerPreview {
     public static void render(DrawContext g, HandledScreen<?> screen, int mouseX, int mouseY) {
         if (!Config.shulkerPreview) return;
         
+        // Используем наш Accessor, чтобы получить защищенные поля x и y
+        HandledScreenAccessor accessor = (HandledScreenAccessor) screen;
+        int screenX = accessor.visuals$getX();
+        int screenY = accessor.visuals$getY();
+        
         // Ищем слот, на который наведена мышь
         Slot hoveredSlot = null;
         for (Slot slot : screen.getScreenHandler().slots) {
-            if (mouseX >= screen.x + slot.x && mouseX < screen.x + slot.x + 16 &&
-                mouseY >= screen.y + slot.y && mouseY < screen.y + slot.y + 16) {
+            if (mouseX >= screenX + slot.x && mouseX < screenX + slot.x + 16 &&
+                mouseY >= screenY + slot.y && mouseY < screenY + slot.y + 16) {
                 hoveredSlot = slot;
                 break;
             }
