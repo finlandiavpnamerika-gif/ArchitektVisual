@@ -14,10 +14,19 @@ public class ShulkerPreview {
     public static void render(DrawContext g, HandledScreen<?> screen, int mouseX, int mouseY) {
         if (!Config.shulkerPreview) return;
         
-        Slot slot = screen.getScreenHandler().getSlotAt(mouseX, mouseY);
-        if (slot == null || !slot.hasStack()) return;
+        // Ищем слот, на который наведена мышь
+        Slot hoveredSlot = null;
+        for (Slot slot : screen.getScreenHandler().slots) {
+            if (mouseX >= screen.x + slot.x && mouseX < screen.x + slot.x + 16 &&
+                mouseY >= screen.y + slot.y && mouseY < screen.y + slot.y + 16) {
+                hoveredSlot = slot;
+                break;
+            }
+        }
+
+        if (hoveredSlot == null || !hoveredSlot.hasStack()) return;
         
-        ItemStack stack = slot.getStack();
+        ItemStack stack = hoveredSlot.getStack();
         if (stack.getItem() != Items.SHULKER_BOX && !stack.getItem().toString().contains("shulker")) return;
 
         ContainerComponent container = stack.get(DataComponentTypes.CONTAINER);
@@ -27,7 +36,7 @@ public class ShulkerPreview {
         int x = mouseX + 12;
         int y = mouseY - 12;
         g.fill(x, y, x + 160, y + 60, 0xD0000000);
-        g.fill(x, y, x + 160, y + 2, 0xFF7CE38B); // Зеленая полоска
+        g.fill(x, y, x + 160, y + 2, 0xFF7CE38B);
 
         // Рисуем слоты
         int index = 0;
@@ -35,8 +44,10 @@ public class ShulkerPreview {
             if (index >= 27) break;
             int ix = x + 5 + (index % 9) * 17;
             int iy = y + 5 + (index / 9) * 17;
+            
             g.drawItem(item, ix, iy);
-            g.drawItemInSlot(MinecraftClient.getInstance().textRenderer, item, ix, iy);
+            g.drawStackOverlay(MinecraftClient.getInstance().textRenderer, item, ix, iy);
+            
             index++;
         }
     }
