@@ -1,9 +1,8 @@
 package com.example.visuals;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.ColorHelper;
@@ -22,39 +21,35 @@ public class ChinaHatRenderer {
         }
 
         matrices.push();
-        
-        // Вращаем матрицу так же, как голову
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-player.getYaw()));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(player.getPitch()));
-        
-        // Смещаем наверх (примерная высота головы)
         matrices.translate(0, -0.45f, 0);
 
         Matrix4f matrix = matrices.peek().getPositionMatrix();
         
-        // Используем getLines() — этот метод точно есть
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getLines());
+        // Используем Tesselator и BufferBuilder (официальный способ 1.21.11)
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         
         float radius = 0.4f;
         float height = 0.3f;
-        int segments = 24; // 24 линии по кругу
+        int segments = 24;
         
         int color = player == MinecraftClient.getInstance().player 
                 ? ColorHelper.getArgb(255, 133, 156, 255)
                 : ColorHelper.getArgb(255, 0, 155, 0);
         
-        // Рисуем линии от основания к вершине (конус)
+        // Рисуем линии от основания к вершине
         for (int i = 0; i < segments; i++) {
             float angle = (float) (2 * Math.PI * i / segments);
             float x = MathHelper.sin(angle) * radius;
             float z = MathHelper.cos(angle) * radius;
             
-            // Линия от вершины к основанию
             buffer.vertex(matrix, 0, height, 0).color(color);
             buffer.vertex(matrix, x, 0, z).color(color);
         }
         
-        // Рисуем основание (круг)
+        // Рисуем основание
         for (int i = 0; i < segments; i++) {
             float angle1 = (float) (2 * Math.PI * i / segments);
             float angle2 = (float) (2 * Math.PI * (i + 1) / segments);
@@ -67,6 +62,9 @@ public class ChinaHatRenderer {
             buffer.vertex(matrix, x1, 0, z1).color(color);
             buffer.vertex(matrix, x2, 0, z2).color(color);
         }
+        
+        // Завершаем и рисуем
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
         
         matrices.pop();
     }
