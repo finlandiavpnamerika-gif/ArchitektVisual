@@ -9,7 +9,7 @@
     "ChatHudMixin",
     "InGameHudMixin",
     "ScreenInvokerMixin",
-    "MinecraftClientAccessor"
+    "ScoreboardMixin"
   ],
   "injectors": {
     "defaultRequire": 1
