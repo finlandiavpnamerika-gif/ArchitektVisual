@@ -36,7 +36,7 @@ public final class Features {
             mc.setScreen(null);
         }
 
-        // Macros (проверяем нажатия клавиш из конфига)
+        // Macros
         long window = mc.getWindow().getHandle();
         if (mc.currentScreen == null && mc.player != null) {
             for (String macro : Config.macros) {
@@ -46,7 +46,6 @@ public final class Features {
                         int key = Integer.parseInt(parts[0]);
                         String cmd = parts[1];
                         if (GLFW.glfwGetKey(window, key) == GLFW.GLFW_PRESS) {
-                            // Очень простая защита от спама (сработает раз в 500 мс)
                             if (System.currentTimeMillis() % 500 < 50) {
                                 mc.player.networkHandler.sendChatCommand(cmd.startsWith("/") ? cmd.substring(1) : cmd);
                             }
@@ -78,23 +77,12 @@ public final class Features {
             origFov = -1;
         }
 
-        // Время
-        if (mc.world != null && Config.customTime) {
-            mc.world.getLevelProperties().setTimeOfDay(Config.timeValue);
-        }
-
-        // Погода
+        // Время и Погода
+        if (mc.world != null && Config.customTime) mc.world.getLevelProperties().setTimeOfDay(Config.timeValue);
         if (mc.world != null && Config.customWeather) {
-            if (Config.weatherType == 0) {
-                mc.world.setRainGradient(0f);
-                mc.world.setThunderGradient(0f);
-            } else if (Config.weatherType == 1) {
-                mc.world.setRainGradient(1f);
-                mc.world.setThunderGradient(0f);
-            } else if (Config.weatherType == 2) {
-                mc.world.setRainGradient(1f);
-                mc.world.setThunderGradient(1f);
-            }
+            if (Config.weatherType == 0) { mc.world.setRainGradient(0f); mc.world.setThunderGradient(0f); }
+            else if (Config.weatherType == 1) { mc.world.setRainGradient(1f); mc.world.setThunderGradient(0f); }
+            else if (Config.weatherType == 2) { mc.world.setRainGradient(1f); mc.world.setThunderGradient(1f); }
         }
     }
 
@@ -124,13 +112,18 @@ public final class Features {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null || mc.options.hudHidden) return;
 
-        // ===== CUSTOM CROSSHAIR =====
+        // ===== АДАПТИВНЫЙ ПРИЦЕЛ =====
         if (Config.customCrosshair) {
             int cx = mc.getWindow().getScaledWidth() / 2;
             int cy = mc.getWindow().getScaledHeight() / 2;
             int color = Config.COLORS[Config.crosshairColor];
             int size = Config.crosshairSize;
             int thick = Config.crosshairThickness;
+
+            // Адаптивность: если игрок бежит, прицел расширяется
+            if (mc.player.isSprinting()) {
+                size += 4;
+            }
 
             if (Config.crosshairDot) {
                 g.fill(cx - thick / 2, cy - thick / 2, cx + thick / 2, cy + thick / 2, color);
