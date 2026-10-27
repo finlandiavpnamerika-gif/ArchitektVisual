@@ -30,14 +30,17 @@ public class Config {
     public static boolean boardSpoofer = false;
     public static boolean shulkerPreview = true;
 
-    // ===== Weather & Time (ИСПРАВЛЕНО) =====
+    // ===== Weather & Time =====
     public static int timeValue = 0;
     public static boolean customWeather = false;
-    public static int weatherType = 0; // 0 = Ясно, 1 = Дождь, 2 = Гроза (исходя из Features.java)
+    public static int weatherType = 0;
 
-    // ===== Bind & Swap (ИСПРАВЛЕНО) =====
-    // Если у вас в проекте есть отдельные классы BoundItem и SwapPair, 
-    // убедитесь, что они импортированы выше.
+    // ===== Новые поля из MenuScreen =====
+    public static int predictions = 0;
+    public static int itemPhysic = 0;
+    public static int sounds = 0;
+
+    // ===== Bind & Swap =====
     public static List<BoundItem> binds = new ArrayList<>();
     public static List<SwapPair> swapPairs = new ArrayList<>();
 
