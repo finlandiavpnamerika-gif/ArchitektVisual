@@ -13,9 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PlayerEntityRenderer.class)
 public class PlayerEntityRendererMixin {
     @Inject(method = "render", at = @At("TAIL"))
-    private void visuals$renderHat(PlayerEntity player, float yaw, float tickDelta,
-                                    MatrixStack matrices, VertexConsumerProvider vertexConsumers,
-                                    int light, CallbackInfo ci) {
+    private void visuals$renderHat(PlayerEntity player, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         ChinaHatRenderer.render(player, matrices, vertexConsumers, light);
     }
 }
