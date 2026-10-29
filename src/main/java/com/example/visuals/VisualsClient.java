@@ -1,6 +1,5 @@
 package com.example.visuals;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -13,6 +12,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.resources.ResourceLocation;
+import org.lwjgl.glfw.GLFW;
 
 public class VisualsClient implements ClientModInitializer {
     public static KeyMapping menuKey;
@@ -31,29 +31,25 @@ public class VisualsClient implements ClientModInitializer {
 
         menuKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.visualsmod.menu",
-                InputConstants.Type.KEYSYM,
-                InputConstants.KEY_RIGHT_SHIFT,
+                GLFW.GLFW_KEY_RIGHT_SHIFT,
                 category
         ));
 
         zoomKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.visualsmod.zoom",
-                InputConstants.Type.KEYSYM,
-                InputConstants.KEY_C,
+                GLFW.GLFW_KEY_C,
                 category
         ));
 
         swapSelectKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.visualsmod.swap_select",
-                InputConstants.Type.KEYSYM,
-                InputConstants.KEY_V,
+                GLFW.GLFW_KEY_V,
                 category
         ));
 
         bindSelectKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.visualsmod.bind_select",
-                InputConstants.Type.KEYSYM,
-                InputConstants.KEY_B,
+                GLFW.GLFW_KEY_B,
                 category
         ));
 
