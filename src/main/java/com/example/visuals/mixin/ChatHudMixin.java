@@ -4,6 +4,7 @@ import com.example.visuals.Config;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -30,7 +31,7 @@ public class ChatHudMixin {
         // Подсветка друзей
         for (String friend : Config.friends) {
             if (text.contains(friend)) {
-                return Text.literal(result).formatted(net.minecraft.util.Formatting.GREEN);
+                return Text.literal(result).formatted(Formatting.GREEN);
             }
         }
         
