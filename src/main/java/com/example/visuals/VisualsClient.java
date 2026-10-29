@@ -8,9 +8,9 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.minecraft.client.KeyBinding;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
@@ -26,8 +26,8 @@ public class VisualsClient implements ClientModInitializer {
         Config.load();
         Theme.apply();
 
-        // Категория передаётся строкой, как в старых версиях Yarn
-        String category = "key.category.visualsmod.main";
+        // В 1.21.9+ категория - объект, а не строка
+        KeyBinding.Category category = KeyBinding.Category.create(Identifier.of("visualsmod", "main"));
 
         menuKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.visualsmod.menu",
