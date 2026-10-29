@@ -11,15 +11,15 @@ import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 
 public class ShulkerPreview {
-    
+
     public static void render(DrawContext g, HandledScreen<?> screen, int mouseX, int mouseY) {
         if (!Config.shulkerPreview) return;
-        
+
         // Используем наш Accessor, чтобы получить защищенные поля x и y
         HandledScreenAccessor accessor = (HandledScreenAccessor) screen;
         int screenX = accessor.visuals$getX();
         int screenY = accessor.visuals$getY();
-        
+
         // Ищем слот, на который наведена мышь
         Slot hoveredSlot = null;
         for (Slot slot : screen.getScreenHandler().slots) {
@@ -31,7 +31,7 @@ public class ShulkerPreview {
         }
 
         if (hoveredSlot == null || !hoveredSlot.hasStack()) return;
-        
+
         ItemStack stack = hoveredSlot.getStack();
         if (stack.getItem() != Items.SHULKER_BOX && !stack.getItem().toString().contains("shulker")) return;
 
@@ -50,10 +50,10 @@ public class ShulkerPreview {
             if (index >= 27) break;
             int ix = x + 5 + (index % 9) * 17;
             int iy = y + 5 + (index / 9) * 17;
-            
+
             g.drawItem(item, ix, iy);
-            g.drawItemInSlot(MinecraftClient.getInstance().textRenderer, item, ix, iy);
-            
+            g.drawStackOverlay(MinecraftClient.getInstance().textRenderer, item, ix, iy);
+
             index++;
         }
     }
