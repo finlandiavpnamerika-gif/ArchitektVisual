@@ -52,7 +52,7 @@ public class ShulkerPreview {
             int iy = y + 5 + (index / 9) * 17;
             
             g.drawItem(item, ix, iy);
-            g.drawStackOverlay(MinecraftClient.getInstance().textRenderer, item, ix, iy);
+            g.drawItemInSlot(MinecraftClient.getInstance().textRenderer, item, ix, iy);
             
             index++;
         }
