@@ -3,6 +3,7 @@ package com.example.visuals.mixin;
 import com.example.visuals.ShulkerPreview;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,7 +24,7 @@ public class HandledScreenMixin {
         // Рисуем нашу картинку (путь: assets/visualsmod/textures/gui/inventory_bg.png)
         // Размер 176x166 — стандартный размер окна инвентаря
         Identifier bgTexture = Identifier.of("visualsmod", "textures/gui/inventory_bg.png");
-        context.drawTexture(bgTexture, x, y, 0, 0, 176, 166, 176, 166);
+        context.drawTexture(RenderLayer::getGuiTextured, bgTexture, x, y, 0, 0, 176, 166, 176, 166);
         
         // Отменяем ванильный фон
         ci.cancel();
