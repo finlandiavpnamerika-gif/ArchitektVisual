@@ -6,11 +6,14 @@
     "HandledScreenAccessor",
     "SimpleOptionAccessor",
     "TitleScreenMixin",
+    "SplashOverlayMixin",
     "ChatHudMixin",
     "InGameHudMixin",
     "ScreenInvokerMixin",
     "ScoreboardMixin",
-    "HandledScreenMixin"
+    "HandledScreenMixin",
+    "ButtonWidgetMixin",
+    "PlayerEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
