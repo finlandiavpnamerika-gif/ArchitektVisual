@@ -8,54 +8,60 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.resources.ResourceLocation;
-import org.lwjgl.glfw.GLFW;
+import net.minecraft.class_2960;
+import net.minecraft.class_304;
+import net.minecraft.class_310;
+import net.minecraft.class_3675;
+import net.minecraft.class_465;
 
 public class VisualsClient implements ClientModInitializer {
-    public static KeyMapping menuKey;
-    public static KeyMapping zoomKey;
-    public static KeyMapping swapSelectKey;
-    public static KeyMapping bindSelectKey;
+    public static class_304 menuKey;
+    public static class_304 zoomKey;
+    public static class_304 swapSelectKey;
+    public static class_304 bindSelectKey;
 
     @Override
     public void onInitializeClient() {
         Config.load();
         Theme.apply();
 
-        KeyMapping.Category category = KeyMapping.Category.register(
-                ResourceLocation.fromNamespaceAndPath("visualsmod", "main")
+        // Категория клавиш
+        class_304.class_11900 category = class_304.class_11900.method_74698(
+                class_2960.method_60655("visualsmod", "main")
         );
 
-        menuKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        // Регистрация клавиш (промежуточные имена)
+        menuKey = KeyBindingHelper.registerKeyBinding(new class_304(
                 "key.visualsmod.menu",
-                GLFW.GLFW_KEY_RIGHT_SHIFT,
+                class_3675.class_307.field_1668,
+                344, // Right Shift
                 category
         ));
 
-        zoomKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        zoomKey = KeyBindingHelper.registerKeyBinding(new class_304(
                 "key.visualsmod.zoom",
-                GLFW.GLFW_KEY_C,
+                class_3675.class_307.field_1668,
+                67, // C
                 category
         ));
 
-        swapSelectKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        swapSelectKey = KeyBindingHelper.registerKeyBinding(new class_304(
                 "key.visualsmod.swap_select",
-                GLFW.GLFW_KEY_V,
+                class_3675.class_307.field_1668,
+                86, // V
                 category
         ));
 
-        bindSelectKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        bindSelectKey = KeyBindingHelper.registerKeyBinding(new class_304(
                 "key.visualsmod.bind_select",
-                GLFW.GLFW_KEY_B,
+                class_3675.class_307.field_1668,
+                66, // B
                 category
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (menuKey.consumeClick()) {
-                client.setScreen(new MenuScreen());
+            while (menuKey.method_1436()) {
+                client.method_1507(new MenuScreen());
             }
             Features.tick(client);
             ItemFeatures.tick(client);
@@ -65,7 +71,7 @@ public class VisualsClient implements ClientModInitializer {
         HudRenderCallback.EVENT.register((drawContext, tickCounter) -> Features.hud(drawContext, tickCounter));
 
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-            if (screen instanceof AbstractContainerScreen) {
+            if (screen instanceof class_465) {
                 ScreenEvents.afterRender(screen).register((s, drawContext, mouseX, mouseY, tickDelta) ->
                         ItemFeatures.drawPanel(drawContext, client));
             }
@@ -74,8 +80,8 @@ public class VisualsClient implements ClientModInitializer {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("visuals")
                     .executes(ctx -> {
-                        Minecraft mc = ctx.getSource().getClient();
-                        mc.execute(() -> mc.setScreen(new MenuScreen()));
+                        class_310 mc = ctx.getSource().getClient();
+                        mc.method_63588(() -> mc.method_1507(new MenuScreen()));
                         return 1;
                     })
             );
