@@ -23,6 +23,10 @@ public final class Config {
     public static boolean chinaHat = false;
     public static int chinaHatColor = 0xFF859CFF; // Добавлено
     public static int chinaHatMode = 0; // 0-4 = COLORS, 5 = радуга
+    public static double hatSize = 1.0;     // множитель радиуса шляпы
+    public static double hatHeight = 1.0;   // множитель высоты конуса
+    public static boolean hatCustom = false; // своя палитра вместо списка цветов
+    public static double hatHue = 0.75, hatSat = 0.8, hatVal = 1.0;
     public static boolean entityBox = false;
     public static boolean predictions = false;
     public static boolean itemPhysic = false;
@@ -128,6 +132,12 @@ public final class Config {
             o.addProperty("chinaHat", chinaHat);
             o.addProperty("chinaHatColor", chinaHatColor);
             o.addProperty("chinaHatMode", chinaHatMode);
+            o.addProperty("hatSize", hatSize);
+            o.addProperty("hatHeight", hatHeight);
+            o.addProperty("hatCustom", hatCustom);
+            o.addProperty("hatHue", hatHue);
+            o.addProperty("hatSat", hatSat);
+            o.addProperty("hatVal", hatVal);
             o.addProperty("entityBox", entityBox);
             o.addProperty("predictions", predictions);
             o.addProperty("itemPhysic", itemPhysic);
@@ -210,6 +220,12 @@ public final class Config {
                 chinaHat = b(o, "chinaHat", chinaHat);
                 chinaHatColor = (int) d(o, "chinaHatColor", chinaHatColor);
                 chinaHatMode = (int) d(o, "chinaHatMode", chinaHatMode);
+                hatSize = d(o, "hatSize", hatSize);
+                hatHeight = d(o, "hatHeight", hatHeight);
+                hatCustom = b(o, "hatCustom", hatCustom);
+                hatHue = d(o, "hatHue", hatHue);
+                hatSat = d(o, "hatSat", hatSat);
+                hatVal = d(o, "hatVal", hatVal);
                 entityBox = b(o, "entityBox", entityBox);
                 predictions = b(o, "predictions", predictions);
                 itemPhysic = b(o, "itemPhysic", itemPhysic);
