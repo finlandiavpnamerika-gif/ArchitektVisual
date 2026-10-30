@@ -20,10 +20,12 @@ jobs:
       - name: Collect API files
         run: |
           mkdir -p mc fr out/mc out/fabric-rendering
-          MC=$(find ~ -path '*fabric-loom*' -name '*sources.jar' -printf '%s %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
+          echo "== all sources jars =="
+          find / -name '*sources*.jar' -size +1M 2>/dev/null | head -20
+          MC=$(find / -name '*minecraft*sources.jar' -printf '%s %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
           echo "Minecraft sources: $MC"
           unzip -q -o "$MC" -d mc
-          for j in $(find ~/.gradle -name 'fabric-rendering-v1*-sources.jar'); do
+          for j in $(find / -name 'fabric-rendering-v1*sources.jar' 2>/dev/null); do
             echo "Fabric: $j"
             unzip -q -o "$j" -d fr
           done
