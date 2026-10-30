@@ -8,28 +8,32 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import net.minecraft.class_12249;
-import net.minecraft.class_1657;
-import net.minecraft.class_243;
-import net.minecraft.class_310;
-import net.minecraft.class_3532;
-import net.minecraft.class_4184;
-import net.minecraft.class_4587;
-import net.minecraft.class_4588;
-import net.minecraft.class_4597;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 
+/**
+ * 3D Trails: лента позади игрока (себя и друзей).
+ * tick() копит историю позиций, render() вызывается из WorldRendererMixin.
+ */
 public final class TrailRenderer {
     private TrailRenderer() {}
 
-    private static final int    MAX_AGE      = 30;
+    private static final int    MAX_AGE      = 30;      // жизнь точки, тиков (1.5 c)
     private static final int    MAX_POINTS   = 90;
-    private static final double MIN_STEP_SQ  = 0.0064;
-    private static final double TELEPORT_SQ  = 64.0;
+    private static final double MIN_STEP_SQ  = 0.0064;  // новая точка каждые ~0.08 блока
+    private static final double TELEPORT_SQ  = 64.0;    // скачок > 8 блоков = телепорт
     private static final double MAX_DIST     = 64.0;
-    private static final float  HALF_WIDTH   = 0.28f;
-    private static final float  CURTAIN_H    = 0.80f;
+    private static final float  HALF_WIDTH   = 0.28f;   // половина ширины полосы под ногами
+    private static final float  CURTAIN_H    = 0.80f;   // высота вертикальной части
     private static final float  LIFT         = 0.05f;
     private static final int    ALPHA_FLAT   = 205;
     private static final int    ALPHA_BOTTOM = 175;
@@ -43,29 +47,29 @@ public final class TrailRenderer {
     private static final Map<UUID, ArrayDeque<Pt>> TRAILS = new HashMap<>();
     private static int tickCount = 0;
 
-    private static boolean eligible(class_310 mc, class_1657 p) {
-        if (p.method_7325() || p.method_5767()) return false;
-        return p == mc.field_1724 || Config.friends.contains(p.method_5477().getString());
+    private static boolean eligible(MinecraftClient mc, PlayerEntity p) {
+        if (p.isSpectator() || p.isInvisible()) return false;
+        return p == mc.player || Config.friends.contains(p.getName().getString());
     }
 
     public static void tick() {
-        class_310 mc = class_310.method_1551();
-        if (mc.field_1687 == null || mc.field_1724 == null || !Config.trails) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.world == null || mc.player == null || !Config.trails) {
             if (!TRAILS.isEmpty()) TRAILS.clear();
             return;
         }
         tickCount++;
 
         Set<UUID> seen = new HashSet<>();
-        for (class_1657 p : mc.field_1687.method_18456()) {
+        for (PlayerEntity p : mc.world.getPlayers()) {
             if (!eligible(mc, p)) continue;
-            UUID id = p.method_5667();
+            UUID id = p.getUuid();
             seen.add(id);
 
             ArrayDeque<Pt> d = TRAILS.get(id);
             if (d == null) { d = new ArrayDeque<>(); TRAILS.put(id, d); }
 
-            double x = p.method_23317(), y = p.method_23318(), z = p.method_23321();
+            double x = p.getX(), y = p.getY(), z = p.getZ();
             Pt last = d.peekFirst();
             if (last != null) {
                 double dx = x - last.x, dy = y - last.y, dz = z - last.z;
@@ -84,29 +88,30 @@ public final class TrailRenderer {
         while (it.hasNext()) if (!seen.contains(it.next())) it.remove();
     }
 
-    public static void render(class_4184 camera, Matrix4f positionMatrix,
-                              class_4597.class_4598 consumers, float tickProgress) {
-        class_310 mc = class_310.method_1551();
-        if (!Config.trails || mc.field_1687 == null || mc.field_1724 == null || TRAILS.isEmpty()) return;
+    public static void render(Camera camera, Matrix4f positionMatrix,
+                              VertexConsumerProvider.Immediate consumers, float tickProgress) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (!Config.trails || mc.world == null || mc.player == null || TRAILS.isEmpty()) return;
 
-        class_243 cam = camera.method_71156();
+        Vec3d cam = camera.getCameraPos();
         int rgb = pickColor();
-        Matrix4f m = new class_4587().method_23760().method_23761();
+        Matrix4f m = new MatrixStack().peek().getPositionMatrix();   // единичная матрица
 
         Matrix4fStack mv = RenderSystem.getModelViewStack();
         mv.pushMatrix();
         mv.mul(positionMatrix);
         try {
-            class_4588 q = null;
-            for (class_1657 p : mc.field_1687.method_18456()) {
+            VertexConsumer q = null;
+            for (PlayerEntity p : mc.world.getPlayers()) {
                 if (!eligible(mc, p)) continue;
-                ArrayDeque<Pt> d = TRAILS.get(p.method_5667());
+                ArrayDeque<Pt> d = TRAILS.get(p.getUuid());
                 if (d == null || d.isEmpty()) continue;
 
-                double hx = class_3532.method_16436((double) tickProgress, p.field_6014, p.method_23317());
-                double hy = class_3532.method_16436((double) tickProgress, p.field_6036, p.method_23318());
-                double hz = class_3532.method_16436((double) tickProgress, p.field_5969, p.method_23321());
-                double ddx = hx - cam.field_1352, ddy = hy - cam.field_1351, ddz = hz - cam.field_1350;
+                // голова ленты = интерполированная позиция игрока
+                double hx = MathHelper.lerp((double) tickProgress, p.lastX, p.getX());
+                double hy = MathHelper.lerp((double) tickProgress, p.lastY, p.getY());
+                double hz = MathHelper.lerp((double) tickProgress, p.lastZ, p.getZ());
+                double ddx = hx - cam.x, ddy = hy - cam.y, ddz = hz - cam.z;
                 if (ddx * ddx + ddy * ddy + ddz * ddz > MAX_DIST * MAX_DIST) continue;
 
                 int n = d.size() + 1;
@@ -122,6 +127,7 @@ public final class TrailRenderer {
                 }
                 if (n < 2) continue;
 
+                // перпендикуляр к направлению движения
                 float[] ox = new float[n], oz = new float[n];
                 float px = 1f, pz = 0f;
                 for (int k = 0; k < n; k++) {
@@ -133,24 +139,26 @@ public final class TrailRenderer {
                     ox[k] = px * w; oz[k] = pz * w;
                 }
 
-                if (q == null) q = consumers.method_73477(class_12249.method_76023());
+                if (q == null) q = consumers.getBuffer(RenderLayers.debugQuads());
 
                 for (int k = 0; k < n - 1; k++) {
                     int k2 = k + 1;
                     if (fade[k2] <= 0f) break;
 
-                    float x0 = (float) (xs[k]  - cam.field_1352), y0 = (float) (ys[k]  - cam.field_1351) + LIFT, z0 = (float) (zs[k]  - cam.field_1350);
-                    float x1 = (float) (xs[k2] - cam.field_1352), y1 = (float) (ys[k2] - cam.field_1351) + LIFT, z1 = (float) (zs[k2] - cam.field_1350);
+                    float x0 = (float) (xs[k]  - cam.x), y0 = (float) (ys[k]  - cam.y) + LIFT, z0 = (float) (zs[k]  - cam.z);
+                    float x1 = (float) (xs[k2] - cam.x), y1 = (float) (ys[k2] - cam.y) + LIFT, z1 = (float) (zs[k2] - cam.z);
 
                     int cf0 = argb((int) (ALPHA_FLAT * fade[k]), rgb),   cf1 = argb((int) (ALPHA_FLAT * fade[k2]), rgb);
                     int cb0 = argb((int) (ALPHA_BOTTOM * fade[k]), rgb), cb1 = argb((int) (ALPHA_BOTTOM * fade[k2]), rgb);
                     int ct0 = argb(0, rgb), ct1 = argb(0, rgb);
 
+                    // плоская полоса (обе стороны)
                     quad(q, m, x0 - ox[k], y0, z0 - oz[k], cf0,  x0 + ox[k], y0, z0 + oz[k], cf0,
                                x1 + ox[k2], y1, z1 + oz[k2], cf1, x1 - ox[k2], y1, z1 - oz[k2], cf1);
                     quad(q, m, x1 - ox[k2], y1, z1 - oz[k2], cf1, x1 + ox[k2], y1, z1 + oz[k2], cf1,
                                x0 + ox[k], y0, z0 + oz[k], cf0, x0 - ox[k], y0, z0 - oz[k], cf0);
 
+                    // вертикальная "занавеска" (обе стороны)
                     float h0 = CURTAIN_H * (0.5f + 0.5f * fade[k]), h1 = CURTAIN_H * (0.5f + 0.5f * fade[k2]);
                     quad(q, m, x0, y0, z0, cb0,  x0, y0 + h0, z0, ct0,
                                x1, y1 + h1, z1, ct1, x1, y1, z1, cb1);
@@ -158,7 +166,7 @@ public final class TrailRenderer {
                                x0, y0 + h0, z0, ct0, x0, y0, z0, cb0);
                 }
             }
-            if (q != null) consumers.method_22994(class_12249.method_76023());
+            if (q != null) consumers.draw(RenderLayers.debugQuads());
         } finally {
             mv.popMatrix();
         }
@@ -168,15 +176,15 @@ public final class TrailRenderer {
         return (Math.max(0, Math.min(255, a)) << 24) | (rgb & 0xFFFFFF);
     }
 
-    private static void quad(class_4588 q, Matrix4f m,
+    private static void quad(VertexConsumer q, Matrix4f m,
                              float ax, float ay, float az, int ac,
                              float bx, float by, float bz, int bc,
                              float cx, float cy, float cz, int cc,
                              float dx, float dy, float dz, int dc) {
-        q.method_22918(m, ax, ay, az).method_39415(ac);
-        q.method_22918(m, bx, by, bz).method_39415(bc);
-        q.method_22918(m, cx, cy, cz).method_39415(cc);
-        q.method_22918(m, dx, dy, dz).method_39415(dc);
+        q.vertex(m, ax, ay, az).color(ac);
+        q.vertex(m, bx, by, bz).color(bc);
+        q.vertex(m, cx, cy, cz).color(cc);
+        q.vertex(m, dx, dy, dz).color(dc);
     }
 
     private static int pickColor() {
