@@ -2,10 +2,11 @@ package com.example.visuals.mixin;
 
 import com.example.visuals.ChinaHatRenderer;
 import com.example.visuals.Config;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.WorldRenderer;
+import com.example.visuals.TrailRenderer;
+import net.minecraft.class_310;
+import net.minecraft.class_4184;
+import net.minecraft.class_4597;
+import net.minecraft.class_761;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,27 +14,25 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(WorldRenderer.class)
+@Mixin(class_761.class)
 public class WorldRendererMixin {
 
-    // Вызывается в конце WorldRenderer.render() и рисует China Hat.
-    // Аргументы метода не нужны, всё берём из MinecraftClient.
     @Inject(method = "render", at = @At("RETURN"))
     private void visuals$renderChinaHat(CallbackInfo ci) {
-        if (!Config.chinaHat) return;
+        if (!Config.chinaHat && !Config.trails) return;
 
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.world == null || mc.player == null) return;
+        class_310 mc = class_310.method_1551();
+        if (mc.field_1687 == null || mc.field_1724 == null) return;
 
-        Camera camera = mc.gameRenderer.getCamera();
-        if (camera == null || !camera.isReady()) return;
+        class_4184 camera = mc.field_1773.method_19418();
+        if (camera == null || !camera.method_19332()) return;
 
-        // Матрица вида: только поворот камеры (позиции считаются относительно камеры)
-        Matrix4f positionMatrix = new Matrix4f().rotation(camera.getRotation().conjugate(new Quaternionf()));
+        Matrix4f positionMatrix = new Matrix4f().rotation(camera.method_23767().conjugate(new Quaternionf()));
 
-        VertexConsumerProvider.Immediate consumers = mc.getBufferBuilders().getEntityVertexConsumers();
-        float tickProgress = mc.getRenderTickCounter().getTickProgress(false);
+        class_4597.class_4598 consumers = mc.method_22940().method_23000();
+        float tickProgress = mc.method_61966().method_60637(false);
 
-        ChinaHatRenderer.render(camera, positionMatrix, consumers, tickProgress);
+        if (Config.chinaHat) ChinaHatRenderer.render(camera, positionMatrix, consumers, tickProgress);
+        if (Config.trails) TrailRenderer.render(camera, positionMatrix, consumers, tickProgress);
     }
 }
