@@ -106,6 +106,10 @@ public final class Config {
     // --- Трейлы ---
     public static boolean trails = true;
     public static int trailsColor = 2;
+    public static int trailsLength = 30;          // длина хвоста в тиках (20 тиков = 1 сек)
+    public static double trailsHeight = 0.8;      // высота "занавески" в блоках
+    public static boolean trailsCustom = false;   // своя палитра вместо списка цветов
+    public static double trailsHue = 0.75, trailsSat = 0.8, trailsVal = 1.0;
 
     // --- Друзья ---
     public static final List<String> friends = new ArrayList<>();
@@ -136,6 +140,12 @@ public final class Config {
             o.addProperty("sounds", sounds);
             o.addProperty("trails", trails);
             o.addProperty("trailsColor", trailsColor);
+            o.addProperty("trailsLength", trailsLength);
+            o.addProperty("trailsHeight", trailsHeight);
+            o.addProperty("trailsCustom", trailsCustom);
+            o.addProperty("trailsHue", trailsHue);
+            o.addProperty("trailsSat", trailsSat);
+            o.addProperty("trailsVal", trailsVal);
 
             // HUD
             o.addProperty("hud", hud);
@@ -212,6 +222,12 @@ public final class Config {
                 sounds = b(o, "sounds", sounds);
                 trails = b(o, "trails", trails);
                 trailsColor = (int) d(o, "trailsColor", trailsColor);
+                trailsLength = (int) d(o, "trailsLength", trailsLength);
+                trailsHeight = d(o, "trailsHeight", trailsHeight);
+                trailsCustom = b(o, "trailsCustom", trailsCustom);
+                trailsHue = d(o, "trailsHue", trailsHue);
+                trailsSat = d(o, "trailsSat", trailsSat);
+                trailsVal = d(o, "trailsVal", trailsVal);
 
                 // HUD
                 hud = b(o, "hud", hud);
