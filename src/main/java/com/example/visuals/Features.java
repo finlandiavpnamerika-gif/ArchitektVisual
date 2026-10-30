@@ -152,6 +152,9 @@ public final class Features {
             g.fill(cx + thick, cy - thick / 2, cx + size, cy + thick / 2, color);
         }
 
+        // ===== PREDICTIONS (траектория + время) =====
+        Predictions.render(g, mc, tick.getTickProgress(false));
+
         if (!Config.hud) return;
 
         TextRenderer tr = mc.textRenderer;
