@@ -22,6 +22,7 @@ public final class Config {
     public static boolean customCrosshair = true;
     public static boolean chinaHat = false;
     public static int chinaHatColor = 0xFF859CFF; // Добавлено
+    public static int chinaHatMode = 0; // 0-4 = COLORS, 5 = радуга
     public static boolean entityBox = false;
     public static boolean predictions = false;
     public static boolean itemPhysic = false;
@@ -122,6 +123,7 @@ public final class Config {
             o.addProperty("customCrosshair", customCrosshair);
             o.addProperty("chinaHat", chinaHat);
             o.addProperty("chinaHatColor", chinaHatColor);
+            o.addProperty("chinaHatMode", chinaHatMode);
             o.addProperty("entityBox", entityBox);
             o.addProperty("predictions", predictions);
             o.addProperty("itemPhysic", itemPhysic);
@@ -197,6 +199,7 @@ public final class Config {
                 customCrosshair = b(o, "customCrosshair", customCrosshair);
                 chinaHat = b(o, "chinaHat", chinaHat);
                 chinaHatColor = (int) d(o, "chinaHatColor", chinaHatColor);
+                chinaHatMode = (int) d(o, "chinaHatMode", chinaHatMode);
                 entityBox = b(o, "entityBox", entityBox);
                 predictions = b(o, "predictions", predictions);
                 itemPhysic = b(o, "itemPhysic", itemPhysic);
