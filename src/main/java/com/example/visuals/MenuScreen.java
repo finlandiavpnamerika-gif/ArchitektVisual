@@ -112,6 +112,15 @@ public class MenuScreen extends Screen {
         return on;
     }
 
+    // Строка-заглушка "скоро" (без переключателя)
+    private void soon(DrawContext g, String label) {
+        rbox(g, cx, cy, cw, 22, Theme.ROW);
+        text(g, label, cx + 8, cy + 7, Theme.TEXT_DIM);
+        String s = "скоро";
+        text(g, s, cx + cw - 8 - textRenderer.getWidth(s), cy + 7, Theme.ACCENT);
+        cy += 24;
+    }
+
     private boolean cbool(DrawContext g, String label, boolean v) {
         boolean hov = hit(cx, cy, cw, 18);
         rbox(g, cx, cy, cw, 18, hov ? Theme.ROW_HOVER : 0x20000000);
@@ -345,10 +354,9 @@ public class MenuScreen extends Screen {
         }
 
         // 6. Extra Visuals 1
-        int hEx1 = 34 + mh("hat", 0) + mh("box", 0) + mh("pred", 0);
+        int hEx1 = 34 + 24 + mh("pred", 0);
         panel(g, "Extra Visuals 1", x0 + step, y1, colW, hEx1);
-        Config.chinaHat = module(g, "hat", "China Hat", "", Config.chinaHat, 0);
-        Config.entityBox = module(g, "box", "Entity Box", "", Config.entityBox, 0);
+        soon(g, "China Hat");
         Config.predictions = module(g, "pred", "Predictions", "", Config.predictions, 0);
 
         // 7. Extra Visuals 2
@@ -358,13 +366,11 @@ public class MenuScreen extends Screen {
         Config.shulkerPreview = module(g, "shulker", "Shulker Prev", "", Config.shulkerPreview, 0);
 
         // 8. Misc (+24: кнопка под Macros)
-        int hMisc = 34 + mh("macro", 0) + mh("stream", 0) + mh("board", 0) + mh("sounds", 0) + 24;
+        int hMisc = 34 + mh("macro", 0) + mh("stream", 0) + 24;
         panel(g, "Misc", x0 + step * 3, y1, colW, hMisc);
         module(g, "macro", "Macros", "", true, 0);
         screenButton(g, "-> Настроить макросы", () -> new MacrosScreen(this));
         Config.streamerMode = module(g, "stream", "StreamerMode", "", Config.streamerMode, 0);
-        Config.boardSpoofer = module(g, "board", "BoardSpoofer", "", Config.boardSpoofer, 0);
-        Config.sounds = module(g, "sounds", "Sounds", "", Config.sounds, 0);
 
         // Кнопка закрытия
         int bw = 160; int bh = 20;
