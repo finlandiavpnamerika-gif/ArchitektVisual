@@ -1,0 +1,40 @@
+name: dump-api
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Generate Minecraft sources
+        run: gradle genSources --no-daemon
+
+      - name: Collect API files
+        run: |
+          mkdir -p mc fr out/mc out/fabric-rendering
+          MC=$(find ~ -path '*fabric-loom*' -name '*sources.jar' -printf '%s %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
+          echo "Minecraft sources: $MC"
+          unzip -q -o "$MC" -d mc
+          for j in $(find ~/.gradle -name 'fabric-rendering-v1*-sources.jar'); do
+            echo "Fabric: $j"
+            unzip -q -o "$j" -d fr
+          done
+          cp -r fr/. out/fabric-rendering/
+          cd mc
+          find net/minecraft/client/render -maxdepth 1 -type f \( -name 'RenderLayer*.java' -o -name 'RenderLayers*.java' -o -name 'RenderPhase*.java' -o -name 'VertexRendering.java' -o -name 'VertexConsumer*.java' -o -name 'Camera.java' -o -name 'WorldRenderer.java' -o -name 'GameRenderer.java' \) -exec cp --parents {} ../out/mc \;
+          cp -r --parents net/minecraft/client/render/state ../out/mc 2>/dev/null || true
+          cp -r --parents net/minecraft/client/render/debug ../out/mc 2>/dev/null || true
+          cp --parents net/minecraft/client/gl/RenderPipelines.java ../out/mc 2>/dev/null || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: api-dump
+          path: out
