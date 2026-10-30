@@ -24,6 +24,7 @@ public class VisualsClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         Config.load();
+        AltManagerInit.register();
         Theme.apply();
 
         // В 1.21.9+ категория - объект, а не строка
