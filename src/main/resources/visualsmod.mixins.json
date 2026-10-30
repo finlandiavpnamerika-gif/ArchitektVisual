@@ -6,7 +6,6 @@
     "HandledScreenAccessor",
     "SimpleOptionAccessor",
     "TitleScreenMixin",
-    "TitleBackgroundMixin",
     "SplashOverlayMixin",
     "ChatHudMixin",
     "InGameHudMixin",
