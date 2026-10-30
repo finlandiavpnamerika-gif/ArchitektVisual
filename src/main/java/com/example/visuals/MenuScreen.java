@@ -356,7 +356,12 @@ public class MenuScreen extends Screen {
         // 6. Extra Visuals 1
         int hEx1 = 34 + 24 + mh("pred", 0);
         panel(g, "Extra Visuals 1", x0 + step, y1, colW, hEx1);
-        soon(g, "China Hat");
+        int hEx1 = 34 + mh("hat", 1) + mh("pred", 0);   // вместо 34 + 24 + mh("pred", 0)
+...
+Config.chinaHat = module(g, "hat", "China Hat", "", Config.chinaHat, 1);
+if (open.contains("hat")) {
+    Config.chinaHatMode = ccycle(g, "Цвет", ChinaHatRenderer.COLOR_NAMES, Config.chinaHatMode);
+}
         Config.predictions = module(g, "pred", "Predictions", "", Config.predictions, 0);
 
         // 7. Extra Visuals 2
