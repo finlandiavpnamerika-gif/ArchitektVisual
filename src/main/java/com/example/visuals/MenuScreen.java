@@ -384,8 +384,47 @@ public class MenuScreen extends Screen {
         }
 
         // 6. Extra Visuals 1
-        int hEx1 = 34 + mh("hat", 1) + mh("pred", 0);
+        int hEx1 = 34 + mh("hat", Config.hatCustom ? 6 : 4) + mh("pred", 0);
         panel(g, "Extra Visuals 1", x0 + step, y1, colW, hEx1);
-        Config.chinaHat = module(g, "hat", "China Hat", "", Config.chinaHat, 1);
+        Config.chinaHat = module(g, "hat", "China Hat", "", Config.chinaHat, Config.hatCustom ? 6 : 4);
         if (open.contains("hat")) {
-            Config.chinaHatMode = ccycle(g, "Цвет", ChinaHatRende
+            Config.hatCustom = cbool(g, "Своя палитра", Config.hatCustom);
+            if (Config.hatCustom) {
+                Config.hatHue = cgrad(g, Config.hatHue, pos -> hsv(pos, 1.0, 1.0));
+                Config.hatSat = cgrad(g, Config.hatSat, pos -> hsv(Config.hatHue, pos, Math.max(0.35, Config.hatVal)));
+                Config.hatVal = cgrad(g, Config.hatVal, pos -> hsv(Config.hatHue, Config.hatSat, pos));
+            } else {
+                Config.chinaHatMode = ccycle(g, "Цвет", ChinaHatRenderer.COLOR_NAMES, Config.chinaHatMode);
+            }
+            Config.hatSize = cslider(g, "Размер", 0.5, 2.0, Config.hatSize, false);
+            Config.hatHeight = cslider(g, "Высота", 0.5, 2.0, Config.hatHeight, false);
+        }
+        Config.predictions = module(g, "pred", "Predictions", "", Config.predictions, 0);
+
+        // 7. Extra Visuals 2
+        int hEx2 = 34 + mh("physic", 0) + mh("shulker", 0);
+        panel(g, "Extra Visuals 2", x0 + step * 2, y1, colW, hEx2);
+        Config.itemPhysic = module(g, "physic", "Item Physic", "", Config.itemPhysic, 0);
+        Config.shulkerPreview = module(g, "shulker", "Shulker Prev", "", Config.shulkerPreview, 0);
+
+        // 8. Misc (+24: кнопка под Macros)
+        int hMisc = 34 + mh("macro", 0) + mh("stream", 0) + 24;
+        panel(g, "Misc", x0 + step * 3, y1, colW, hMisc);
+        module(g, "macro", "Macros", "", true, 0);
+        screenButton(g, "-> Настроить макросы", () -> new MacrosScreen(this));
+        Config.streamerMode = module(g, "stream", "StreamerMode", "", Config.streamerMode, 0);
+
+        // Кнопка закрытия
+        int bw = 160; int bh = 20;
+        int bx = (width - bw) / 2; int by = height - bh - 10;
+        boolean hov = hit(bx, by, bw, bh);
+        rbox(g, bx + 1, by + 2, bw, bh, 0x40000000);
+        rbox(g, bx, by, bw, bh, hov ? Theme.ACCENT : Theme.PANEL_BG);
+        g.fill(bx + 1, by, bx + bw - 1, by + 1, ff(Theme.ACCENT));
+        g.drawCenteredTextWithShadow(textRenderer, "ArchitektVisuals | Закрыть", width / 2, by + 6, ff(Theme.TEXT));
+        if (clicked && hov) close();
+    }
+
+    @Override
+    public void removed() { Config.save(); }
+}
