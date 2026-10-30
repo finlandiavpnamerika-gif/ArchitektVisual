@@ -10,7 +10,8 @@
     "ChatHudMixin",
     "InGameHudMixin",
     "ScreenInvokerMixin",
-    "HandledScreenMixin"
+    "HandledScreenMixin",
+    "WorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
