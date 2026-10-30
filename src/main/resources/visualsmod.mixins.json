@@ -11,7 +11,7 @@
     "InGameHudMixin",
     "ScreenInvokerMixin",
     "HandledScreenMixin",
-    "ButtonWidgetMixin"
+    "PlayerEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
