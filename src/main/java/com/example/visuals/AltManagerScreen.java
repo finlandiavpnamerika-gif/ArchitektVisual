@@ -1,79 +1,123 @@
 package com.example.visuals;
 
-import com.example.visuals.mixin.MinecraftClientAccessor;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.session.Session;
 import net.minecraft.text.Text;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
 
 public class AltManagerScreen extends Screen {
+    private static final int PER_PAGE = 5;
+
     private final Screen parent;
-    private TextFieldWidget nameField;
+    private int page;
+    private TextFieldWidget input;
+    private String status = "";
 
     public AltManagerScreen(Screen parent) {
+        this(parent, 0);
+    }
+
+    public AltManagerScreen(Screen parent, int page) {
         super(Text.literal("Alt Manager"));
         this.parent = parent;
+        this.page = page;
     }
 
     @Override
     protected void init() {
-        super.init();
-        
-        this.nameField = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, this.height / 2 - 20, 200, 20, Text.literal("Введите ник"));
-        this.nameField.setMaxLength(16);
-        this.addDrawableChild(this.nameField);
+        int cx = this.width / 2;
+        List<String> accounts = AltManager.getAccounts();
+        int maxPage = Math.max(0, (accounts.size() - 1) / PER_PAGE);
+        page = Math.max(0, Math.min(page, maxPage));
 
-        this.addDrawableChild(ButtonWidget.builder(Text.literal("Войти"), button -> {
-            String name = nameField.getText().trim();
-            if (!name.isEmpty()) {
-                applyAltAccount(name);
-            }
-        }).dimensions(this.width / 2 - 100, this.height / 2 + 10, 95, 20).build());
+        input = new TextFieldWidget(this.textRenderer, cx - 100, 48, 140, 20, Text.literal("Ник"));
+        input.setMaxLength(16);
+        this.addDrawableChild(input);
 
-        this.addDrawableChild(ButtonWidget.builder(Text.literal("Назад"), button -> {
-            if (this.client != null) this.client.setScreen(parent);
-        }).dimensions(this.width / 2 + 5, this.height / 2 + 10, 95, 20).build());
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Добавить"), b -> addAlt())
+                .dimensions(cx + 45, 48, 55, 20).build());
+
+        String current = AltManager.currentName();
+        int start = page * PER_PAGE;
+        for (int i = 0; i < PER_PAGE; i++) {
+            int idx = start + i;
+            if (idx >= accounts.size()) break;
+            String name = accounts.get(idx);
+            int y = 82 + i * 24;
+
+            String label = name.equals(current) ? "§a● " + name : name;
+            this.addDrawableChild(ButtonWidget.builder(Text.literal(label), b -> {
+                AltManager.use(name);
+                reopen();
+            }).dimensions(cx - 100, y, 176, 20).build());
+
+            this.addDrawableChild(ButtonWidget.builder(Text.literal("§cX"), b -> {
+                AltManager.remove(name);
+                reopen();
+            }).dimensions(cx + 80, y, 20, 20).build());
+        }
+
+        int bottom = this.height - 28;
+
+        ButtonWidget prev = ButtonWidget.builder(Text.literal("<"), b -> {
+            page--;
+            reopen();
+        }).dimensions(cx - 100, bottom, 30, 20).build();
+        prev.active = page > 0;
+        this.addDrawableChild(prev);
+
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Назад"), b -> this.close())
+                .dimensions(cx - 65, bottom, 130, 20).build());
+
+        ButtonWidget next = ButtonWidget.builder(Text.literal(">"), b -> {
+            page++;
+            reopen();
+        }).dimensions(cx + 70, bottom, 30, 20).build();
+        next.active = page < maxPage;
+        this.addDrawableChild(next);
+    }
+
+    private void addAlt() {
+        String name = input.getText().trim();
+        if (!AltManager.isValid(name)) {
+            status = "§cНеверный ник";
+            return;
+        }
+        if (!AltManager.add(name)) {
+            status = "§eТакой ник уже есть";
+            return;
+        }
+        page = Integer.MAX_VALUE; // прыгаем на последнюю страницу, init() обрежет
+        reopen();
+    }
+
+    private void reopen() {
+        this.client.setScreen(new AltManagerScreen(parent, page));
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        
-        context.drawCenteredTextWithShadow(this.textRenderer, "§lAlt Manager", this.width / 2, this.height / 2 - 50, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(this.textRenderer, "§7Введите ник и нажмите Войти", this.width / 2, this.height / 2 - 35, 0xAAAAAA);
+
+        int cx = this.width / 2;
+        context.drawCenteredTextWithShadow(this.textRenderer, "§lAlt Manager", cx, 12, 0xFFFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer,
+                "§7Текущий ник: §f" + AltManager.currentName(), cx, 24, 0xFFFFFFFF);
+        context.drawText(this.textRenderer, "§7Ник (3-16: A-Z, 0-9, _)", cx - 100, 38, 0xFFFFFFFF, false);
+        if (!status.isEmpty()) {
+            context.drawText(this.textRenderer, status, cx - 100, 71, 0xFFFFFFFF, false);
+        }
+        if (AltManager.getAccounts().isEmpty()) {
+            context.drawCenteredTextWithShadow(this.textRenderer, "§8Список пуст", cx, 100, 0xFFFFFFFF);
+        }
     }
 
-    private void applyAltAccount(String newName) {
-        try {
-            MinecraftClient mc = MinecraftClient.getInstance();
-            
-            UUID uuid = UUID.nameUUIDFromBytes(newName.getBytes(StandardCharsets.UTF_8));
-            
-            Session newSession = new Session(
-                    newName, 
-                    uuid, 
-                    "", 
-                    Optional.empty(), 
-                    Optional.empty()
-            );
-            
-            ((MinecraftClientAccessor) mc).setSession(newSession);
-
-            if (mc.player != null) {
-                mc.player.sendMessage(Text.literal("§aНик изменен на: " + newName + ". Перезайди на сервер!"), false);
-            }
-        } catch (Exception e) {
-            if (MinecraftClient.getInstance().player != null) {
-                MinecraftClient.getInstance().player.sendMessage(Text.literal("§cОшибка: " + e.getMessage()), false);
-            }
-        }
+    @Override
+    public void close() {
+        this.client.setScreen(parent);
     }
 
     @Override
