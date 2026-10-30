@@ -87,12 +87,27 @@ public final class AltManager {
         return MinecraftClient.getInstance().getSession().getUsername();
     }
 
-    /** Ник применится при следующем заходе на сервер / в мир. */
-    public static void use(String name) {
-        if (!isValid(name)) return;
+    /**
+     * Подменяет Session клиента. Ник применится при следующем заходе на сервер / в мир.
+     *
+     * @return true, если сессия реально сменилась на {@code name}
+     */
+    public static boolean use(String name) {
+        if (!isValid(name)) return false;
         MinecraftClient mc = MinecraftClient.getInstance();
-        Session session = new Session(name, offlineUuid(name), "0", Optional.empty(), Optional.empty());
-        ((MinecraftClientAccessor) mc).setSession(session);
-        LOGGER.info("Switched to offline account {}", name);
+        if (!(mc instanceof MinecraftClientAccessor accessor)) {
+            LOGGER.error("MinecraftClientAccessor mixin is not applied - is it listed in visualsmod.mixins.json?");
+            return false;
+        }
+        try {
+            accessor.setSession(new Session(name, offlineUuid(name), "0", Optional.empty(), Optional.empty()));
+        } catch (Exception e) {
+            LOGGER.error("Failed to switch session", e);
+            return false;
+        }
+        boolean ok = name.equals(currentName());
+        if (ok) LOGGER.info("Switched to offline account {}", name);
+        else LOGGER.error("Session was set, but current name is still {}", currentName());
+        return ok;
     }
 }
