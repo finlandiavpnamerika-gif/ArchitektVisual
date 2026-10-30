@@ -16,6 +16,7 @@ import org.joml.Matrix4fStack;
 /**
  * 3D China Hat: полупрозрачный конус над головой + яркий обод.
  * Рисуется из WorldRendererMixin в конце WorldRenderer.render().
+ * Цвет, размер и высота настраиваются в меню (Config.hat*).
  */
 public final class ChinaHatRenderer {
     private ChinaHatRenderer() {}
@@ -23,12 +24,12 @@ public final class ChinaHatRenderer {
     // Названия для меню (0-4 = Config.COLORS, 5 = радуга)
     public static final String[] COLOR_NAMES = {"Фиолетовый", "Голубой", "Зелёный", "Жёлтый", "Красный", "Радуга"};
 
-    // --- настройки внешнего вида ---
+    // --- базовые параметры внешнего вида (множители размера/высоты из меню) ---
     private static final int   SEGMENTS   = 48;
-    private static final float RADIUS     = 0.62f;  // радиус основания
-    private static final float HEIGHT     = 0.32f;  // высота конуса
+    private static final float RADIUS     = 0.62f;  // радиус основания (при размере 1.0)
+    private static final float HEIGHT     = 0.32f;  // высота конуса (при высоте 1.0)
     private static final float LIFT       = 0.04f;  // насколько выше головы
-    private static final float RIM_WIDTH  = 0.05f;  // ширина обода
+    private static final float RIM_WIDTH  = 0.05f;  // ширина обода (при размере 1.0)
     private static final int   ALPHA_TIP  = 190;    // прозрачность у вершины (0-255)
     private static final int   ALPHA_EDGE = 110;    // прозрачность у основания
     private static final int   ALPHA_RIM  = 235;    // прозрачность обода
@@ -41,6 +42,8 @@ public final class ChinaHatRenderer {
 
         Vec3d cam = camera.getCameraPos();
         int rgb = pickColor();
+        float size = (float) Math.max(0.1, Config.hatSize);
+        float height = (float) Math.max(0.1, Config.hatHeight);
 
         Matrix4fStack mv = RenderSystem.getModelViewStack();
         mv.pushMatrix();
@@ -66,7 +69,7 @@ public final class ChinaHatRenderer {
                 MatrixStack ms = new MatrixStack();
                 ms.translate(dx, dy + p.getHeight() + LIFT * scale, dz);
                 ms.scale(scale, scale, scale);
-                drawHat(ms.peek().getPositionMatrix(), consumers, rgb);
+                drawHat(ms.peek().getPositionMatrix(), consumers, rgb, size, height);
                 drew = true;
             }
             if (drew) {
@@ -78,23 +81,27 @@ public final class ChinaHatRenderer {
         }
     }
 
-    private static void drawHat(Matrix4f m, VertexConsumerProvider.Immediate consumers, int rgb) {
+    private static void drawHat(Matrix4f m, VertexConsumerProvider.Immediate consumers, int rgb,
+                                float size, float heightMul) {
         int tip  = (ALPHA_TIP  << 24) | rgb;
         int edge = (ALPHA_EDGE << 24) | rgb;
         int rim  = (ALPHA_RIM  << 24) | rgb;
 
+        float radius = RADIUS * size;
+        float height = HEIGHT * heightMul;
+
         // 1) заливка конуса (triangle fan)
         VertexConsumer fan = consumers.getBuffer(RenderLayers.debugTriangleFan());
-        fan.vertex(m, 0f, HEIGHT, 0f).color(tip);
+        fan.vertex(m, 0f, height, 0f).color(tip);
         for (int i = 0; i <= SEGMENTS; i++) {
             float a = (float) (i * (Math.PI * 2.0) / SEGMENTS);
-            fan.vertex(m, MathHelper.cos(a) * RADIUS, 0f, MathHelper.sin(a) * RADIUS).color(edge);
+            fan.vertex(m, MathHelper.cos(a) * radius, 0f, MathHelper.sin(a) * radius).color(edge);
         }
         // слой сменится ниже -> фан отрисуется сам
 
         // 2) обод: плоское кольцо + вертикальная полоска снаружи
         VertexConsumer q = consumers.getBuffer(RenderLayers.debugQuads());
-        float r0 = RADIUS, r1 = RADIUS + RIM_WIDTH, h0 = -0.03f, h1 = 0.0f;
+        float r0 = radius, r1 = radius + RIM_WIDTH * size, h0 = -0.03f, h1 = 0.0f;
         for (int i = 0; i < SEGMENTS; i++) {
             float a0 = (float) (i * (Math.PI * 2.0) / SEGMENTS);
             float a1 = (float) ((i + 1) * (Math.PI * 2.0) / SEGMENTS);
@@ -116,6 +123,9 @@ public final class ChinaHatRenderer {
     }
 
     private static int pickColor() {
+        if (Config.hatCustom) {
+            return MathHelper.hsvToRgb((float) Config.hatHue, (float) Config.hatSat, (float) Config.hatVal) & 0xFFFFFF;
+        }
         int mode = Config.chinaHatMode;
         if (mode >= 0 && mode < Config.COLORS.length) return Config.COLORS[mode] & 0xFFFFFF;
         float hue = (System.currentTimeMillis() % 4000L) / 4000f;   // радуга
