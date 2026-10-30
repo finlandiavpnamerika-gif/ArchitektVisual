@@ -2,6 +2,7 @@ package com.example.visuals.mixin;
 
 import com.example.visuals.Config;
 import com.example.visuals.MainMenuUI;
+import com.example.visuals.RainyScene;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -25,13 +26,13 @@ public abstract class TitleScreenMixin extends Screen {
         MainMenuUI.onOpen(MinecraftClient.getInstance());
     }
 
-    // Заменяем весь ванильный render: логотип, сплэш и копирайт больше не рисуются.
-    // Фон (панорама, ваш миксин на renderPanoramaBackground) рисуется через renderBackground.
+    // Полностью заменяем ванильный render. Фон, дождь, туман и молнию
+    // рисуем сами, не полагаясь на панораму.
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void visuals$render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (!Config.customMainMenu) return;
         ci.cancel();
-        this.renderBackground(context, mouseX, mouseY, delta);
+        RainyScene.drawScene(context, this.width, this.height);
         MainMenuUI.render(context, MinecraftClient.getInstance(), this, this.textRenderer, mouseX, mouseY);
     }
 }
