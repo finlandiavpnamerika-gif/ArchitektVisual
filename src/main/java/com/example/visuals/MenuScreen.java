@@ -165,6 +165,28 @@ public class MenuScreen extends Screen {
         return idx;
     }
 
+    // Палитра: градиентная полоска, возвращает позицию маркера 0..1
+    private double cgrad(DrawContext g, double t, java.util.function.DoubleToIntFunction colorAt) {
+        int id = idc++;
+        boolean hov = hit(cx, cy, cw, 16);
+        if (clicked && hov) active = id;
+        if (active == id && down) t = Math.max(0.0, Math.min(1.0, (double) (mx - cx) / (double) cw));
+
+        for (int x = 0; x < cw; x += 2) {
+            int x2 = Math.min(x + 2, cw);
+            g.fill(cx + x, cy, cx + x2, cy + 16, ff(0xFF000000 | colorAt.applyAsInt((x + 1.0) / cw)));
+        }
+        int mxp = cx + (int) (cw * t);
+        g.fill(mxp - 2, cy - 1, mxp + 1, cy + 17, ff(0xFF000000));   // обводка маркера
+        g.fill(mxp - 1, cy, mxp, cy + 16, ff(0xFFFFFFFF));           // маркер
+        cy += 20;
+        return t;
+    }
+
+    private static int hsv(double h, double s, double v) {
+        return net.minecraft.util.math.MathHelper.hsvToRgb((float) h, (float) s, (float) v) & 0xFFFFFF;
+    }
+
     private void hint2(DrawContext g, String l1, String l2) {
         int max = cw - 4;
         text(g, textRenderer.trimToWidth(l1, max), cx + 4, cy + 2, Theme.TEXT_DIM);
@@ -232,7 +254,7 @@ public class MenuScreen extends Screen {
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", 2);
+        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
@@ -245,10 +267,18 @@ public class MenuScreen extends Screen {
             Config.crosshairDot = cbool(g, "Точка", Config.crosshairDot);
         }
 
-        Config.trails = module(g, "trails", "Trails", "", Config.trails, 2);
+        Config.trails = module(g, "trails", "Trails", "", Config.trails, Config.trailsCustom ? 6 : 4);
         if (open.contains("trails")) {
-            Config.trailsColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.trailsColor);
-            cy += 20;
+            Config.trailsCustom = cbool(g, "Своя палитра", Config.trailsCustom);
+            if (Config.trailsCustom) {
+                Config.trailsHue = cgrad(g, Config.trailsHue, pos -> hsv(pos, 1.0, 1.0));
+                Config.trailsSat = cgrad(g, Config.trailsSat, pos -> hsv(Config.trailsHue, pos, Math.max(0.35, Config.trailsVal)));
+                Config.trailsVal = cgrad(g, Config.trailsVal, pos -> hsv(Config.trailsHue, Config.trailsSat, pos));
+            } else {
+                Config.trailsColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.trailsColor);
+            }
+            Config.trailsLength = (int) cslider(g, "Длина (тики)", 10, 80, Config.trailsLength, true);
+            Config.trailsHeight = cslider(g, "Высота", 0.1, 2.0, Config.trailsHeight, false);
         }
 
         // 3. HUD
@@ -358,34 +388,4 @@ public class MenuScreen extends Screen {
         panel(g, "Extra Visuals 1", x0 + step, y1, colW, hEx1);
         Config.chinaHat = module(g, "hat", "China Hat", "", Config.chinaHat, 1);
         if (open.contains("hat")) {
-            Config.chinaHatMode = ccycle(g, "Цвет", ChinaHatRenderer.COLOR_NAMES, Config.chinaHatMode);
-        }
-        Config.predictions = module(g, "pred", "Predictions", "", Config.predictions, 0);
-
-        // 7. Extra Visuals 2
-        int hEx2 = 34 + mh("physic", 0) + mh("shulker", 0);
-        panel(g, "Extra Visuals 2", x0 + step * 2, y1, colW, hEx2);
-        Config.itemPhysic = module(g, "physic", "Item Physic", "", Config.itemPhysic, 0);
-        Config.shulkerPreview = module(g, "shulker", "Shulker Prev", "", Config.shulkerPreview, 0);
-
-        // 8. Misc (+24: кнопка под Macros)
-        int hMisc = 34 + mh("macro", 0) + mh("stream", 0) + 24;
-        panel(g, "Misc", x0 + step * 3, y1, colW, hMisc);
-        module(g, "macro", "Macros", "", true, 0);
-        screenButton(g, "-> Настроить макросы", () -> new MacrosScreen(this));
-        Config.streamerMode = module(g, "stream", "StreamerMode", "", Config.streamerMode, 0);
-
-        // Кнопка закрытия
-        int bw = 160; int bh = 20;
-        int bx = (width - bw) / 2; int by = height - bh - 10;
-        boolean hov = hit(bx, by, bw, bh);
-        rbox(g, bx + 1, by + 2, bw, bh, 0x40000000);
-        rbox(g, bx, by, bw, bh, hov ? Theme.ACCENT : Theme.PANEL_BG);
-        g.fill(bx + 1, by, bx + bw - 1, by + 1, ff(Theme.ACCENT));
-        g.drawCenteredTextWithShadow(textRenderer, "ArchitektVisuals | Закрыть", width / 2, by + 6, ff(Theme.TEXT));
-        if (clicked && hov) close();
-    }
-
-    @Override
-    public void removed() { Config.save(); }
-}
+            Config.chinaHatMode = ccycle(g, "Цвет", ChinaHatRende
