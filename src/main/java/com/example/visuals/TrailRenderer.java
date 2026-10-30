@@ -27,13 +27,11 @@ import org.joml.Matrix4fStack;
 public final class TrailRenderer {
     private TrailRenderer() {}
 
-    private static final int    MAX_AGE      = 30;      // жизнь точки, тиков (1.5 c)
-    private static final int    MAX_POINTS   = 90;
+    private static final int    MAX_POINTS   = 160;     // длина/высота/цвет берутся из Config (меню)
     private static final double MIN_STEP_SQ  = 0.0064;  // новая точка каждые ~0.08 блока
     private static final double TELEPORT_SQ  = 64.0;    // скачок > 8 блоков = телепорт
     private static final double MAX_DIST     = 64.0;
     private static final float  HALF_WIDTH   = 0.28f;   // половина ширины полосы под ногами
-    private static final float  CURTAIN_H    = 0.80f;   // высота вертикальной части
     private static final float  LIFT         = 0.05f;
     private static final int    ALPHA_FLAT   = 205;
     private static final int    ALPHA_BOTTOM = 175;
@@ -59,6 +57,7 @@ public final class TrailRenderer {
             return;
         }
         tickCount++;
+        final int maxAge = maxAge();
 
         Set<UUID> seen = new HashSet<>();
         for (PlayerEntity p : mc.world.getPlayers()) {
@@ -80,7 +79,7 @@ public final class TrailRenderer {
                 d.addFirst(new Pt(x, y, z, tickCount));
             }
 
-            while (!d.isEmpty() && tickCount - d.peekLast().tick > MAX_AGE) d.pollLast();
+            while (!d.isEmpty() && tickCount - d.peekLast().tick > maxAge) d.pollLast();
             while (d.size() > MAX_POINTS) d.pollLast();
         }
 
@@ -94,6 +93,8 @@ public final class TrailRenderer {
         if (!Config.trails || mc.world == null || mc.player == null || TRAILS.isEmpty()) return;
 
         Vec3d cam = camera.getCameraPos();
+        final int maxAge = maxAge();
+        final float curtainH = (float) Math.max(0.0, Config.trailsHeight);
         int rgb = pickColor();
         Matrix4f m = new MatrixStack().peek().getPositionMatrix();   // единичная матрица
 
@@ -122,7 +123,7 @@ public final class TrailRenderer {
                 for (Pt pt : d) {
                     float age = (tickCount - pt.tick) + tickProgress;
                     xs[i] = pt.x; ys[i] = pt.y; zs[i] = pt.z;
-                    fade[i] = Math.max(0f, 1f - age / MAX_AGE);
+                    fade[i] = Math.max(0f, 1f - age / maxAge);
                     i++;
                 }
                 if (n < 2) continue;
@@ -159,7 +160,7 @@ public final class TrailRenderer {
                                x0 + ox[k], y0, z0 + oz[k], cf0, x0 - ox[k], y0, z0 - oz[k], cf0);
 
                     // вертикальная "занавеска" (обе стороны)
-                    float h0 = CURTAIN_H * (0.5f + 0.5f * fade[k]), h1 = CURTAIN_H * (0.5f + 0.5f * fade[k2]);
+                    float h0 = curtainH * (0.5f + 0.5f * fade[k]), h1 = curtainH * (0.5f + 0.5f * fade[k2]);
                     quad(q, m, x0, y0, z0, cb0,  x0, y0 + h0, z0, ct0,
                                x1, y1 + h1, z1, ct1, x1, y1, z1, cb1);
                     quad(q, m, x1, y1, z1, cb1, x1, y1 + h1, z1, ct1,
@@ -187,7 +188,14 @@ public final class TrailRenderer {
         q.vertex(m, dx, dy, dz).color(dc);
     }
 
+    private static int maxAge() {
+        return Math.max(5, Math.min(120, Config.trailsLength));
+    }
+
     private static int pickColor() {
+        if (Config.trailsCustom) {
+            return MathHelper.hsvToRgb((float) Config.trailsHue, (float) Config.trailsSat, (float) Config.trailsVal) & 0xFFFFFF;
+        }
         int c = Math.max(0, Math.min(Config.trailsColor, Config.COLORS.length - 1));
         return Config.COLORS[c] & 0xFFFFFF;
     }
