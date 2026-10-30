@@ -10,8 +10,7 @@
     "ChatHudMixin",
     "InGameHudMixin",
     "ScreenInvokerMixin",
-    "HandledScreenMixin",
-    "PlayerEntityRendererMixin"
+    "HandledScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
