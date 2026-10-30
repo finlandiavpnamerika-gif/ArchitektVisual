@@ -10,7 +10,6 @@
     "ChatHudMixin",
     "InGameHudMixin",
     "ScreenInvokerMixin",
-    "ScoreboardMixin",
     "HandledScreenMixin",
     "ButtonWidgetMixin"
   ],
