@@ -7,7 +7,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.Perspective;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -24,7 +23,6 @@ public final class Features {
     private static double origGamma = -1.0;
     private static int origFov = -1;
     private static int origView = -1;
-    private static boolean freelookApplied = false;
 
     public static void tick(MinecraftClient mc) {
         if (mc.options == null) return;
@@ -97,16 +95,8 @@ public final class Features {
             }
         }
 
-        // ---- Freelook (третье лицо, пока модуль включён) ----
-        if (Config.thirdPerson) {
-            if (!freelookApplied) {
-                o.setPerspective(Perspective.THIRD_PERSON_BACK);
-                freelookApplied = true;
-            }
-        } else if (freelookApplied) {
-            o.setPerspective(Perspective.FIRST_PERSON);
-            freelookApplied = false;
-        }
+        // ---- Freelook (зажал клавишу - камера крутится отдельно от игрока) ----
+        Freelook.tick(mc);
     }
 
     @SuppressWarnings("unchecked")
