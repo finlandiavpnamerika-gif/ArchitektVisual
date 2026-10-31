@@ -92,6 +92,13 @@ public class VisualsClient implements ClientModInitializer {
                         return 1;
                     })
             );
+            dispatcher.register(ClientCommandManager.literal("freelook")
+                    .executes(ctx -> {
+                        MinecraftClient mc = ctx.getSource().getClient();
+                        mc.execute(Freelook::toggleLatch);
+                        return 1;
+                    })
+            );
         });
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
