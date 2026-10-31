@@ -18,6 +18,7 @@ import org.lwjgl.glfw.GLFW;
 public class VisualsClient implements ClientModInitializer {
     public static KeyBinding menuKey;
     public static KeyBinding zoomKey;
+    public static KeyBinding freelookKey;
     public static KeyBinding swapSelectKey;
     public static KeyBinding bindSelectKey;
 
@@ -41,6 +42,13 @@ public class VisualsClient implements ClientModInitializer {
                 "key.visualsmod.zoom",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_C,
+                category
+        ));
+
+        freelookKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.visualsmod.freelook",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_LEFT_ALT,
                 category
         ));
 
