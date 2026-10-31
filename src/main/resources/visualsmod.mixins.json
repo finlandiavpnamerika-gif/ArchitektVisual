@@ -12,7 +12,9 @@
     "InGameHudMixin",
     "ScreenInvokerMixin",
     "HandledScreenMixin",
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "FreelookEntityMixin",
+    "FreelookCameraMixin"
   ],
   "injectors": {
     "defaultRequire": 1
