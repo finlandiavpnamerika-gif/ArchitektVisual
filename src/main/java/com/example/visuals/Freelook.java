@@ -2,20 +2,32 @@ package com.example.visuals;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.Perspective;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 /**
- * Freelook: пока зажата клавиша, камера крутится вокруг игрока отдельно от его поворота.
- * Персонаж не поворачивается и идёт туда, куда смотрел. Отпустил - камера плавно возвращается.
- * Управляется модулем "Freelook" в меню (Config.thirdPerson) и клавишей VisualsClient.freelookKey.
+ * Freelook: камера крутится вокруг игрока отдельно от его поворота.
+ * Персонаж не поворачивается и идёт туда, куда смотрел.
+ *
+ * Включение (модуль "Freelook" в меню должен быть включён):
+ *  - клавиша: зажал = Freelook пока держишь; быстрый тап = закрепить (ещё тап = выключить)
+ *  - команда /freelook = закрепить/выключить (работает и без клавиатуры)
+ * Отпустил / выключил - камера плавно возвращается за спину игрока.
  */
 public final class Freelook {
     private Freelook() {}
 
-    /** клавиша зажата: мышь крутит камеру, а не игрока */
+    private static final long TAP_MS = 250L;
+
+    /** Freelook работает: мышь крутит камеру, а не игрока */
     public static boolean active = false;
-    /** клавишу отпустили: камера плавно едет обратно за спину игрока */
+    /** плавный возврат камеры к игроку */
     private static boolean returning = false;
+    /** закреплён тапом по клавише или командой */
+    private static boolean latched = false;
+
+    private static boolean keyPrev = false;
+    private static long keyPressedAt = 0L;
 
     public static float yaw, pitch;
     private static Perspective prev = null;
@@ -24,18 +36,39 @@ public final class Freelook {
     /** камера должна использовать yaw/pitch отсюда */
     public static boolean overriding() { return active || returning; }
 
+    /** команда /freelook */
+    public static void toggleLatch() {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.player == null) return;
+        if (!Config.thirdPerson) {
+            mc.player.sendMessage(Text.literal("Freelook: сначала включи модуль в меню"), true);
+            return;
+        }
+        latched = !latched;
+    }
+
     /** вызывается каждый тик из Features.tick */
     public static void tick(MinecraftClient mc) {
         if (mc.player == null || mc.options == null) {
+            latched = false;
+            keyPrev = false;
             if (overriding()) reset(mc);
             return;
         }
         if (!Config.thirdPerson) {
+            latched = false;
+            keyPrev = false;
             if (overriding()) reset(mc);
             return;
         }
 
-        boolean want = mc.currentScreen == null && VisualsClient.freelookKey.isPressed();
+        boolean down = mc.currentScreen == null && VisualsClient.freelookKey.isPressed();
+        long now = System.currentTimeMillis();
+        if (down && !keyPrev) keyPressedAt = now;
+        if (!down && keyPrev && now - keyPressedAt < TAP_MS) latched = !latched;   // быстрый тап = закрепить / снять
+        keyPrev = down;
+
+        boolean want = mc.currentScreen == null && (down || latched);
 
         if (want && !active) {
             if (!returning) {                       // новый заход (не продолжение возврата)
@@ -46,10 +79,12 @@ public final class Freelook {
             }
             active = true;
             returning = false;
+            mc.player.sendMessage(Text.literal("Freelook: ВКЛ"), true);
         } else if (!want && active) {
             active = false;
             returning = true;
             lastNanos = System.nanoTime();
+            mc.player.sendMessage(Text.literal("Freelook: ВЫКЛ"), true);
         }
     }
 
