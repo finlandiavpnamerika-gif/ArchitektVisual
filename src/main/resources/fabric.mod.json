@@ -25,13 +25,4 @@
     "minecraft": "~1.21.1",
     "java": ">=21",
     "fabric-api": "*"
-  },
-  "recommends": {
-    "sodium": "*",
-    "lithium": "*",
-    "ferritecore": "*",
-    "modernfix": "*",
-    "entityculling": "*",
-    "immediatelyfast": "*"
   }
-}
