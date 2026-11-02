@@ -3,11 +3,11 @@ package com.example.visuals;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import net.minecraft.class_1293;
-import net.minecraft.class_310;
-import net.minecraft.class_327;
-import net.minecraft.class_332;
-import net.minecraft.class_640;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.entity.effect.StatusEffectInstance;
 
 /** Info HUD: FPS, пинг, координаты, направление и эффекты (перенесён из Features.hud). */
 public final class InfoHud {
@@ -18,15 +18,15 @@ public final class InfoHud {
     private static final int HEADER = 14;
     private static final int COL_GAP = 12;
 
-    private static String time(class_1293 e) {
-        if (e.method_48559()) return "inf";
-        int s = e.method_5584() / 20;
+    private static String time(StatusEffectInstance e) {
+        if (e.isInfinite()) return "inf";
+        int s = e.getDuration() / 20;
         return String.format(Locale.ROOT, "%02d:%02d", s / 60, s % 60);
     }
 
     /** Рисует в (0,0), возвращает {w, h}. */
-    public static int[] draw(class_332 g, class_310 mc, float a) {
-        class_327 tr = mc.field_1772;
+    public static int[] draw(DrawContext g, MinecraftClient mc, float a) {
+        TextRenderer tr = mc.textRenderer;
         int accent = Config.COLORS[Config.hudColor];
 
         // ---- данные ----
@@ -35,15 +35,15 @@ public final class InfoHud {
         List<Integer> colors = new ArrayList<>();
 
         if (Config.hudFps) {
-            int fps = mc.method_47599();
+            int fps = mc.getCurrentFps();
             labels.add("FPS");
             values.add(String.valueOf(fps));
             colors.add(fps >= 60 ? HudStyle.GOOD : fps >= 30 ? HudStyle.MID : HudStyle.BAD);
         }
         if (Config.hudPing) {
-            class_640 entry = mc.method_1562() == null
-                    ? null : mc.method_1562().method_2871(mc.field_1724.method_5667());
-            int ping = entry == null ? 0 : entry.method_2959();
+            PlayerListEntry entry = mc.getNetworkHandler() == null
+                    ? null : mc.getNetworkHandler().getPlayerListEntry(mc.player.getUuid());
+            int ping = entry == null ? 0 : entry.getLatency();
             labels.add("Ping");
             values.add(ping + " ms");
             colors.add(ping <= 80 ? HudStyle.GOOD : ping <= 150 ? HudStyle.MID : HudStyle.BAD);
@@ -51,11 +51,11 @@ public final class InfoHud {
         if (Config.hudCoords) {
             labels.add("XYZ");
             values.add(String.format(Locale.ROOT, "%.1f / %.1f / %.1f",
-                    mc.field_1724.method_23317(), mc.field_1724.method_23318(), mc.field_1724.method_23321()));
+                    mc.player.getX(), mc.player.getY(), mc.player.getZ()));
             colors.add(Theme.TEXT);
         }
         if (Config.hudFacing) {
-            String f = mc.field_1724.method_5735().name().toLowerCase(Locale.ROOT);
+            String f = mc.player.getHorizontalFacing().name().toLowerCase(Locale.ROOT);
             labels.add("Facing");
             values.add(Character.toUpperCase(f.charAt(0)) + f.substring(1));
             colors.add(Theme.TEXT);
@@ -64,9 +64,9 @@ public final class InfoHud {
         List<String> effNames = new ArrayList<>();
         List<String> effTimes = new ArrayList<>();
         if (Config.hudEffects) {
-            for (class_1293 e : mc.field_1724.method_6026()) {
-                String name = e.method_5579().comp_349().method_5560().getString();
-                if (e.method_5578() > 0) name = name + " " + (e.method_5578() + 1);
+            for (StatusEffectInstance e : mc.player.getStatusEffects()) {
+                String name = e.getEffectType().value().getName().getString();
+                if (e.getAmplifier() > 0) name = name + " " + (e.getAmplifier() + 1);
                 effNames.add(name);
                 effTimes.add(time(e));
             }
@@ -74,11 +74,11 @@ public final class InfoHud {
 
         // ---- размеры ----
         String title = "ArchitektVisuals";
-        int inner = tr.method_1727(title);
+        int inner = tr.getWidth(title);
         for (int i = 0; i < labels.size(); i++)
-            inner = Math.max(inner, tr.method_1727(labels.get(i)) + COL_GAP + tr.method_1727(values.get(i)));
+            inner = Math.max(inner, tr.getWidth(labels.get(i)) + COL_GAP + tr.getWidth(values.get(i)));
         for (int i = 0; i < effNames.size(); i++)
-            inner = Math.max(inner, tr.method_1727(effNames.get(i)) + COL_GAP + tr.method_1727(effTimes.get(i)));
+            inner = Math.max(inner, tr.getWidth(effNames.get(i)) + COL_GAP + tr.getWidth(effTimes.get(i)));
 
         int w = inner + PAD * 2;
         int h = HEADER + 4 + labels.size() * LINE
