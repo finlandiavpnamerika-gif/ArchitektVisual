@@ -1,22 +1,37 @@
 {
   "schemaVersion": 1,
   "id": "visualsmod",
-  "version": "${version}",
+  "version": "1.2.0",
   "name": "ArchitektVisuals",
-  "description": "Меню с визуальными функциями + AutoSwap + ItemBind",
-  "authors": ["me"],
+  "description": "Меню с визуальными функциями + AutoSwap + ItemBind\n\nРекомендуемые моды для производительности:\n• Sodium — переписанный рендер, главный прирост FPS\n• Lithium — оптимизация логики игры: мобы, тики, физика\n• FerriteCore — меньше потребление оперативной памяти\n• ModernFix — быстрее запуск, меньше памяти, фиксы утечек\n• Entity Culling — не рисует сущности, скрытые за стенами\n• ImmediatelyFast — ускоряет отрисовку интерфейса и текста",
+  "authors": [
+    "me"
+  ],
   "license": "MIT",
   "environment": "client",
   "entrypoints": {
-    "client": ["com.example.visuals.VisualsClient"]
+    "client": [
+      "com.example.visuals.VisualsClient"
+    ]
   },
   "mixins": [
-    { "config": "visualsmod.mixins.json", "environment": "client" }
+    {
+      "config": "visualsmod.mixins.json",
+      "environment": "client"
+    }
   ],
   "depends": {
     "fabricloader": ">=0.16.0",
     "minecraft": "~1.21.1",
     "java": ">=21",
     "fabric-api": "*"
+  },
+  "recommends": {
+    "sodium": "*",
+    "lithium": "*",
+    "ferritecore": "*",
+    "modernfix": "*",
+    "entityculling": "*",
+    "immediatelyfast": "*"
   }
 }
