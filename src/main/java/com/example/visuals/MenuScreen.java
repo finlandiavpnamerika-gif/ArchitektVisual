@@ -7,12 +7,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
-import net.minecraft.class_124;
-import net.minecraft.class_2561;
-import net.minecraft.class_332;
-import net.minecraft.class_437;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
-public class MenuScreen extends class_437 {
+public class MenuScreen extends Screen {
     private static final Set<String> open = new HashSet<>();
     private static final Map<String, Float> anims = new HashMap<>();
     private final long openedAt = System.currentTimeMillis();
@@ -24,7 +24,7 @@ public class MenuScreen extends class_437 {
     private int idc;
     private int cx, cy, cw;
 
-    public MenuScreen() { super(class_2561.method_43470("ArchitektVisuals")); }
+    public MenuScreen() { super(Text.literal("ArchitektVisuals")); }
 
     // ---------- цвета и анимации ----------
     private int ff(int color) {
@@ -54,34 +54,34 @@ public class MenuScreen extends class_437 {
 
     // ---------- примитивы ----------
     private boolean hit(int x, int y, int w, int h) { return mx >= x && mx < x + w && my >= y && my < y + h; }
-    private void text(class_332 g, String s, int x, int y, int color) { g.method_25303(field_22793, s, x, y, ff(color)); }
+    private void text(DrawContext g, String s, int x, int y, int color) { g.drawTextWithShadow(textRenderer, s, x, y, ff(color)); }
 
-    private void box(class_332 g, int x, int y, int w, int h, int color) {
-        g.method_25294(x, y, x + w, y + h, ff(color));
+    private void box(DrawContext g, int x, int y, int w, int h, int color) {
+        g.fill(x, y, x + w, y + h, ff(color));
     }
 
     // Прямоугольник со срезанными углами
-    private void rbox(class_332 g, int x, int y, int w, int h, int color) {
+    private void rbox(DrawContext g, int x, int y, int w, int h, int color) {
         int c = ff(color);
-        g.method_25294(x + 1, y, x + w - 1, y + h, c);
-        g.method_25294(x, y + 1, x + 1, y + h - 1, c);
-        g.method_25294(x + w - 1, y + 1, x + w, y + h - 1, c);
+        g.fill(x + 1, y, x + w - 1, y + h, c);
+        g.fill(x, y + 1, x + 1, y + h - 1, c);
+        g.fill(x + w - 1, y + 1, x + w, y + h - 1, c);
     }
 
-    private void panel(class_332 g, String title, int x, int y, int w, int h) {
+    private void panel(DrawContext g, String title, int x, int y, int w, int h) {
         rbox(g, x + 2, y + 3, w, h, 0x45000000);
         rbox(g, x, y, w, h, Theme.PANEL_BG);
-        g.method_25296(x + 1, y + 1, x + w - 1, y + 22,
+        g.fillGradient(x + 1, y + 1, x + w - 1, y + 22,
                 ff(withAlpha(Theme.ACCENT, 48)), ff(withAlpha(Theme.ACCENT, 4)));
-        g.method_25294(x + 1, y, x + w - 1, y + 1, ff(Theme.ACCENT));
-        g.method_27534(field_22793, class_2561.method_43470(title).method_27692(class_124.field_1067),
+        g.fill(x + 1, y, x + w - 1, y + 1, ff(Theme.ACCENT));
+        g.drawCenteredTextWithShadow(textRenderer, Text.literal(title).formatted(Formatting.BOLD),
                 x + w / 2, y + 8, ff(Theme.TEXT));
-        g.method_25294(x + 8, y + 22, x + w - 8, y + 23, ff(Theme.ACCENT_DIM));
+        g.fill(x + 8, y + 22, x + w - 8, y + 23, ff(Theme.ACCENT_DIM));
         cx = x + 6; cw = w - 12; cy = y + 28;
     }
 
     // Тумблер с плавным движением ползунка
-    private void sw(class_332 g, int x, int y, String key, boolean on) {
+    private void sw(DrawContext g, int x, int y, String key, boolean on) {
         float p = anim(key, on);
         rbox(g, x, y, 24, 12, mix(Theme.TOGGLE_OFF, Theme.TOGGLE_ON, p));
         int kx = x + 2 + Math.round(p * 12);
@@ -91,12 +91,12 @@ public class MenuScreen extends class_437 {
     private int mh(String id, int options) { return 24 + (open.contains(id) ? options * 20 + 4 : 0); }
 
     // ---------- элементы ----------
-    private boolean module(class_332 g, String id, String label, String hint, boolean on, int options) {
+    private boolean module(DrawContext g, String id, String label, String hint, boolean on, int options) {
         curId = id;
         boolean hov = hit(cx, cy, cw, 22);
         rbox(g, cx, cy, cw, 22, hov ? Theme.ROW_HOVER : Theme.ROW);
 
-        if (on) g.method_25294(cx, cy + 2, cx + 2, cy + 20, ff(Theme.ACCENT)); // Полоска слева, если включено
+        if (on) g.fill(cx, cy + 2, cx + 2, cy + 20, ff(Theme.ACCENT)); // Полоска слева, если включено
 
         text(g, label + (hint.isEmpty() ? "" : " [" + hint + "]"), cx + 8, cy + 7, on ? Theme.TEXT : Theme.TEXT_DIM);
 
@@ -113,15 +113,15 @@ public class MenuScreen extends class_437 {
     }
 
     // Строка-заглушка "скоро" (без переключателя)
-    private void soon(class_332 g, String label) {
+    private void soon(DrawContext g, String label) {
         rbox(g, cx, cy, cw, 22, Theme.ROW);
         text(g, label, cx + 8, cy + 7, Theme.TEXT_DIM);
         String s = "скоро";
-        text(g, s, cx + cw - 8 - field_22793.method_1727(s), cy + 7, Theme.ACCENT);
+        text(g, s, cx + cw - 8 - textRenderer.getWidth(s), cy + 7, Theme.ACCENT);
         cy += 24;
     }
 
-    private boolean cbool(class_332 g, String label, boolean v) {
+    private boolean cbool(DrawContext g, String label, boolean v) {
         boolean hov = hit(cx, cy, cw, 18);
         rbox(g, cx, cy, cw, 18, hov ? Theme.ROW_HOVER : 0x20000000);
         text(g, label, cx + 8, cy + 5, Theme.TEXT_DIM);
@@ -131,7 +131,7 @@ public class MenuScreen extends class_437 {
         return v;
     }
 
-    private double cslider(class_332 g, String label, double min, double max, double v, boolean isInt) {
+    private double cslider(DrawContext g, String label, double min, double max, double v, boolean isInt) {
         int id = idc++;
         boolean hov = hit(cx, cy, cw, 18);
         if (clicked && hov) active = id;
@@ -146,16 +146,16 @@ public class MenuScreen extends class_437 {
         rbox(g, cx, cy, cw, 18, hov ? 0x30000000 : 0x20000000);
         if (fw > 2) {
             rbox(g, cx, cy, fw, 18, Theme.SLIDER_FILL);
-            g.method_25294(cx + fw - 2, cy + 2, cx + fw, cy + 16, ff(0xCCFFFFFF));
+            g.fill(cx + fw - 2, cy + 2, cx + fw, cy + 16, ff(0xCCFFFFFF));
         }
 
         String val = isInt ? String.valueOf((int) v) : String.valueOf(v);
-        g.method_25300(field_22793, label + ": " + val, cx + cw / 2, cy + 5, ff(Theme.TEXT));
+        g.drawCenteredTextWithShadow(textRenderer, label + ": " + val, cx + cw / 2, cy + 5, ff(Theme.TEXT));
         cy += 20;
         return v;
     }
 
-    private int ccycle(class_332 g, String label, String[] names, int idx) {
+    private int ccycle(DrawContext g, String label, String[] names, int idx) {
         boolean hov = hit(cx, cy, cw, 18);
         rbox(g, cx, cy, cw, 18, hov ? Theme.ROW_HOVER : 0x20000000);
         text(g, label + ": " + names[Math.max(0, Math.min(idx, names.length - 1))], cx + 8, cy + 5, Theme.TEXT_DIM);
@@ -166,7 +166,7 @@ public class MenuScreen extends class_437 {
     }
 
     // Палитра: градиентная полоска, возвращает позицию маркера 0..1
-    private double cgrad(class_332 g, double t, java.util.function.DoubleToIntFunction colorAt) {
+    private double cgrad(DrawContext g, double t, java.util.function.DoubleToIntFunction colorAt) {
         int id = idc++;
         boolean hov = hit(cx, cy, cw, 16);
         if (clicked && hov) active = id;
@@ -174,32 +174,32 @@ public class MenuScreen extends class_437 {
 
         for (int x = 0; x < cw; x += 2) {
             int x2 = Math.min(x + 2, cw);
-            g.method_25294(cx + x, cy, cx + x2, cy + 16, ff(0xFF000000 | colorAt.applyAsInt((x + 1.0) / cw)));
+            g.fill(cx + x, cy, cx + x2, cy + 16, ff(0xFF000000 | colorAt.applyAsInt((x + 1.0) / cw)));
         }
         int mxp = cx + (int) (cw * t);
-        g.method_25294(mxp - 2, cy - 1, mxp + 1, cy + 17, ff(0xFF000000));   // обводка маркера
-        g.method_25294(mxp - 1, cy, mxp, cy + 16, ff(0xFFFFFFFF));           // маркер
+        g.fill(mxp - 2, cy - 1, mxp + 1, cy + 17, ff(0xFF000000));   // обводка маркера
+        g.fill(mxp - 1, cy, mxp, cy + 16, ff(0xFFFFFFFF));           // маркер
         cy += 20;
         return t;
     }
 
     private static int hsv(double h, double s, double v) {
-        return net.minecraft.class_3532.method_15369((float) h, (float) s, (float) v) & 0xFFFFFF;
+        return net.minecraft.util.math.MathHelper.hsvToRgb((float) h, (float) s, (float) v) & 0xFFFFFF;
     }
 
-    private void hint2(class_332 g, String l1, String l2) {
+    private void hint2(DrawContext g, String l1, String l2) {
         int max = cw - 4;
-        text(g, field_22793.method_27523(l1, max), cx + 4, cy + 2, Theme.TEXT_DIM);
-        text(g, field_22793.method_27523(l2, max), cx + 4, cy + 12, Theme.TEXT_DIM);
+        text(g, textRenderer.trimToWidth(l1, max), cx + 4, cy + 2, Theme.TEXT_DIM);
+        text(g, textRenderer.trimToWidth(l2, max), cx + 4, cy + 12, Theme.TEXT_DIM);
         cy += 24;
     }
 
-    private int listRow(class_332 g, int key, String label) {
+    private int listRow(DrawContext g, int key, String label) {
         boolean hov = hit(cx, cy, cw, 18);
         boolean overX = hit(cx + cw - 16, cy, 16, 18);
         rbox(g, cx, cy, cw, 18, hov ? Theme.ROW_HOVER : 0x20000000);
         String full = "[" + Keys.name(key) + "] " + label;
-        text(g, field_22793.method_27523(full, cw - 22), cx + 6, cy + 5, key == -1 ? 0xFFFF5555 : Theme.TEXT);
+        text(g, textRenderer.trimToWidth(full, cw - 22), cx + 6, cy + 5, key == -1 ? 0xFFFF5555 : Theme.TEXT);
         text(g, "✕", cx + cw - 12, cy + 5, overX ? 0xFFFF5555 : Theme.TEXT_DIM);
         int result = 0;
         if (clicked && hov) result = overX ? 2 : 1;
@@ -207,18 +207,18 @@ public class MenuScreen extends class_437 {
         return result;
     }
 
-    private void screenButton(class_332 g, String label, Supplier<class_437> screen) {
+    private void screenButton(DrawContext g, String label, Supplier<Screen> screen) {
         boolean hov = hit(cx, cy, cw, 22);
         rbox(g, cx, cy, cw, 22, hov ? Theme.ACCENT_DIM : Theme.ROW);
         text(g, label, cx + 8, cy + 7, Theme.TEXT);
-        if (clicked && hov) field_22787.method_1507(screen.get());
+        if (clicked && hov) client.setScreen(screen.get());
         cy += 24;
     }
 
     @Override
-    public void method_25394(class_332 g, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext g, int mouseX, int mouseY, float delta) {
         mx = mouseX; my = mouseY;
-        long window = field_22787.method_22683().method_4490();
+        long window = client.getWindow().getHandle();
         down = GLFW.glfwGetMouseButton(window, 0) == GLFW.GLFW_PRESS;
         clicked = down && !prevDown;
         prevDown = down;
@@ -231,13 +231,13 @@ public class MenuScreen extends class_437 {
         int slide = Math.round((1f - fade) * 10f);
 
         // Фон: затемнение с градиентом и лёгкий дождь
-        g.method_25296(0, 0, field_22789, field_22790, 0x80080810, 0xC0000000);
-        RainyScene.drawRain(g, field_22789, field_22790, 0.6f);
+        g.fillGradient(0, 0, width, height, 0x80080810, 0xC0000000);
+        RainyScene.drawRain(g, width, height, 0.6f);
 
         int cols = 4;
-        int colW = Math.max(110, Math.min(150, (field_22789 - 30) / cols));
+        int colW = Math.max(110, Math.min(150, (width - 30) / cols));
         int gap = 10;
-        int x0 = (field_22789 - (colW * cols + gap * (cols - 1))) / 2;
+        int x0 = (width - (colW * cols + gap * (cols - 1))) / 2;
         int y0 = 14 + slide;
         int step = colW + gap;
 
@@ -349,7 +349,7 @@ public class MenuScreen extends class_437 {
             if (toRemove != null) { Config.swapPairs.remove(toRemove); Config.save(); }
             else if (toRebind != null) {
                 final SwapPair sp = toRebind;
-                field_22787.execute(() -> field_22787.method_1507(new BindScreen(this, "AutoSwap: " + sp.a + " <-> " + sp.b, k -> ItemFeatures.setKey(sp, k))));
+                client.execute(() -> client.setScreen(new BindScreen(this, "AutoSwap: " + sp.a + " <-> " + sp.b, k -> ItemFeatures.setKey(sp, k))));
             }
         }
 
@@ -364,7 +364,7 @@ public class MenuScreen extends class_437 {
             if (toRemove != null) { Config.binds.remove(toRemove); Config.save(); }
             else if (toRebind != null) {
                 final BoundItem b = toRebind;
-                field_22787.execute(() -> field_22787.method_1507(new BindScreen(this, "ItemBind: " + b.name, k -> ItemFeatures.setKey(b, k))));
+                client.execute(() -> client.setScreen(new BindScreen(this, "ItemBind: " + b.name, k -> ItemFeatures.setKey(b, k))));
             }
         }
 
@@ -421,15 +421,15 @@ public class MenuScreen extends class_437 {
 
         // Кнопка закрытия
         int bw = 160; int bh = 20;
-        int bx = (field_22789 - bw) / 2; int by = field_22790 - bh - 10;
+        int bx = (width - bw) / 2; int by = height - bh - 10;
         boolean hov = hit(bx, by, bw, bh);
         rbox(g, bx + 1, by + 2, bw, bh, 0x40000000);
         rbox(g, bx, by, bw, bh, hov ? Theme.ACCENT : Theme.PANEL_BG);
-        g.method_25294(bx + 1, by, bx + bw - 1, by + 1, ff(Theme.ACCENT));
-        g.method_25300(field_22793, "ArchitektVisuals | Закрыть", field_22789 / 2, by + 6, ff(Theme.TEXT));
-        if (clicked && hov) method_25419();
+        g.fill(bx + 1, by, bx + bw - 1, by + 1, ff(Theme.ACCENT));
+        g.drawCenteredTextWithShadow(textRenderer, "ArchitektVisuals | Закрыть", width / 2, by + 6, ff(Theme.TEXT));
+        if (clicked && hov) close();
     }
 
     @Override
-    public void method_25432() { Config.save(); }
+    public void removed() { Config.save(); }
 }
