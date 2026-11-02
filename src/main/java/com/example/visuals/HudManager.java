@@ -2,9 +2,10 @@ package com.example.visuals;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.class_310;
-import net.minecraft.class_327;
-import net.minecraft.class_332;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.ChatScreen;
 import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
@@ -26,7 +27,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.keystrokesX = x; Config.keystrokesY = y; }
             public double scale() { return Config.keystrokesScale; }
             public double alpha() { return Config.keystrokesAlpha; }
-            public int[] draw(class_332 g, class_310 mc, float a) { return KeystrokesHud.draw(g, mc, a); }
+            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return KeystrokesHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("ArrayList") {
             public boolean enabled() { return Config.arrayList; }
@@ -35,7 +36,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.arrayListX = x; Config.arrayListY = y; }
             public double scale() { return Config.arrayListScale; }
             public double alpha() { return Config.arrayListAlpha; }
-            public int[] draw(class_332 g, class_310 mc, float a) { return ArrayListHud.draw(g, mc, a); }
+            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return ArrayListHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("Armor") {
             public boolean enabled() { return Config.armorHud; }
@@ -44,7 +45,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.armorHudX = x; Config.armorHudY = y; }
             public double scale() { return Config.armorHudScale; }
             public double alpha() { return Config.armorHudAlpha; }
-            public int[] draw(class_332 g, class_310 mc, float a) { return ArmorHud.draw(g, mc, a); }
+            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return ArmorHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("Info") {
             public boolean enabled() { return Config.hud; }
@@ -53,7 +54,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.hudX = x; Config.hudY = y; }
             public double scale() { return Config.hudScale; }
             public double alpha() { return Config.hudAlpha; }
-            public int[] draw(class_332 g, class_310 mc, float a) { return InfoHud.draw(g, mc, a); }
+            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return InfoHud.draw(g, mc, a); }
         });
     }
 
@@ -65,13 +66,13 @@ public final class HudManager {
     private static boolean moved = false;
 
     /** Вызывается каждый кадр из Features.hud. */
-    public static void render(class_332 g, class_310 mc) {
-        if (mc.field_1724 == null || mc.field_1690.field_1842) {
+    public static void render(DrawContext g, MinecraftClient mc) {
+        if (mc.player == null || mc.options.hudHidden) {
             stopEdit();
             return;
         }
 
-        Matrix3x2fStack m = g.method_51448();
+        Matrix3x2fStack m = g.getMatrices();
         for (HudElement e : ELEMENTS) {
             e.visible = false;
             if (!e.enabled()) continue;
@@ -98,11 +99,9 @@ public final class HudManager {
         else stopEdit();
     }
 
-    /** Открыт ли чат (по имени класса: net.minecraft.class_408 / ChatScreen). */
-    private static boolean isChatOpen(class_310 mc) {
-        if (mc.field_1755 == null) return false;
-        String n = mc.field_1755.getClass().getName();
-        return n.endsWith("class_408") || n.endsWith("ChatScreen");
+    /** Открыт ли чат. */
+    private static boolean isChatOpen(MinecraftClient mc) {
+        return mc.currentScreen instanceof ChatScreen;
     }
 
     private static void stopEdit() {
@@ -112,10 +111,10 @@ public final class HudManager {
         editActive = false;
     }
 
-    private static void edit(class_332 g, class_310 mc) {
-        long window = mc.method_22683().method_4490();
-        int sw = mc.method_22683().method_4486();
-        int sh = mc.method_22683().method_4502();
+    private static void edit(DrawContext g, MinecraftClient mc) {
+        long window = mc.getWindow().getHandle();
+        int sw = mc.getWindow().getScaledWidth();
+        int sh = mc.getWindow().getScaledHeight();
 
         double[] cx = new double[1];
         double[] cy = new double[1];
@@ -165,19 +164,19 @@ public final class HudManager {
         }
 
         // --- оверлей редактирования ---
-        class_327 tr = mc.field_1772;
+        TextRenderer tr = mc.textRenderer;
         HudElement hover = dragging != null ? dragging : top;
         for (HudElement e : ELEMENTS) {
             if (!e.visible) continue;
             boolean hot = e == hover;
             int p = 2;
-            if (hot) g.method_25294(e.bx - p, e.by - p, e.bx + e.bw + p, e.by + e.bh + p, 0x18FFFFFF);
+            if (hot) g.fill(e.bx - p, e.by - p, e.bx + e.bw + p, e.by + e.bh + p, 0x18FFFFFF);
             HudStyle.rectRing(g, e.bx - p, e.by - p, e.bw + p * 2, e.bh + p * 2,
                     HudStyle.withAlpha(Theme.ACCENT, hot ? 1f : 0.45f));
             int ty = e.by - p - 10;
             if (ty < 1) ty = e.by + e.bh + p + 2;
-            g.method_25303(tr, e.name, e.bx, ty, hot ? Theme.TEXT : Theme.TEXT_DIM);
+            g.drawTextWithShadow(tr, e.name, e.bx, ty, hot ? Theme.TEXT : Theme.TEXT_DIM);
         }
-        g.method_25300(tr, "Перетаскивай HUD мышью", sw / 2, 4, Theme.TEXT_DIM);
+        g.drawCenteredTextWithShadow(tr, "Перетаскивай HUD мышью", sw / 2, 4, Theme.TEXT_DIM);
     }
 }
