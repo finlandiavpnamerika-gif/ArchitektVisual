@@ -2,9 +2,9 @@ package com.example.visuals;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.class_310;
-import net.minecraft.class_327;
-import net.minecraft.class_332;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 
 /** ArrayList — список включённых модулей, самые длинные названия сверху. */
 public final class ArrayListHud {
@@ -14,8 +14,8 @@ public final class ArrayListHud {
     private static final int PAD = 4;
 
     /** Рисует в (0,0), возвращает {w, h} или null, если включённых модулей нет. */
-    public static int[] draw(class_332 g, class_310 mc, float a) {
-        class_327 tr = mc.field_1772;
+    public static int[] draw(DrawContext g, MinecraftClient mc, float a) {
+        TextRenderer tr = mc.textRenderer;
         int accent = Config.COLORS[Config.arrayListColor];
 
         List<String> mods = new ArrayList<>();
@@ -33,10 +33,10 @@ public final class ArrayListHud {
 
         if (mods.isEmpty()) return null;
 
-        mods.sort((p, q) -> tr.method_1727(q) - tr.method_1727(p));   // длинные сверху
+        mods.sort((p, q) -> tr.getWidth(q) - tr.getWidth(p));   // длинные сверху
 
         int maxW = 0;
-        for (String s : mods) maxW = Math.max(maxW, tr.method_1727(s));
+        for (String s : mods) maxW = Math.max(maxW, tr.getWidth(s));
 
         int barX = PAD;                       // акцентная полоска слева
         int textX = PAD + 2 + 4;
