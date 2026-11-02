@@ -61,6 +61,7 @@ public final class Config {
     public static boolean hudFacing = true;
     public static boolean hudEffects = true;
     public static double hudScale = 1.0;
+    public static double hudAlpha = 1.0;            // прозрачность 0.1..1.0
     public static int hudX = 4;
     public static int hudY = 4;
     public static int hudColor = 2;
@@ -69,6 +70,8 @@ public final class Config {
     public static boolean arrayList = true;
     public static int arrayListColor = 2;
     public static boolean arrayListShadow = true;
+    public static double arrayListScale = 1.0;
+    public static double arrayListAlpha = 1.0;
     public static int arrayListX = 4;
     public static int arrayListY = 4;
 
@@ -77,6 +80,7 @@ public final class Config {
     public static int keystrokesX = 4;
     public static int keystrokesY = 150;
     public static double keystrokesScale = 1.0;
+    public static double keystrokesAlpha = 1.0;
     public static int keystrokesColor = 2;
     public static boolean keystrokesShowMouse = true; // Добавлено
     public static boolean keystrokesShowSpace = true;
@@ -86,6 +90,7 @@ public final class Config {
     public static int armorHudX = 4;
     public static int armorHudY = 220;
     public static double armorHudScale = 1.0;
+    public static double armorHudAlpha = 1.0;
     public static boolean armorHudShowTool = true;
     public static boolean armorHudShowDurability = true;
 
@@ -165,6 +170,7 @@ public final class Config {
             o.addProperty("hudFacing", hudFacing);
             o.addProperty("hudEffects", hudEffects);
             o.addProperty("hudScale", hudScale);
+            o.addProperty("hudAlpha", hudAlpha);
             o.addProperty("hudX", hudX);
             o.addProperty("hudY", hudY);
             o.addProperty("hudColor", hudColor);
@@ -173,12 +179,15 @@ public final class Config {
             o.addProperty("arrayList", arrayList);
             o.addProperty("arrayListColor", arrayListColor);
             o.addProperty("arrayListShadow", arrayListShadow);
+            o.addProperty("arrayListScale", arrayListScale);
+            o.addProperty("arrayListAlpha", arrayListAlpha);
             o.addProperty("arrayListX", arrayListX);
             o.addProperty("arrayListY", arrayListY);
             o.addProperty("keystrokes", keystrokes);
             o.addProperty("keystrokesX", keystrokesX);
             o.addProperty("keystrokesY", keystrokesY);
             o.addProperty("keystrokesScale", keystrokesScale);
+            o.addProperty("keystrokesAlpha", keystrokesAlpha);
             o.addProperty("keystrokesColor", keystrokesColor);
             o.addProperty("keystrokesShowMouse", keystrokesShowMouse);
             o.addProperty("keystrokesShowSpace", keystrokesShowSpace);
@@ -188,6 +197,7 @@ public final class Config {
             o.addProperty("armorHudX", armorHudX);
             o.addProperty("armorHudY", armorHudY);
             o.addProperty("armorHudScale", armorHudScale);
+            o.addProperty("armorHudAlpha", armorHudAlpha);
             o.addProperty("armorHudShowTool", armorHudShowTool);
             o.addProperty("armorHudShowDurability", armorHudShowDurability);
 
@@ -253,6 +263,7 @@ public final class Config {
                 hudFacing = b(o, "hudFacing", hudFacing);
                 hudEffects = b(o, "hudEffects", hudEffects);
                 hudScale = d(o, "hudScale", hudScale);
+                hudAlpha = d(o, "hudAlpha", hudAlpha);
                 hudX = (int) d(o, "hudX", hudX);
                 hudY = (int) d(o, "hudY", hudY);
                 hudColor = (int) d(o, "hudColor", hudColor);
@@ -261,12 +272,15 @@ public final class Config {
                 arrayList = b(o, "arrayList", arrayList);
                 arrayListColor = (int) d(o, "arrayListColor", arrayListColor);
                 arrayListShadow = b(o, "arrayListShadow", arrayListShadow);
+                arrayListScale = d(o, "arrayListScale", arrayListScale);
+                arrayListAlpha = d(o, "arrayListAlpha", arrayListAlpha);
                 arrayListX = (int) d(o, "arrayListX", arrayListX);
                 arrayListY = (int) d(o, "arrayListY", arrayListY);
                 keystrokes = b(o, "keystrokes", keystrokes);
                 keystrokesX = (int) d(o, "keystrokesX", keystrokesX);
                 keystrokesY = (int) d(o, "keystrokesY", keystrokesY);
                 keystrokesScale = d(o, "keystrokesScale", keystrokesScale);
+                keystrokesAlpha = d(o, "keystrokesAlpha", keystrokesAlpha);
                 keystrokesColor = (int) d(o, "keystrokesColor", keystrokesColor);
                 keystrokesShowMouse = b(o, "keystrokesShowMouse", keystrokesShowMouse);
                 keystrokesShowSpace = b(o, "keystrokesShowSpace", keystrokesShowSpace);
@@ -276,6 +290,7 @@ public final class Config {
                 armorHudX = (int) d(o, "armorHudX", armorHudX);
                 armorHudY = (int) d(o, "armorHudY", armorHudY);
                 armorHudScale = d(o, "armorHudScale", armorHudScale);
+                armorHudAlpha = d(o, "armorHudAlpha", armorHudAlpha);
                 armorHudShowTool = b(o, "armorHudShowTool", armorHudShowTool);
                 armorHudShowDurability = b(o, "armorHudShowDurability", armorHudShowDurability);
 
