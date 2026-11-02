@@ -1,7 +1,7 @@
 package com.example.visuals;
 
-import net.minecraft.class_310;
-import net.minecraft.class_332;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 
 /**
  * Один перетаскиваемый HUD-элемент.
@@ -25,7 +25,7 @@ public abstract class HudElement {
     public abstract double alpha();
 
     /** @return {w, h} или null, если рисовать нечего */
-    public abstract int[] draw(class_332 g, class_310 mc, float alpha);
+    public abstract int[] draw(DrawContext g, MinecraftClient mc, float alpha);
 
     public boolean contains(int mx, int my) {
         return mx >= bx && mx < bx + bw && my >= by && my < by + bh;
