@@ -2,11 +2,11 @@ package com.example.visuals;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.class_1304;
-import net.minecraft.class_1799;
-import net.minecraft.class_310;
-import net.minecraft.class_327;
-import net.minecraft.class_332;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ItemStack;
 
 /** Armor + Tool HUD: иконки брони и предмета в руке, цифра и полоска прочности. */
 public final class ArmorHud {
@@ -19,25 +19,25 @@ public final class ArmorHud {
     private static final int MIN_BAR = 26;
 
     /** Рисует в (0,0), возвращает {w, h}. */
-    public static int[] draw(class_332 g, class_310 mc, float a) {
-        class_327 tr = mc.field_1772;
+    public static int[] draw(DrawContext g, MinecraftClient mc, float a) {
+        TextRenderer tr = mc.textRenderer;
 
-        List<class_1799> items = new ArrayList<>();
-        items.add(mc.field_1724.method_6118(class_1304.field_6169));   // шлем
-        items.add(mc.field_1724.method_6118(class_1304.field_6174));   // нагрудник
-        items.add(mc.field_1724.method_6118(class_1304.field_6172));   // поножи
-        items.add(mc.field_1724.method_6118(class_1304.field_6166));   // ботинки
+        List<ItemStack> items = new ArrayList<>();
+        items.add(mc.player.getEquippedStack(EquipmentSlot.HEAD));   // шлем
+        items.add(mc.player.getEquippedStack(EquipmentSlot.CHEST));   // нагрудник
+        items.add(mc.player.getEquippedStack(EquipmentSlot.LEGS));   // поножи
+        items.add(mc.player.getEquippedStack(EquipmentSlot.FEET));   // ботинки
         boolean tool = Config.armorHudShowTool;
-        if (tool) items.add(mc.field_1724.method_6047());
+        if (tool) items.add(mc.player.getMainHandStack());
 
         boolean showDur = Config.armorHudShowDurability;
 
         // ширина колонки с цифрой/полоской
         int barW = MIN_BAR;
         if (showDur) {
-            for (class_1799 st : items) {
-                if (!st.method_7960() && st.method_7963()) {
-                    barW = Math.max(barW, tr.method_1727(String.valueOf(st.method_7936() - st.method_7919())));
+            for (ItemStack st : items) {
+                if (!st.isEmpty() && st.isDamageable()) {
+                    barW = Math.max(barW, tr.getWidth(String.valueOf(st.getMaxDamage() - st.getDamage())));
                 }
             }
         }
@@ -48,24 +48,24 @@ public final class ArmorHud {
         HudStyle.panel(g, 0, 0, w, h, a, Theme.ACCENT);
 
         for (int i = 0; i < items.size(); i++) {
-            class_1799 st = items.get(i);
+            ItemStack st = items.get(i);
             int y = PAD + i * ROW + (tool && i == 4 ? TOOL_GAP : 0);
 
             if (tool && i == 4) {
                 HudStyle.divider(g, PAD, w - PAD, y - TOOL_GAP / 2 - 1, 0x30FFFFFF, a);
             }
 
-            if (st.method_7960()) {
+            if (st.isEmpty()) {
                 // пустой слот: еле заметная плашка, чтобы раскладка не прыгала
                 HudStyle.roundFill(g, PAD, y, ICON, ICON, 2, HudStyle.withAlpha(0x22FFFFFF, a));
                 continue;
             }
 
-            g.method_51427(st, PAD, y);   // иконка (прозрачность на неё не действует)
+            g.drawItem(st, PAD, y);   // иконка (прозрачность на неё не действует)
 
-            if (showDur && st.method_7963()) {
-                int max = st.method_7936();
-                int left = max - st.method_7919();
+            if (showDur && st.isDamageable()) {
+                int max = st.getMaxDamage();
+                int left = max - st.getDamage();
                 float ratio = max > 0 ? (float) left / max : 0f;
                 int col = HudStyle.ratioColor(ratio);
                 int tx = PAD + ICON + 4;
