@@ -1,68 +1,79 @@
 package com.example.visuals;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
-import org.joml.Matrix3x2fStack;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.class_1304;
+import net.minecraft.class_1799;
+import net.minecraft.class_310;
+import net.minecraft.class_327;
+import net.minecraft.class_332;
 
-/** Armor + Tool HUD: иконки брони, инструмента и полоски прочности. */
+/** Armor + Tool HUD: иконки брони и предмета в руке, цифра и полоска прочности. */
 public final class ArmorHud {
     private ArmorHud() {}
 
-    private static final int SLOT = 18;
+    private static final int PAD = 4;
+    private static final int ICON = 16;
+    private static final int ROW = 18;
+    private static final int TOOL_GAP = 4;   // отступ перед предметом в руке
+    private static final int MIN_BAR = 26;
 
-    public static void render(DrawContext g, MinecraftClient mc) {
-        if (!Config.armorHud) return;
-        if (mc.player == null || mc.options.hudHidden) return;
+    /** Рисует в (0,0), возвращает {w, h}. */
+    public static int[] draw(class_332 g, class_310 mc, float a) {
+        class_327 tr = mc.field_1772;
 
-        TextRenderer tr = mc.textRenderer;
+        List<class_1799> items = new ArrayList<>();
+        items.add(mc.field_1724.method_6118(class_1304.field_6169));   // шлем
+        items.add(mc.field_1724.method_6118(class_1304.field_6174));   // нагрудник
+        items.add(mc.field_1724.method_6118(class_1304.field_6172));   // поножи
+        items.add(mc.field_1724.method_6118(class_1304.field_6166));   // ботинки
+        boolean tool = Config.armorHudShowTool;
+        if (tool) items.add(mc.field_1724.method_6047());
 
-        List<ItemStack> items = new ArrayList<>();
-        items.add(mc.player.getEquippedStack(EquipmentSlot.HEAD));
-        items.add(mc.player.getEquippedStack(EquipmentSlot.CHEST));
-        items.add(mc.player.getEquippedStack(EquipmentSlot.LEGS));
-        items.add(mc.player.getEquippedStack(EquipmentSlot.FEET));
-        if (Config.armorHudShowTool) {
-            items.add(mc.player.getMainHandStack());
+        boolean showDur = Config.armorHudShowDurability;
+
+        // ширина колонки с цифрой/полоской
+        int barW = MIN_BAR;
+        if (showDur) {
+            for (class_1799 st : items) {
+                if (!st.method_7960() && st.method_7963()) {
+                    barW = Math.max(barW, tr.method_1727(String.valueOf(st.method_7936() - st.method_7919())));
+                }
+            }
         }
 
-        Matrix3x2fStack m = g.getMatrices();
-        m.pushMatrix();
-        m.translate((float) Config.armorHudX, (float) Config.armorHudY);
-        m.scale((float) Config.armorHudScale, (float) Config.armorHudScale);
+        int w = PAD * 2 + ICON + (showDur ? 4 + barW : 0);
+        int h = PAD * 2 + items.size() * ROW - (ROW - ICON) + (tool ? TOOL_GAP : 0);
 
-        int y = 0;
-        for (ItemStack st : items) {
-            if (st.isEmpty()) {
-                y += SLOT;
+        HudStyle.panel(g, 0, 0, w, h, a, Theme.ACCENT);
+
+        for (int i = 0; i < items.size(); i++) {
+            class_1799 st = items.get(i);
+            int y = PAD + i * ROW + (tool && i == 4 ? TOOL_GAP : 0);
+
+            if (tool && i == 4) {
+                HudStyle.divider(g, PAD, w - PAD, y - TOOL_GAP / 2 - 1, 0x30FFFFFF, a);
+            }
+
+            if (st.method_7960()) {
+                // пустой слот: еле заметная плашка, чтобы раскладка не прыгала
+                HudStyle.roundFill(g, PAD, y, ICON, ICON, 2, HudStyle.withAlpha(0x22FFFFFF, a));
                 continue;
             }
 
-            // Иконка предмета
-            g.drawItem(st, 0, y);
+            g.method_51427(st, PAD, y);   // иконка (прозрачность на неё не действует)
 
-            // Прочность
-            if (Config.armorHudShowDurability && st.isDamageable()) {
-                int max = st.getMaxDamage();
-                int dmg = st.getDamage();
-                int left = max - dmg;
+            if (showDur && st.method_7963()) {
+                int max = st.method_7936();
+                int left = max - st.method_7919();
                 float ratio = max > 0 ? (float) left / max : 0f;
+                int col = HudStyle.ratioColor(ratio);
+                int tx = PAD + ICON + 4;
 
-                HudUtils.durabilityBar(g, 0, y + 16, 16, ratio);
-
-                // Цифра прочности
-                String txt = String.valueOf(left);
-                g.drawTextWithShadow(tr, txt, 18, y + 8, Theme.TEXT);
+                HudStyle.text(g, tr, String.valueOf(left), tx, y + 1, col, a, true);
+                HudStyle.bar(g, tx, y + 11, barW, 3, ratio, col, a);
             }
-
-            y += SLOT;
         }
-
-        m.popMatrix();
+        return new int[] {w, h};
     }
 }
