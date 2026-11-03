@@ -4,5 +4,6 @@
   "key.visualsmod.freelook": "Freelook (hold)",
   "key.visualsmod.swap_select": "AutoSwap: pick item (in inventory)",
   "key.visualsmod.bind_select": "ItemBind: pick item (in inventory)",
+  "key.visualsmod.highlight_select": "Highlight: pick item (in inventory)",
   "key.category.visualsmod.main": "Visuals"
 }
