@@ -207,6 +207,18 @@ public class MenuScreen extends Screen {
         return result;
     }
 
+    // Строка с названием предмета и крестиком удаления (2 = нажат крестик)
+    private int nameRow(DrawContext g, String label) {
+        boolean hov = hit(cx, cy, cw, 18);
+        boolean overX = hit(cx + cw - 16, cy, 16, 18);
+        rbox(g, cx, cy, cw, 18, hov ? Theme.ROW_HOVER : 0x20000000);
+        text(g, textRenderer.trimToWidth(label, cw - 22), cx + 6, cy + 5, Theme.TEXT);
+        text(g, "✕", cx + cw - 12, cy + 5, overX ? 0xFFFF5555 : Theme.TEXT_DIM);
+        int result = (clicked && overX) ? 2 : 0;
+        cy += 20;
+        return result;
+    }
+
     private void screenButton(DrawContext g, String label, Supplier<Screen> screen) {
         boolean hov = hit(cx, cy, cw, 22);
         rbox(g, cx, cy, cw, 22, hov ? Theme.ACCENT_DIM : Theme.ROW);
@@ -254,7 +266,7 @@ public class MenuScreen extends Screen {
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4);
+        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
@@ -279,6 +291,11 @@ public class MenuScreen extends Screen {
             }
             Config.trailsLength = (int) cslider(g, "Длина (тики)", 10, 80, Config.trailsLength, true);
             Config.trailsHeight = cslider(g, "Высота", 0.1, 2.0, Config.trailsHeight, false);
+        }
+
+        Config.zones = module(g, "zones", "FunTime Zones", "", Config.zones, 1);
+        if (open.contains("zones")) {
+            Config.zonesHeld = cbool(g, "Чужие в руке", Config.zonesHeld);
         }
 
         // 3. HUD
@@ -407,10 +424,22 @@ public class MenuScreen extends Screen {
         Config.predictions = module(g, "pred", "Predictions", "", Config.predictions, 0);
 
         // 7. Extra Visuals 2
-        int hEx2 = 34 + mh("physic", 0) + mh("shulker", 0);
+        int hEx2 = 34 + mh("physic", 0) + mh("shulker", 0) + mh("hl", 3 * Config.highlights.size() + 1);
         panel(g, "Extra Visuals 2", x0 + step * 2, y1, colW, hEx2);
         Config.itemPhysic = module(g, "physic", "Item Physic", "", Config.itemPhysic, 0);
         Config.shulkerPreview = module(g, "shulker", "Shulker Prev", "", Config.shulkerPreview, 0);
+
+        Config.highlight = module(g, "hl", "Item Highlight", ItemHighlight.keyName(), Config.highlight, 3 * Config.highlights.size() + 1);
+        if (open.contains("hl")) {
+            ItemHighlight.Entry toRemove = null;
+            for (ItemHighlight.Entry e : Config.highlights) {
+                if (nameRow(g, e.name) == 2) toRemove = e;
+                e.hue = cgrad(g, e.hue, pos -> hsv(pos, 0.85, 1.0));
+                e.alpha = cslider(g, "Прозрачность", 0.1, 1.0, e.alpha, false);
+            }
+            hint2(g, "Наведи на предмет", "и жми [" + ItemHighlight.keyName() + "]");
+            if (toRemove != null) { Config.highlights.remove(toRemove); Config.save(); }
+        }
 
         // 8. Misc (+24: кнопка под Macros)
         int hMisc = 34 + mh("macro", 0) + mh("stream", 0) + 24;
