@@ -21,11 +21,13 @@ public class VisualsClient implements ClientModInitializer {
     public static KeyBinding freelookKey;
     public static KeyBinding swapSelectKey;
     public static KeyBinding bindSelectKey;
+    public static KeyBinding highlightKey;
 
     @Override
     public void onInitializeClient() {
         Config.load();
         AltManagerInit.register();
+        FuntimeHelper.register();
         Theme.apply();
 
         // В 1.21.9+ категория - объект, а не строка
@@ -66,6 +68,13 @@ public class VisualsClient implements ClientModInitializer {
                 category
         ));
 
+        highlightKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.visualsmod.highlight_select",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_H,
+                category
+        ));
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (menuKey.wasPressed()) {
                 client.setScreen(new MenuScreen());
@@ -73,6 +82,8 @@ public class VisualsClient implements ClientModInitializer {
             Features.tick(client);
             ItemFeatures.tick(client);
             TrailRenderer.tick();
+            FuntimeHelper.tick();
+            ItemHighlight.tick(client);
         });
 
         HudRenderCallback.EVENT.register((drawContext, tickCounter) -> Features.hud(drawContext, tickCounter));
