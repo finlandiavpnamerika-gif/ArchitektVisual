@@ -120,6 +120,14 @@ public final class Config {
     public static boolean trailsCustom = false;   // своя палитра вместо списка цветов
     public static double trailsHue = 0.75, trailsSat = 0.8, trailsVal = 1.0;
 
+    // --- FunTime Helper (радиусы зон) ---
+    public static boolean zones = true;
+    public static boolean zonesHeld = true;   // показывать радиус у игроков с предметом в руке
+
+    // --- Item Highlight ---
+    public static boolean highlight = true;
+    public static final List<ItemHighlight.Entry> highlights = new ArrayList<>();
+
     // --- Друзья ---
     public static final List<String> friends = new ArrayList<>();
 
@@ -161,6 +169,8 @@ public final class Config {
             o.addProperty("trailsHue", trailsHue);
             o.addProperty("trailsSat", trailsSat);
             o.addProperty("trailsVal", trailsVal);
+            o.addProperty("zones", zones);
+            o.addProperty("zonesHeld", zonesHeld);
 
             // HUD
             o.addProperty("hud", hud);
@@ -212,6 +222,18 @@ public final class Config {
             for (String m : macros) mac.add(m);
             o.add("macros", mac);
 
+            // Item Highlight
+            o.addProperty("highlight", highlight);
+            JsonArray hl = new JsonArray();
+            for (ItemHighlight.Entry e : highlights) {
+                JsonObject jo = new JsonObject();
+                jo.addProperty("name", e.name);
+                jo.addProperty("hue", e.hue);
+                jo.addProperty("alpha", e.alpha);
+                hl.add(jo);
+            }
+            o.add("highlights", hl);
+
             // Друзья
             JsonArray fArr = new JsonArray();
             for (String f : friends) fArr.add(f);
@@ -254,6 +276,8 @@ public final class Config {
                 trailsHue = d(o, "trailsHue", trailsHue);
                 trailsSat = d(o, "trailsSat", trailsSat);
                 trailsVal = d(o, "trailsVal", trailsVal);
+                zones = b(o, "zones", zones);
+                zonesHeld = b(o, "zonesHeld", zonesHeld);
 
                 // HUD
                 hud = b(o, "hud", hud);
@@ -302,6 +326,18 @@ public final class Config {
 
                 macros.clear();
                 if (o.has("macros")) for (JsonElement el : o.getAsJsonArray("macros")) macros.add(el.getAsString());
+
+                highlight = b(o, "highlight", highlight);
+                highlights.clear();
+                if (o.has("highlights")) {
+                    for (JsonElement el : o.getAsJsonArray("highlights")) {
+                        JsonObject jo = el.getAsJsonObject();
+                        highlights.add(new ItemHighlight.Entry(
+                                jo.get("name").getAsString(),
+                                jo.has("hue") ? jo.get("hue").getAsDouble() : 0.1,
+                                jo.has("alpha") ? jo.get("alpha").getAsDouble() : 0.6));
+                    }
+                }
 
                 friends.clear();
                 if (o.has("friends")) for (JsonElement el : o.getAsJsonArray("friends")) friends.add(el.getAsString());
