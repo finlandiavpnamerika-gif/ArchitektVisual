@@ -2,6 +2,7 @@ package com.example.visuals.mixin;
 
 import com.example.visuals.ChinaHatRenderer;
 import com.example.visuals.Config;
+import com.example.visuals.FuntimeHelper;
 import com.example.visuals.TrailRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
@@ -20,7 +21,7 @@ public class WorldRendererMixin {
     // Вызывается в конце WorldRenderer.render(): рисует China Hat и Trails.
     @Inject(method = "render", at = @At("RETURN"))
     private void visuals$renderChinaHat(CallbackInfo ci) {
-        if (!Config.chinaHat && !Config.trails) return;
+        if (!Config.chinaHat && !Config.trails && !Config.zones) return;
 
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.world == null || mc.player == null) return;
@@ -36,5 +37,6 @@ public class WorldRendererMixin {
 
         if (Config.chinaHat) ChinaHatRenderer.render(camera, positionMatrix, consumers, tickProgress);
         if (Config.trails) TrailRenderer.render(camera, positionMatrix, consumers, tickProgress);
+        if (Config.zones) FuntimeHelper.render(camera, positionMatrix, consumers, tickProgress);
     }
 }
