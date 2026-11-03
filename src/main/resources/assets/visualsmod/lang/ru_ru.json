@@ -4,5 +4,6 @@
   "key.visualsmod.freelook": "Freelook (зажать)",
   "key.visualsmod.swap_select": "AutoSwap: выбрать предмет (в инвентаре)",
   "key.visualsmod.bind_select": "ItemBind: выбрать предмет (в инвентаре)",
+  "key.visualsmod.highlight_select": "Highlight: выбрать предмет (в инвентаре)",
   "key.category.visualsmod.main": "Visuals"
 }
