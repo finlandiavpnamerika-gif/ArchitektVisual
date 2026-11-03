@@ -1,5 +1,6 @@
 package com.example.visuals.mixin;
 
+import com.example.visuals.ItemHighlight;
 import com.example.visuals.ShulkerPreview;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -14,6 +15,7 @@ public class HandledScreenMixin {
     // Отрисовка превью шалкера
     @Inject(method = "render", at = @At("TAIL"))
     private void visuals$renderShulker(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        ItemHighlight.render(context, (HandledScreen<?>) (Object) this);
         ShulkerPreview.render(context, (HandledScreen<?>) (Object) this, mouseX, mouseY);
     }
 }
