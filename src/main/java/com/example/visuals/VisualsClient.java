@@ -86,7 +86,10 @@ public class VisualsClient implements ClientModInitializer {
             ItemHighlight.tick(client);
         });
 
-        HudRenderCallback.EVENT.register((drawContext, tickCounter) -> Features.hud(drawContext, tickCounter));
+        HudRenderCallback.EVENT.register((drawContext, tickCounter) -> {
+            Features.hud(drawContext, tickCounter);
+            FuntimeHelper.hud(drawContext);
+        });
 
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             if (screen instanceof HandledScreen) {
