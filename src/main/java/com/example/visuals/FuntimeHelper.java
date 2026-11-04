@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.VertexConsumer;
@@ -38,21 +39,25 @@ public final class FuntimeHelper {
 
     private static final class Kind {
         final String key;    // кусок имени предмета (нижний регистр)
+        final String title;  // название для таймера
         final Shape shape;
         final double size;   // RING: радиус; CUBE/WALL: сторона в блоках
         final int ticks;     // сколько тиков держится фигура
         final int rgb;
-        Kind(String key, Shape shape, double size, int ticks, int rgb) {
-            this.key = key; this.shape = shape; this.size = size; this.ticks = ticks; this.rgb = rgb;
+        final boolean timer; // показывать таймер на экране
+        Kind(String key, String title, Shape shape, double size, int ticks, int rgb, boolean timer) {
+            this.key = key; this.title = title; this.shape = shape; this.size = size;
+            this.ticks = ticks; this.rgb = rgb; this.timer = timer;
         }
     }
 
     // ====== ТАБЛИЦА ПРЕДМЕТОВ: правь здесь ======
     private static final Kind[] KINDS = {
-            new Kind("дезориентация", Shape.RING, 10.0, 20 * 15, 0xB388FF),
-            new Kind("явная пыль",    Shape.RING, 10.0, 20 * 15, 0x69F0AE),
-            new Kind("трапка",        Shape.CUBE,  3.0, 20 * 15, 0xFF5252),
-            new Kind("пласт",         Shape.WALL,  3.0, 20 * 15, 0xFFD740),
+            //        ключ              название         форма        размер  время (тики)  цвет      таймер
+            new Kind("дезориентация", "Дезориентация", Shape.RING, 10.0, 20 * 15, 0xB388FF, false),
+            new Kind("явная пыль",    "Явная пыль",    Shape.RING, 10.0, 20 * 15, 0x69F0AE, false),
+            new Kind("трапка",        "Трапка",        Shape.CUBE,  3.0, 20 * 15, 0xFF5252, true),
+            new Kind("пласт",         "Пласт",         Shape.WALL,  3.0, 20 * 15, 0xFFD740, true),
     };
     // =============================================
 
@@ -86,6 +91,17 @@ public final class FuntimeHelper {
             }
             return ActionResult.PASS;
         });
+    }
+
+    /** Предмет в любой из рук игрока (основная, потом вторая). */
+    private static Kind heldKind(PlayerEntity p) {
+        Kind k = kindOf(p.getMainHandStack());
+        return k != null ? k : kindOf(p.getOffHandStack());
+    }
+
+    private static boolean hasActive(Kind k) {
+        for (Zone z : ZONES) if (z.kind == k) return true;
+        return false;
     }
 
     private static Kind kindOf(ItemStack stack) {
@@ -127,7 +143,7 @@ public final class FuntimeHelper {
         boolean anyHeld = false;
         if (Config.zonesHeld) {
             for (PlayerEntity p : mc.world.getPlayers()) {
-                if (p != mc.player && !p.isSpectator() && kindOf(p.getMainHandStack()) != null) { anyHeld = true; break; }
+                if (!p.isSpectator() && heldKind(p) != null) { anyHeld = true; break; }
             }
         }
         if (ZONES.isEmpty() && !anyHeld) return;
@@ -148,12 +164,14 @@ public final class FuntimeHelper {
                 draw(q, m, cam, z.kind, z.x, z.y, z.z, z.yaw, fade);
             }
 
-            // 2) предметы в руках у других игроков (превью)
+            // 2) предметы в руках (у тебя и у других игроков): превью фигуры
             if (Config.zonesHeld) {
                 for (PlayerEntity p : mc.world.getPlayers()) {
-                    if (p == mc.player || p.isSpectator()) continue;
-                    Kind k = kindOf(p.getMainHandStack());
+                    if (p.isSpectator()) continue;
+                    Kind k = heldKind(p);
                     if (k == null) continue;
+                    // у себя не рисуем превью, пока такая же фигура уже стоит
+                    if (p == mc.player && hasActive(k)) continue;
                     double hx = MathHelper.lerp((double) tickProgress, p.lastX, p.getX());
                     double hy = MathHelper.lerp((double) tickProgress, p.lastY, p.getY());
                     double hz = MathHelper.lerp((double) tickProgress, p.lastZ, p.getZ());
@@ -166,6 +184,30 @@ public final class FuntimeHelper {
             consumers.draw(RenderLayers.debugQuads());
         } finally {
             mv.popMatrix();
+        }
+    }
+
+    /** Таймер оставшегося времени для трапки и пласта (под прицелом). Вызывается из HudRenderCallback. */
+    public static void hud(DrawContext g) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (!Config.zones || mc.world == null || mc.player == null || ZONES.isEmpty()) return;
+
+        int cx = mc.getWindow().getScaledWidth() / 2;
+        int y = mc.getWindow().getScaledHeight() / 2 + 24;
+        for (Zone z : ZONES) {
+            if (!z.kind.timer) continue;
+            int left = z.endTick - tickCount;
+            if (left <= 0) continue;
+
+            String s = z.kind.title + " " + String.format(Locale.ROOT, "%.1f", left / 20.0) + "с";
+            int w = mc.textRenderer.getWidth(s) + 12;
+            int x0 = cx - w / 2;
+            float frac = Math.max(0f, Math.min(1f, left / (float) z.kind.ticks));
+
+            g.fill(x0, y, x0 + w, y + 14, 0x90000000);
+            g.fill(x0, y + 12, x0 + (int) (w * frac), y + 14, 0xFF000000 | z.kind.rgb);
+            g.drawCenteredTextWithShadow(mc.textRenderer, s, cx, y + 3, 0xFFFFFFFF);
+            y += 17;
         }
     }
 
