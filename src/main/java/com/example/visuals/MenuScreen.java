@@ -246,6 +246,9 @@ public class MenuScreen extends Screen {
         g.fillGradient(0, 0, width, height, 0x80080810, 0xC0000000);
         RainyScene.drawRain(g, width, height, 0.6f);
 
+        // Sidebar-стиль меню (переключается кнопкой снизу)
+        if (Config.menuStyle == 1) { renderSidebar(g); drawBottom(g); return; }
+
         int cols = 4;
         int colW = Math.max(110, Math.min(150, (width - 30) / cols));
         int gap = 10;
@@ -448,7 +451,13 @@ public class MenuScreen extends Screen {
         screenButton(g, "-> Настроить макросы", () -> new MacrosScreen(this));
         Config.streamerMode = module(g, "stream", "StreamerMode", "", Config.streamerMode, 0);
 
-        // Кнопка закрытия
+        drawBottom(g);
+    }
+
+    // =====================================================================
+    //  Нижние кнопки: закрыть + переключатель стиля меню
+    // =====================================================================
+    private void drawBottom(DrawContext g) {
         int bw = 160; int bh = 20;
         int bx = (width - bw) / 2; int by = height - bh - 10;
         boolean hov = hit(bx, by, bw, bh);
@@ -457,6 +466,329 @@ public class MenuScreen extends Screen {
         g.fill(bx + 1, by, bx + bw - 1, by + 1, ff(Theme.ACCENT));
         g.drawCenteredTextWithShadow(textRenderer, "ArchitektVisuals | Закрыть", width / 2, by + 6, ff(Theme.TEXT));
         if (clicked && hov) close();
+
+        // переключатель стиля меню (Classic <-> Sidebar)
+        int sw2 = 160;
+        int sx = bx + bw + 8;
+        if (sx + sw2 > width - 4) sx = bx - sw2 - 8;
+        boolean h2 = hit(sx, by, sw2, bh);
+        rbox(g, sx + 1, by + 2, sw2, bh, 0x40000000);
+        rbox(g, sx, by, sw2, bh, h2 ? Theme.ACCENT : Theme.PANEL_BG);
+        g.fill(sx + 1, by, sx + sw2 - 1, by + 1, ff(Theme.ACCENT));
+        g.drawCenteredTextWithShadow(textRenderer, "Стиль меню: " + (Config.menuStyle == 1 ? "Sidebar" : "Classic"),
+                sx + sw2 / 2, by + 6, ff(Theme.TEXT));
+        if (clicked && h2) {
+            Config.menuStyle = Config.menuStyle == 1 ? 0 : 1;
+            Config.save();
+        }
+    }
+
+    // =====================================================================
+    //  SIDEBAR-стиль: слева категории, в центре модули, справа настройки
+    // =====================================================================
+    private static int sbCat = 0;
+    private static String sbSel = "";
+
+    private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
+    private static final String[][] SB_MODS = {
+            {"fb", "cross", "trails", "zones", "hat", "pred", "physic", "shulker", "hl"},
+            {"hud", "array", "armor", "keys"},
+            {"sprint", "zoom", "respawn", "freelook", "stream"},
+            {"autoswap", "itembind", "friends", "macro"},
+            {"time", "weather"}
+    };
+
+    private static String sbLabel(String id) {
+        return switch (id) {
+            case "fb" -> "Fullbright";
+            case "cross" -> "Crosshair";
+            case "trails" -> "Trails";
+            case "zones" -> "FunTime Zones";
+            case "hat" -> "China Hat";
+            case "pred" -> "Predictions";
+            case "physic" -> "Item Physic";
+            case "shulker" -> "Shulker Prev";
+            case "hl" -> "Item Highlight";
+            case "hud" -> "Info HUD";
+            case "array" -> "ArrayList";
+            case "armor" -> "Armor";
+            case "keys" -> "Keystrokes";
+            case "sprint" -> "AutoSprint";
+            case "zoom" -> "Zoom";
+            case "respawn" -> "AutoRespawn";
+            case "freelook" -> "Freelook";
+            case "stream" -> "StreamerMode";
+            case "autoswap" -> "AutoSwap";
+            case "itembind" -> "ItemBind";
+            case "friends" -> "Friends";
+            case "macro" -> "Macros";
+            case "time" -> "Время";
+            case "weather" -> "Погода";
+            default -> id;
+        };
+    }
+
+    private static boolean sbHasSwitch(String id) {
+        return !id.equals("friends") && !id.equals("macro");
+    }
+
+    private static boolean sbGet(String id) {
+        return switch (id) {
+            case "fb" -> Config.fullbright;
+            case "cross" -> Config.customCrosshair;
+            case "trails" -> Config.trails;
+            case "zones" -> Config.zones;
+            case "hat" -> Config.chinaHat;
+            case "pred" -> Config.predictions;
+            case "physic" -> Config.itemPhysic;
+            case "shulker" -> Config.shulkerPreview;
+            case "hl" -> Config.highlight;
+            case "hud" -> Config.hud;
+            case "array" -> Config.arrayList;
+            case "armor" -> Config.armorHud;
+            case "keys" -> Config.keystrokes;
+            case "sprint" -> Config.sprint;
+            case "zoom" -> Config.zoom;
+            case "respawn" -> Config.autoRespawn;
+            case "freelook" -> Config.thirdPerson;
+            case "stream" -> Config.streamerMode;
+            case "autoswap" -> Config.autoswap;
+            case "itembind" -> Config.itembind;
+            case "time" -> Config.customTime;
+            case "weather" -> Config.customWeather;
+            default -> true;
+        };
+    }
+
+    private static void sbSet(String id, boolean v) {
+        switch (id) {
+            case "fb": Config.fullbright = v; break;
+            case "cross": Config.customCrosshair = v; break;
+            case "trails": Config.trails = v; break;
+            case "zones": Config.zones = v; break;
+            case "hat": Config.chinaHat = v; break;
+            case "pred": Config.predictions = v; break;
+            case "physic": Config.itemPhysic = v; break;
+            case "shulker": Config.shulkerPreview = v; break;
+            case "hl": Config.highlight = v; break;
+            case "hud": Config.hud = v; break;
+            case "array": Config.arrayList = v; break;
+            case "armor": Config.armorHud = v; break;
+            case "keys": Config.keystrokes = v; break;
+            case "sprint": Config.sprint = v; break;
+            case "zoom": Config.zoom = v; break;
+            case "respawn": Config.autoRespawn = v; break;
+            case "freelook": Config.thirdPerson = v; break;
+            case "stream": Config.streamerMode = v; break;
+            case "autoswap": Config.autoswap = v; break;
+            case "itembind": Config.itembind = v; break;
+            case "time": Config.customTime = v; break;
+            case "weather": Config.customWeather = v; break;
+            default: break;
+        }
+    }
+
+    // строка без переключателя (для Friends / Macros)
+    private boolean plainRow(DrawContext g, String label) {
+        boolean hov = hit(cx, cy, cw, 22);
+        rbox(g, cx, cy, cw, 22, hov ? Theme.ROW_HOVER : Theme.ROW);
+        text(g, label, cx + 8, cy + 7, Theme.TEXT);
+        text(g, ">", cx + cw - 14, cy + 7, Theme.TEXT_DIM);
+        cy += 24;
+        return clicked && hov;
+    }
+
+    private void renderSidebar(DrawContext g) {
+        int pw = Math.min(width - 16, 470);
+        int ph = Math.min(height - 44, 300);
+        int px = (width - pw) / 2;
+        int py = Math.max(6, (height - 36 - ph) / 2);
+
+        // подложка
+        rbox(g, px + 2, py + 3, pw, ph, 0x45000000);
+        rbox(g, px, py, pw, ph, Theme.PANEL_BG);
+        g.fill(px + 1, py, px + pw - 1, py + 1, ff(Theme.ACCENT));
+
+        int sbW = 104;
+        int midW = Math.max(120, (pw - sbW) * 2 / 5);
+        int rightW = pw - sbW - midW;
+        g.fill(px + sbW, py + 8, px + sbW + 1, py + ph - 8, ff(Theme.ACCENT_DIM));
+        g.fill(px + sbW + midW, py + 8, px + sbW + midW + 1, py + ph - 8, ff(Theme.ACCENT_DIM));
+
+        // ---------- левая колонка: название и категории ----------
+        g.drawCenteredTextWithShadow(textRenderer, Text.literal("Architekt").formatted(Formatting.BOLD),
+                px + sbW / 2, py + 14, ff(Theme.ACCENT));
+        g.drawCenteredTextWithShadow(textRenderer, "Visuals", px + sbW / 2, py + 26, ff(Theme.TEXT));
+
+        int ry = py + 46;
+        for (int i = 0; i < SB_CATS.length; i++) {
+            int rx = px + 8, rw = sbW - 16;
+            boolean hov = hit(rx, ry, rw, 22);
+            if (clicked && hov) { sbCat = i; sbSel = ""; }
+            rbox(g, rx, ry, rw, 22, sbCat == i ? Theme.ACCENT_DIM : (hov ? Theme.ROW_HOVER : 0x00000000));
+            text(g, SB_CATS[i], rx + 10, ry + 7, sbCat == i ? Theme.TEXT : Theme.TEXT_DIM);
+            ry += 26;
+        }
+
+        // ---------- центральная колонка: модули ----------
+        sbCat = Math.max(0, Math.min(sbCat, SB_CATS.length - 1));
+        String[] mods = SB_MODS[sbCat];
+        boolean found = false;
+        for (String m : mods) if (m.equals(sbSel)) found = true;
+        if (!found) sbSel = mods[0];
+
+        int mx0 = px + sbW + 8;
+        text(g, "Категория: " + SB_CATS[sbCat], mx0, py + 12, Theme.TEXT_DIM);
+        cx = mx0; cw = midW - 16; cy = py + 30;
+        for (String id : mods) {
+            int rowY = cy;
+            if (sbHasSwitch(id)) {
+                boolean on = sbGet(id);
+                if (clicked && hit(cx, cy, cw - 32, 22)) sbSel = id;
+                boolean nv = module(g, id, sbLabel(id), "", on, 0);
+                if (nv != on) sbSet(id, nv);
+            } else {
+                if (plainRow(g, sbLabel(id))) sbSel = id;
+            }
+            if (id.equals(sbSel)) {   // рамка у выбранного модуля
+                int c = ff(Theme.ACCENT);
+                g.fill(mx0, rowY, mx0 + cw, rowY + 1, c);
+                g.fill(mx0, rowY + 21, mx0 + cw, rowY + 22, c);
+                g.fill(mx0, rowY, mx0 + 1, rowY + 22, c);
+                g.fill(mx0 + cw - 1, rowY, mx0 + cw, rowY + 22, c);
+            }
+        }
+
+        // ---------- правая колонка: настройки выбранного модуля ----------
+        int rx0 = px + sbW + midW + 10;
+        text(g, sbLabel(sbSel), rx0, py + 12, Theme.TEXT);
+        cx = rx0; cw = rightW - 20; cy = py + 30; curId = sbSel;
+        sbSettings(g, sbSel);
+    }
+
+    private void noOptions(DrawContext g) {
+        text(g, "Нет настроек", cx + 2, cy + 2, Theme.TEXT_DIM);
+        cy += 20;
+    }
+
+    private void sbSettings(DrawContext g, String id) {
+        switch (id) {
+            case "fb" -> Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false);
+            case "cross" -> {
+                Config.crosshairColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.crosshairColor);
+                Config.crosshairSize = (int) cslider(g, "Размер", 2, 20, Config.crosshairSize, true);
+                Config.crosshairThickness = (int) cslider(g, "Толщина", 1, 5, Config.crosshairThickness, true);
+                Config.crosshairDot = cbool(g, "Точка", Config.crosshairDot);
+            }
+            case "trails" -> {
+                Config.trailsCustom = cbool(g, "Своя палитра", Config.trailsCustom);
+                if (Config.trailsCustom) {
+                    Config.trailsHue = cgrad(g, Config.trailsHue, pos -> hsv(pos, 1.0, 1.0));
+                    Config.trailsSat = cgrad(g, Config.trailsSat, pos -> hsv(Config.trailsHue, pos, Math.max(0.35, Config.trailsVal)));
+                    Config.trailsVal = cgrad(g, Config.trailsVal, pos -> hsv(Config.trailsHue, Config.trailsSat, pos));
+                } else {
+                    Config.trailsColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.trailsColor);
+                }
+                Config.trailsLength = (int) cslider(g, "Длина (тики)", 10, 80, Config.trailsLength, true);
+                Config.trailsHeight = cslider(g, "Высота", 0.1, 2.0, Config.trailsHeight, false);
+            }
+            case "zones" -> {
+                Config.zonesHeld = cbool(g, "Показывать в руках", Config.zonesHeld);
+                hint2(g, "Радиусы при предмете", "в руке, таймер трапки");
+            }
+            case "hat" -> {
+                Config.hatCustom = cbool(g, "Своя палитра", Config.hatCustom);
+                if (Config.hatCustom) {
+                    Config.hatHue = cgrad(g, Config.hatHue, pos -> hsv(pos, 1.0, 1.0));
+                    Config.hatSat = cgrad(g, Config.hatSat, pos -> hsv(Config.hatHue, pos, Math.max(0.35, Config.hatVal)));
+                    Config.hatVal = cgrad(g, Config.hatVal, pos -> hsv(Config.hatHue, Config.hatSat, pos));
+                } else {
+                    Config.chinaHatMode = ccycle(g, "Цвет", ChinaHatRenderer.COLOR_NAMES, Config.chinaHatMode);
+                }
+                Config.hatSize = cslider(g, "Размер", 0.5, 2.0, Config.hatSize, false);
+                Config.hatHeight = cslider(g, "Высота", 0.5, 2.0, Config.hatHeight, false);
+            }
+            case "hl" -> {
+                ItemHighlight.Entry toRemove = null;
+                for (ItemHighlight.Entry e : Config.highlights) {
+                    if (nameRow(g, e.name) == 2) toRemove = e;
+                    e.hue = cgrad(g, e.hue, pos -> hsv(pos, 0.85, 1.0));
+                    e.alpha = cslider(g, "Прозрачность", 0.1, 1.0, e.alpha, false);
+                }
+                hint2(g, "Наведи на предмет", "и жми [" + ItemHighlight.keyName() + "]");
+                if (toRemove != null) { Config.highlights.remove(toRemove); Config.save(); }
+            }
+            case "hud" -> {
+                Config.hudFps = cbool(g, "FPS", Config.hudFps);
+                Config.hudPing = cbool(g, "Ping", Config.hudPing);
+                Config.hudCoords = cbool(g, "Координаты", Config.hudCoords);
+                Config.hudFacing = cbool(g, "Направление", Config.hudFacing);
+                Config.hudEffects = cbool(g, "Эффекты", Config.hudEffects);
+                Config.hudScale = cslider(g, "Размер", 0.5, 3.0, Config.hudScale, false);
+                Config.hudAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.hudAlpha, false);
+                Config.hudColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.hudColor);
+                Config.hudX = (int) cslider(g, "X", 0, 400, Config.hudX, true);
+                Config.hudY = (int) cslider(g, "Y", 0, 250, Config.hudY, true);
+            }
+            case "array" -> {
+                Config.arrayListColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.arrayListColor);
+                Config.arrayListShadow = cbool(g, "Тень", Config.arrayListShadow);
+                Config.arrayListScale = cslider(g, "Размер", 0.5, 2.0, Config.arrayListScale, false);
+                Config.arrayListAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.arrayListAlpha, false);
+                Config.arrayListX = (int) cslider(g, "X", 0, 400, Config.arrayListX, true);
+                Config.arrayListY = (int) cslider(g, "Y", 0, 250, Config.arrayListY, true);
+            }
+            case "armor" -> {
+                Config.armorHudShowTool = cbool(g, "Инструмент", Config.armorHudShowTool);
+                Config.armorHudShowDurability = cbool(g, "Прочность", Config.armorHudShowDurability);
+                Config.armorHudScale = cslider(g, "Размер", 0.5, 2.0, Config.armorHudScale, false);
+                Config.armorHudAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.armorHudAlpha, false);
+                Config.armorHudX = (int) cslider(g, "X", 0, 400, Config.armorHudX, true);
+                Config.armorHudY = (int) cslider(g, "Y", 0, 400, Config.armorHudY, true);
+            }
+            case "keys" -> {
+                Config.keystrokesShowMouse = cbool(g, "ЛКМ/ПКМ", Config.keystrokesShowMouse);
+                Config.keystrokesShowSpace = cbool(g, "Space", Config.keystrokesShowSpace);
+                Config.keystrokesScale = cslider(g, "Размер", 0.5, 2.0, Config.keystrokesScale, false);
+                Config.keystrokesAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.keystrokesAlpha, false);
+                Config.keystrokesColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.keystrokesColor);
+                Config.keystrokesX = (int) cslider(g, "X", 0, 400, Config.keystrokesX, true);
+                Config.keystrokesY = (int) cslider(g, "Y", 0, 400, Config.keystrokesY, true);
+            }
+            case "sprint" -> Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs);
+            case "zoom" -> Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true);
+            case "autoswap" -> {
+                SwapPair toRebind = null, toRemove = null;
+                for (SwapPair sp : Config.swapPairs) {
+                    int r = listRow(g, sp.key, sp.a + " <-> " + sp.b);
+                    if (r == 1) toRebind = sp; else if (r == 2) toRemove = sp;
+                }
+                hint2(g, "Наведи на предмет", "и жми [" + ItemFeatures.swapKeyName() + "]");
+                if (toRemove != null) { Config.swapPairs.remove(toRemove); Config.save(); }
+                else if (toRebind != null) {
+                    final SwapPair sp = toRebind;
+                    client.execute(() -> client.setScreen(new BindScreen(this, "AutoSwap: " + sp.a + " <-> " + sp.b, k -> ItemFeatures.setKey(sp, k))));
+                }
+            }
+            case "itembind" -> {
+                BoundItem toRebind = null, toRemove = null;
+                for (BoundItem b : Config.binds) {
+                    int r = listRow(g, b.key, b.name);
+                    if (r == 1) toRebind = b; else if (r == 2) toRemove = b;
+                }
+                hint2(g, "Наведи на предмет", "и жми [" + ItemFeatures.bindKeyName() + "]");
+                if (toRemove != null) { Config.binds.remove(toRemove); Config.save(); }
+                else if (toRebind != null) {
+                    final BoundItem b = toRebind;
+                    client.execute(() -> client.setScreen(new BindScreen(this, "ItemBind: " + b.name, k -> ItemFeatures.setKey(b, k))));
+                }
+            }
+            case "friends" -> screenButton(g, "-> Открыть Friends", () -> new FriendsScreen(this));
+            case "macro" -> screenButton(g, "-> Настроить макросы", () -> new MacrosScreen(this));
+            case "time" -> Config.timeValue = (int) cslider(g, "Время", 0, 24000, Config.timeValue, true);
+            case "weather" -> Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
+            default -> noOptions(g);
+        }
     }
 
     @Override
