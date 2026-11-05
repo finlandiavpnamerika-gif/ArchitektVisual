@@ -28,25 +28,6 @@ public final class Features {
             mc.setScreen(null);
         }
 
-        // Macros
-        long window = mc.getWindow().getHandle();
-        if (mc.currentScreen == null && mc.player != null) {
-            for (String macro : Config.macros) {
-                try {
-                    String[] parts = macro.split(":");
-                    if (parts.length == 2) {
-                        int key = Integer.parseInt(parts[0]);
-                        String cmd = parts[1];
-                        if (GLFW.glfwGetKey(window, key) == GLFW.GLFW_PRESS) {
-                            if (System.currentTimeMillis() % 500 < 50) {
-                                mc.player.networkHandler.sendChatCommand(cmd.startsWith("/") ? cmd.substring(1) : cmd);
-                            }
-                        }
-                    }
-                } catch (Exception ignored) {}
-            }
-        }
-
         // Fullbright
         SimpleOption<Double> gamma = o.getGamma();
         if (Config.fullbright) {
