@@ -41,7 +41,7 @@ public final class Config {
     public static boolean autoRespawn = true;
     public static boolean thirdPerson = false;
     public static boolean itemScroller = false;
-    public static final List<String> macros = new ArrayList<>();
+    public static final List<Macro> macros = new ArrayList<>();
 
     // --- Разное ---
     public static boolean streamerMode = false;
@@ -221,8 +221,14 @@ public final class Config {
 
             // Макросы
             JsonArray mac = new JsonArray();
-            for (String m : macros) mac.add(m);
-            o.add("macros", mac);
+            for (Macro m : macros) {
+                JsonObject jo = new JsonObject();
+                jo.addProperty("key", m.key);
+                jo.addProperty("text", m.text);
+                jo.addProperty("enabled", m.enabled);
+                mac.add(jo);
+            }
+            o.add("macroList", mac);
 
             // Item Highlight
             o.addProperty("highlight", highlight);
@@ -328,7 +334,26 @@ public final class Config {
                 weatherType = (int) d(o, "weatherType", weatherType);
 
                 macros.clear();
-                if (o.has("macros")) for (JsonElement el : o.getAsJsonArray("macros")) macros.add(el.getAsString());
+                if (o.has("macroList")) {
+                    for (JsonElement el : o.getAsJsonArray("macroList")) {
+                        JsonObject jo = el.getAsJsonObject();
+                        Macro m = new Macro(jo.get("key").getAsInt(), jo.get("text").getAsString());
+                        if (jo.has("enabled")) m.enabled = jo.get("enabled").getAsBoolean();
+                        macros.add(m);
+                    }
+                } else if (o.has("macros")) {
+                    // старый формат "клавиша:команда" -> переносим
+                    for (JsonElement el : o.getAsJsonArray("macros")) {
+                        try {
+                            String[] parts = el.getAsString().split(":", 2);
+                            if (parts.length == 2) {
+                                String cmd = parts[1].trim();
+                                if (!cmd.startsWith("/")) cmd = "/" + cmd;
+                                macros.add(new Macro(Integer.parseInt(parts[0].trim()), cmd));
+                            }
+                        } catch (Exception ignored) {}
+                    }
+                }
 
                 highlight = b(o, "highlight", highlight);
                 highlights.clear();
