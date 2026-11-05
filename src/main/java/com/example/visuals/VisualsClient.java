@@ -83,12 +83,14 @@ public class VisualsClient implements ClientModInitializer {
             ItemFeatures.tick(client);
             TrailRenderer.tick();
             FuntimeHelper.tick();
+            Macros.poll();
             ItemHighlight.tick(client);
         });
 
         HudRenderCallback.EVENT.register((drawContext, tickCounter) -> {
             Features.hud(drawContext, tickCounter);
             FuntimeHelper.hud(drawContext);
+            Macros.poll();   // и каждый кадр: тапы не теряются
         });
 
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
