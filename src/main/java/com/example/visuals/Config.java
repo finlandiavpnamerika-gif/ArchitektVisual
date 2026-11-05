@@ -125,6 +125,15 @@ public final class Config {
     public static boolean zones = true;
     public static boolean zonesHeld = true;   // показывать радиус у игроков с предметом в руке
 
+    // --- Target ESP ---
+    public static boolean targetEsp = true;
+    public static int targetEspShape = 0;          // 0 Chevrons, 1 Ring, 2 Diamond, 3 Orbit
+    public static double targetEspSize = 1.0;
+    public static double targetEspSpeed = 1.0;
+    public static double targetEspAlpha = 0.9;
+    public static double targetEspHue = 0.33;      // обычный цвет (зелёный)
+    public static double targetEspHitHue = 0.0;    // цвет при ударе (красный)
+
     // --- Item Highlight ---
     public static boolean highlight = true;
     public static final List<ItemHighlight.Entry> highlights = new ArrayList<>();
@@ -173,6 +182,13 @@ public final class Config {
             o.addProperty("trailsVal", trailsVal);
             o.addProperty("zones", zones);
             o.addProperty("zonesHeld", zonesHeld);
+            o.addProperty("targetEsp", targetEsp);
+            o.addProperty("targetEspShape", targetEspShape);
+            o.addProperty("targetEspSize", targetEspSize);
+            o.addProperty("targetEspSpeed", targetEspSpeed);
+            o.addProperty("targetEspAlpha", targetEspAlpha);
+            o.addProperty("targetEspHue", targetEspHue);
+            o.addProperty("targetEspHitHue", targetEspHitHue);
 
             // HUD
             o.addProperty("hud", hud);
@@ -287,6 +303,13 @@ public final class Config {
                 trailsVal = d(o, "trailsVal", trailsVal);
                 zones = b(o, "zones", zones);
                 zonesHeld = b(o, "zonesHeld", zonesHeld);
+                targetEsp = b(o, "targetEsp", targetEsp);
+                targetEspShape = (int) d(o, "targetEspShape", targetEspShape);
+                targetEspSize = d(o, "targetEspSize", targetEspSize);
+                targetEspSpeed = d(o, "targetEspSpeed", targetEspSpeed);
+                targetEspAlpha = d(o, "targetEspAlpha", targetEspAlpha);
+                targetEspHue = d(o, "targetEspHue", targetEspHue);
+                targetEspHitHue = d(o, "targetEspHitHue", targetEspHitHue);
 
                 // HUD
                 hud = b(o, "hud", hud);
