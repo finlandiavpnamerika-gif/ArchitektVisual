@@ -134,6 +134,14 @@ public final class Config {
     public static double targetEspHue = 0.33;      // обычный цвет (зелёный)
     public static double targetEspHitHue = 0.0;    // цвет при ударе (красный)
 
+    // --- Sky Shader ---
+    public static boolean skyShader = false;
+    public static int skyPreset = 0;               // 0 Aurora, 1 Galaxy, 2 Purple Night
+    public static double skyAlpha = 1.0;
+    public static double skySpeed = 1.0;
+    public static boolean skyNightOnly = false;
+    public static boolean skyStars = true;
+
     // --- Item Highlight ---
     public static boolean highlight = true;
     public static final List<ItemHighlight.Entry> highlights = new ArrayList<>();
@@ -189,6 +197,12 @@ public final class Config {
             o.addProperty("targetEspAlpha", targetEspAlpha);
             o.addProperty("targetEspHue", targetEspHue);
             o.addProperty("targetEspHitHue", targetEspHitHue);
+            o.addProperty("skyShader", skyShader);
+            o.addProperty("skyPreset", skyPreset);
+            o.addProperty("skyAlpha", skyAlpha);
+            o.addProperty("skySpeed", skySpeed);
+            o.addProperty("skyNightOnly", skyNightOnly);
+            o.addProperty("skyStars", skyStars);
 
             // HUD
             o.addProperty("hud", hud);
@@ -310,6 +324,12 @@ public final class Config {
                 targetEspAlpha = d(o, "targetEspAlpha", targetEspAlpha);
                 targetEspHue = d(o, "targetEspHue", targetEspHue);
                 targetEspHitHue = d(o, "targetEspHitHue", targetEspHitHue);
+                skyShader = b(o, "skyShader", skyShader);
+                skyPreset = (int) d(o, "skyPreset", skyPreset);
+                skyAlpha = d(o, "skyAlpha", skyAlpha);
+                skySpeed = d(o, "skySpeed", skySpeed);
+                skyNightOnly = b(o, "skyNightOnly", skyNightOnly);
+                skyStars = b(o, "skyStars", skyStars);
 
                 // HUD
                 hud = b(o, "hud", hud);
