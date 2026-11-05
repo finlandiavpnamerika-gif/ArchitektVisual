@@ -277,7 +277,7 @@ public class MenuScreen extends Screen {
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6);
+        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
@@ -317,6 +317,15 @@ public class MenuScreen extends Screen {
             Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
             Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
             Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+        }
+
+        Config.skyShader = module(g, "sky", "Sky Shader", "", Config.skyShader, 5);
+        if (open.contains("sky")) {
+            Config.skyPreset = ccycle(g, "Небо", SkyRenderer.PRESETS, Config.skyPreset);
+            Config.skyAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.skyAlpha, false);
+            Config.skySpeed = cslider(g, "Скорость", 0.2, 3.0, Config.skySpeed, false);
+            Config.skyNightOnly = cbool(g, "Только ночью", Config.skyNightOnly);
+            Config.skyStars = cbool(g, "Звёзды", Config.skyStars);
         }
 
         // 3. HUD
@@ -509,7 +518,7 @@ public class MenuScreen extends Screen {
 
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
-            {"fb", "cross", "trails", "zones", "tesp", "hat", "pred", "physic", "shulker", "hl"},
+            {"fb", "cross", "trails", "zones", "tesp", "sky", "hat", "pred", "physic", "shulker", "hl"},
             {"hud", "array", "armor", "keys"},
             {"sprint", "zoom", "respawn", "freelook", "stream"},
             {"autoswap", "itembind", "friends", "macro"},
@@ -523,6 +532,7 @@ public class MenuScreen extends Screen {
             case "trails" -> "Trails";
             case "zones" -> "FunTime Zones";
             case "tesp" -> "Target ESP";
+            case "sky" -> "Sky Shader";
             case "hat" -> "China Hat";
             case "pred" -> "Predictions";
             case "physic" -> "Item Physic";
@@ -558,6 +568,7 @@ public class MenuScreen extends Screen {
             case "trails" -> Config.trails;
             case "zones" -> Config.zones;
             case "tesp" -> Config.targetEsp;
+            case "sky" -> Config.skyShader;
             case "hat" -> Config.chinaHat;
             case "pred" -> Config.predictions;
             case "physic" -> Config.itemPhysic;
@@ -587,6 +598,7 @@ public class MenuScreen extends Screen {
             case "trails": Config.trails = v; break;
             case "zones": Config.zones = v; break;
             case "tesp": Config.targetEsp = v; break;
+            case "sky": Config.skyShader = v; break;
             case "hat": Config.chinaHat = v; break;
             case "pred": Config.predictions = v; break;
             case "physic": Config.itemPhysic = v; break;
@@ -724,6 +736,13 @@ public class MenuScreen extends Screen {
                 Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
                 Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
                 Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+            }
+            case "sky" -> {
+                Config.skyPreset = ccycle(g, "Небо", SkyRenderer.PRESETS, Config.skyPreset);
+                Config.skyAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.skyAlpha, false);
+                Config.skySpeed = cslider(g, "Скорость", 0.2, 3.0, Config.skySpeed, false);
+                Config.skyNightOnly = cbool(g, "Только ночью", Config.skyNightOnly);
+                Config.skyStars = cbool(g, "Звёзды", Config.skyStars);
             }
             case "hat" -> {
                 Config.hatCustom = cbool(g, "Своя палитра", Config.hatCustom);
