@@ -183,6 +183,14 @@ public class MenuScreen extends Screen {
         return t;
     }
 
+    // Палитра с подписью поверх полоски
+    private double cgradL(DrawContext g, String label, double t, java.util.function.DoubleToIntFunction colorAt) {
+        int y0 = cy;
+        double r = cgrad(g, t, colorAt);
+        g.drawCenteredTextWithShadow(textRenderer, label, cx + cw / 2, y0 + 4, ff(0xFFFFFFFF));
+        return r;
+    }
+
     private static int hsv(double h, double s, double v) {
         return net.minecraft.util.math.MathHelper.hsvToRgb((float) h, (float) s, (float) v) & 0xFFFFFF;
     }
@@ -269,7 +277,7 @@ public class MenuScreen extends Screen {
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1);
+        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
@@ -299,6 +307,16 @@ public class MenuScreen extends Screen {
         Config.zones = module(g, "zones", "FunTime Zones", "", Config.zones, 1);
         if (open.contains("zones")) {
             Config.zonesHeld = cbool(g, "Чужие в руке", Config.zonesHeld);
+        }
+
+        Config.targetEsp = module(g, "tesp", "Target ESP", "", Config.targetEsp, 6);
+        if (open.contains("tesp")) {
+            Config.targetEspShape = ccycle(g, "Фигура", TargetEsp.SHAPES, Config.targetEspShape);
+            Config.targetEspHue = cgradL(g, "Цвет", Config.targetEspHue, pos -> hsv(pos, 0.85, 1.0));
+            Config.targetEspHitHue = cgradL(g, "Цвет при ударе", Config.targetEspHitHue, pos -> hsv(pos, 0.85, 1.0));
+            Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
+            Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
+            Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
         }
 
         // 3. HUD
@@ -491,7 +509,7 @@ public class MenuScreen extends Screen {
 
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
-            {"fb", "cross", "trails", "zones", "hat", "pred", "physic", "shulker", "hl"},
+            {"fb", "cross", "trails", "zones", "tesp", "hat", "pred", "physic", "shulker", "hl"},
             {"hud", "array", "armor", "keys"},
             {"sprint", "zoom", "respawn", "freelook", "stream"},
             {"autoswap", "itembind", "friends", "macro"},
@@ -504,6 +522,7 @@ public class MenuScreen extends Screen {
             case "cross" -> "Crosshair";
             case "trails" -> "Trails";
             case "zones" -> "FunTime Zones";
+            case "tesp" -> "Target ESP";
             case "hat" -> "China Hat";
             case "pred" -> "Predictions";
             case "physic" -> "Item Physic";
@@ -538,6 +557,7 @@ public class MenuScreen extends Screen {
             case "cross" -> Config.customCrosshair;
             case "trails" -> Config.trails;
             case "zones" -> Config.zones;
+            case "tesp" -> Config.targetEsp;
             case "hat" -> Config.chinaHat;
             case "pred" -> Config.predictions;
             case "physic" -> Config.itemPhysic;
@@ -566,6 +586,7 @@ public class MenuScreen extends Screen {
             case "cross": Config.customCrosshair = v; break;
             case "trails": Config.trails = v; break;
             case "zones": Config.zones = v; break;
+            case "tesp": Config.targetEsp = v; break;
             case "hat": Config.chinaHat = v; break;
             case "pred": Config.predictions = v; break;
             case "physic": Config.itemPhysic = v; break;
@@ -695,6 +716,14 @@ public class MenuScreen extends Screen {
             case "zones" -> {
                 Config.zonesHeld = cbool(g, "Показывать в руках", Config.zonesHeld);
                 hint2(g, "Радиусы при предмете", "в руке, таймер трапки");
+            }
+            case "tesp" -> {
+                Config.targetEspShape = ccycle(g, "Фигура", TargetEsp.SHAPES, Config.targetEspShape);
+                Config.targetEspHue = cgradL(g, "Цвет", Config.targetEspHue, pos -> hsv(pos, 0.85, 1.0));
+                Config.targetEspHitHue = cgradL(g, "Цвет при ударе", Config.targetEspHitHue, pos -> hsv(pos, 0.85, 1.0));
+                Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
+                Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
+                Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
             }
             case "hat" -> {
                 Config.hatCustom = cbool(g, "Своя палитра", Config.hatCustom);
