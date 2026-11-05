@@ -28,6 +28,7 @@ public class VisualsClient implements ClientModInitializer {
         Config.load();
         AltManagerInit.register();
         FuntimeHelper.register();
+        TargetEsp.register();
         Theme.apply();
 
         // В 1.21.9+ категория - объект, а не строка
