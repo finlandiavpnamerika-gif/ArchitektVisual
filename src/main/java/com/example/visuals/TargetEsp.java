@@ -30,7 +30,7 @@ public final class TargetEsp {
 
     public static final String[] SHAPES = {"Chevrons", "Ring", "Diamond", "Orbit"};
 
-    private static final long   GRACE_MS = 700;    // сколько держим цель после того, как отвёл прицел
+    private static final long   GRACE_MS = 0;      // задержка перед угасанием после отвода прицела (0 = сразу)
     private static final long   FADE_MS  = 350;    // и сколько она потом гаснет
     private static final long   FLASH_MS = 250;    // вспышка цвета при ударе
     private static final double MAX_DIST = 64.0;
