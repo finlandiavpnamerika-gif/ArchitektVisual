@@ -143,6 +143,14 @@ public final class Config {
     public static boolean skyNightOnly = false;
     public static boolean skyStars = true;
 
+    // --- DamageFever ---
+    public static boolean damageFever = true;
+    public static boolean dfMine = true;           // только урон от моих ударов
+    public static boolean dfDecimals = true;       // 4.5 вместо 5
+    public static double dfSize = 1.0;
+    public static double dfLife = 1.2;
+    public static double dfHue = 0.0;              // цвет числа (красный)
+
     // --- Particles ---
     public static boolean particles = true;
     public static int partMode = 0;                // 0 Удар, 1 Аура, 2 Оба
@@ -218,6 +226,12 @@ public final class Config {
             o.addProperty("skyNightOnly", skyNightOnly);
             o.addProperty("skyStars", skyStars);
             o.addProperty("particles", particles);
+            o.addProperty("damageFever", damageFever);
+            o.addProperty("dfMine", dfMine);
+            o.addProperty("dfDecimals", dfDecimals);
+            o.addProperty("dfSize", dfSize);
+            o.addProperty("dfLife", dfLife);
+            o.addProperty("dfHue", dfHue);
             o.addProperty("partMode", partMode);
             o.addProperty("partShape", partShape);
             o.addProperty("partCount", partCount);
@@ -356,6 +370,12 @@ public final class Config {
                 skyNightOnly = b(o, "skyNightOnly", skyNightOnly);
                 skyStars = b(o, "skyStars", skyStars);
                 particles = b(o, "particles", particles);
+                damageFever = b(o, "damageFever", damageFever);
+                dfMine = b(o, "dfMine", dfMine);
+                dfDecimals = b(o, "dfDecimals", dfDecimals);
+                dfSize = d(o, "dfSize", dfSize);
+                dfLife = d(o, "dfLife", dfLife);
+                dfHue = d(o, "dfHue", dfHue);
                 partMode = (int) d(o, "partMode", partMode);
                 partShape = (int) d(o, "partShape", partShape);
                 partCount = d(o, "partCount", partCount);
