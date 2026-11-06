@@ -30,6 +30,7 @@ public class VisualsClient implements ClientModInitializer {
         FuntimeHelper.register();
         TargetEsp.register();
         Particles.register();
+        Theme.THEME_ID = Config.menuTheme;
         Theme.apply();
 
         // В 1.21.9+ категория - объект, а не строка
