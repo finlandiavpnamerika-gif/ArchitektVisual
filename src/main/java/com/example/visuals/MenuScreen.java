@@ -62,30 +62,55 @@ public class MenuScreen extends Screen {
 
     // Прямоугольник со срезанными углами
     private void rbox(DrawContext g, int x, int y, int w, int h, int color) {
+        rr(g, x, y, w, h, Math.min(Theme.CORNER, Math.min(w, h) / 2), color);
+    }
+
+    // Настоящий скруглённый прямоугольник (радиус r)
+    private void rr(DrawContext g, int x, int y, int w, int h, int r, int color) {
         int c = ff(color);
-        g.fill(x + 1, y, x + w - 1, y + h, c);
-        g.fill(x, y + 1, x + 1, y + h - 1, c);
-        g.fill(x + w - 1, y + 1, x + w, y + h - 1, c);
+        if (r <= 0 || w < 2 * r || h < 2 * r) { g.fill(x, y, x + w, y + h, c); return; }
+        g.fill(x, y + r, x + w, y + h - r, c);
+        for (int i = 0; i < r; i++) {
+            double dy = r - i - 0.5;
+            int inset = r - (int) Math.round(Math.sqrt(r * r - dy * dy));
+            g.fill(x + inset, y + i, x + w - inset, y + i + 1, c);
+            g.fill(x + inset, y + h - 1 - i, x + w - inset, y + h - i, c);
+        }
+    }
+
+    // Мягкая тень под скруглённым блоком
+    private void shadow(DrawContext g, int x, int y, int w, int h, int r) {
+        for (int i = 5; i >= 1; i--) rr(g, x - i, y - i + 3, w + 2 * i, h + 2 * i, r + i, 0x0A000000);
+    }
+
+    // Горизонтальная линия, плавно исчезающая по краям
+    private void fadeLine(DrawContext g, int x, int y, int w, int color, int maxAlpha) {
+        for (int i = 0; i < w; i += 2) {
+            double t = (i + 1.0) / w;
+            int a = (int) (maxAlpha * Math.sin(Math.PI * t));
+            g.fill(x + i, y, x + Math.min(w, i + 2), y + 1, ff(withAlpha(color, Math.max(0, a))));
+        }
     }
 
     private void panel(DrawContext g, String title, int x, int y, int w, int h) {
-        rbox(g, x + 2, y + 3, w, h, 0x45000000);
-        rbox(g, x, y, w, h, Theme.PANEL_BG);
-        g.fillGradient(x + 1, y + 1, x + w - 1, y + 22,
-                ff(withAlpha(Theme.ACCENT, 48)), ff(withAlpha(Theme.ACCENT, 4)));
-        g.fill(x + 1, y, x + w - 1, y + 1, ff(Theme.ACCENT));
+        shadow(g, x, y, w, h, 6);
+        rr(g, x, y, w, h, 6, Theme.PANEL_BG);
+        g.fillGradient(x + 3, y + 1, x + w - 3, y + 24,
+                ff(withAlpha(Theme.ACCENT, 70)), ff(withAlpha(Theme.ACCENT, 0)));
+        fadeLine(g, x + 6, y, w - 12, Theme.ACCENT, 255);
         g.drawCenteredTextWithShadow(textRenderer, Text.literal(title).formatted(Formatting.BOLD),
                 x + w / 2, y + 8, ff(Theme.TEXT));
-        g.fill(x + 8, y + 22, x + w - 8, y + 23, ff(Theme.ACCENT_DIM));
+        fadeLine(g, x + 10, y + 22, w - 20, Theme.ACCENT, 160);
         cx = x + 6; cw = w - 12; cy = y + 28;
     }
 
     // Тумблер с плавным движением ползунка
     private void sw(DrawContext g, int x, int y, String key, boolean on) {
         float p = anim(key, on);
-        rbox(g, x, y, 24, 12, mix(Theme.TOGGLE_OFF, Theme.TOGGLE_ON, p));
+        if (p > 0.05f) rr(g, x - 2, y - 2, 28, 16, 8, withAlpha(Theme.ACCENT, (int) (46 * p)));
+        rr(g, x, y, 24, 12, 6, mix(Theme.TOGGLE_OFF, Theme.TOGGLE_ON, p));
         int kx = x + 2 + Math.round(p * 12);
-        rbox(g, kx, y + 2, 8, 8, 0xFFFFFFFF);
+        rr(g, kx, y + 2, 8, 8, 4, 0xFFFFFFFF);
     }
 
     private int mh(String id, int options) { return 24 + (open.contains(id) ? options * 20 + 4 : 0); }
@@ -94,9 +119,12 @@ public class MenuScreen extends Screen {
     private boolean module(DrawContext g, String id, String label, String hint, boolean on, int options) {
         curId = id;
         boolean hov = hit(cx, cy, cw, 22);
-        rbox(g, cx, cy, cw, 22, hov ? Theme.ROW_HOVER : Theme.ROW);
+        float hv = anim("h:" + id, hov);
+        int rowCol = mix(Theme.ROW, Theme.ROW_HOVER, hv * 0.6f);
+        if (on) rowCol = mix(rowCol, withAlpha(Theme.ACCENT, 0x40), 0.45f);
+        rbox(g, cx, cy, cw, 22, rowCol);
 
-        if (on) g.fill(cx, cy + 2, cx + 2, cy + 20, ff(Theme.ACCENT)); // Полоска слева, если включено
+        if (on) rr(g, cx, cy + 4, 3, 14, 1, Theme.ACCENT); // Полоска слева, если включено
 
         text(g, label + (hint.isEmpty() ? "" : " [" + hint + "]"), cx + 8, cy + 7, on ? Theme.TEXT : Theme.TEXT_DIM);
 
@@ -123,8 +151,8 @@ public class MenuScreen extends Screen {
 
     private boolean cbool(DrawContext g, String label, boolean v) {
         boolean hov = hit(cx, cy, cw, 18);
-        rbox(g, cx, cy, cw, 18, hov ? Theme.ROW_HOVER : 0x20000000);
-        text(g, label, cx + 8, cy + 5, Theme.TEXT_DIM);
+        rbox(g, cx, cy, cw, 18, mix(0x20000000, Theme.ROW_HOVER, anim("hb:" + curId + label, hov) * 0.6f));
+        text(g, label, cx + 8, cy + 5, v ? Theme.TEXT : Theme.TEXT_DIM);
         sw(g, cx + cw - 28, cy + 3, "c:" + curId + "/" + label, v);
         if (clicked && hov) v = !v;
         cy += 20;
@@ -141,25 +169,31 @@ public class MenuScreen extends Screen {
             v = isInt ? (double) Math.round(v) : Math.round(v * 10.0) / 10.0;
         }
         double t = Math.max(0.0, Math.min(1.0, (v - min) / (max - min)));
-        int fw = (int) (cw * t);
+        int tw = cw - 12;
+        int fw = (int) (tw * t);
 
-        rbox(g, cx, cy, cw, 18, hov ? 0x30000000 : 0x20000000);
-        if (fw > 2) {
-            rbox(g, cx, cy, fw, 18, Theme.SLIDER_FILL);
-            g.fill(cx + fw - 2, cy + 2, cx + fw, cy + 16, ff(0xCCFFFFFF));
-        }
-
+        rbox(g, cx, cy, cw, 18, hov || active == id ? 0x30000000 : 0x20000000);
         String val = isInt ? String.valueOf((int) v) : String.valueOf(v);
-        g.drawCenteredTextWithShadow(textRenderer, label + ": " + val, cx + cw / 2, cy + 5, ff(Theme.TEXT));
+        text(g, label, cx + 6, cy + 2, Theme.TEXT_DIM);
+        text(g, val, cx + cw - 6 - textRenderer.getWidth(val), cy + 2, Theme.TEXT);
+        rr(g, cx + 6, cy + 12, tw, 4, 2, 0x45FFFFFF);
+        if (fw > 1) {
+            int c0 = mix(Theme.ACCENT, 0xFF14141C, 0.5f), c1 = Theme.ACCENT;
+            for (int i = 0; i < fw; i += 2) {
+                int c = mix(c0, c1, (float) i / Math.max(1, tw));
+                g.fill(cx + 6 + i, cy + 12, cx + 6 + Math.min(fw, i + 2), cy + 16, ff(0xFF000000 | (c & 0xFFFFFF)));
+            }
+            rr(g, cx + 6 + fw - 3, cy + 10, 6, 8, 3, 0xFFFFFFFF);
+        }
         cy += 20;
         return v;
     }
 
     private int ccycle(DrawContext g, String label, String[] names, int idx) {
         boolean hov = hit(cx, cy, cw, 18);
-        rbox(g, cx, cy, cw, 18, hov ? Theme.ROW_HOVER : 0x20000000);
+        rbox(g, cx, cy, cw, 18, mix(0x20000000, Theme.ROW_HOVER, anim("hc:" + curId + label, hov) * 0.6f));
         text(g, label + ": " + names[Math.max(0, Math.min(idx, names.length - 1))], cx + 8, cy + 5, Theme.TEXT_DIM);
-        rbox(g, cx + cw - 16, cy + 4, 8, 10, Theme.ACCENT);
+        text(g, "›", cx + cw - 12, cy + 5, Theme.ACCENT);
         if (clicked && hov) idx = (idx + 1) % names.length;
         cy += 20;
         return idx;
@@ -497,28 +531,32 @@ public class MenuScreen extends Screen {
     // =====================================================================
     //  Нижние кнопки: закрыть + переключатель стиля меню
     // =====================================================================
-    private void drawBottom(DrawContext g) {
-        int bw = 160; int bh = 20;
-        int bx = (width - bw) / 2; int by = height - bh - 10;
-        boolean hov = hit(bx, by, bw, bh);
-        rbox(g, bx + 1, by + 2, bw, bh, 0x40000000);
-        rbox(g, bx, by, bw, bh, hov ? Theme.ACCENT : Theme.PANEL_BG);
-        g.fill(bx + 1, by, bx + bw - 1, by + 1, ff(Theme.ACCENT));
-        g.drawCenteredTextWithShadow(textRenderer, "ArchitektVisuals | Закрыть", width / 2, by + 6, ff(Theme.TEXT));
-        if (clicked && hov) close();
+    private boolean btn(DrawContext g, int x, int y, int w, int h, String label, String key) {
+        boolean hov = hit(x, y, w, h);
+        float p = anim("b:" + key, hov);
+        shadow(g, x, y, w, h, 5);
+        rr(g, x, y, w, h, 5, mix(Theme.PANEL_BG, withAlpha(Theme.ACCENT, 0xB0), p));
+        fadeLine(g, x + 5, y, w - 10, Theme.ACCENT, 255);
+        g.drawCenteredTextWithShadow(textRenderer, label, x + w / 2, y + (h - 8) / 2, ff(Theme.TEXT));
+        return clicked && hov;
+    }
 
-        // переключатель стиля меню (Classic <-> Sidebar)
-        int sw2 = 160;
-        int sx = bx + bw + 8;
-        if (sx + sw2 > width - 4) sx = bx - sw2 - 8;
-        boolean h2 = hit(sx, by, sw2, bh);
-        rbox(g, sx + 1, by + 2, sw2, bh, 0x40000000);
-        rbox(g, sx, by, sw2, bh, h2 ? Theme.ACCENT : Theme.PANEL_BG);
-        g.fill(sx + 1, by, sx + sw2 - 1, by + 1, ff(Theme.ACCENT));
-        g.drawCenteredTextWithShadow(textRenderer, "Стиль меню: " + (Config.menuStyle == 1 ? "Sidebar" : "Classic"),
-                sx + sw2 / 2, by + 6, ff(Theme.TEXT));
-        if (clicked && h2) {
+    private void drawBottom(DrawContext g) {
+        int bh = 20, gap = 8;
+        int bw = Math.max(90, Math.min(150, (width - 24 - gap * 2) / 3));
+        int total = bw * 3 + gap * 2;
+        int bx = (width - total) / 2, by = height - bh - 10;
+
+        if (btn(g, bx, by, bw, bh, "ArchitektVisuals | Закрыть", "close")) close();
+        if (btn(g, bx + bw + gap, by, bw, bh, "Стиль: " + (Config.menuStyle == 1 ? "Sidebar" : "Classic"), "style")) {
             Config.menuStyle = Config.menuStyle == 1 ? 0 : 1;
+            Config.save();
+        }
+        if (btn(g, bx + (bw + gap) * 2, by, bw, bh,
+                "Тема: " + Theme.NAMES[Math.max(0, Math.min(Config.menuTheme, Theme.NAMES.length - 1))], "theme")) {
+            Config.menuTheme = (Config.menuTheme + 1) % Theme.NAMES.length;
+            Theme.THEME_ID = Config.menuTheme;
+            Theme.apply();
             Config.save();
         }
     }
@@ -654,9 +692,11 @@ public class MenuScreen extends Screen {
         int py = Math.max(6, (height - 36 - ph) / 2);
 
         // подложка
-        rbox(g, px + 2, py + 3, pw, ph, 0x45000000);
-        rbox(g, px, py, pw, ph, Theme.PANEL_BG);
-        g.fill(px + 1, py, px + pw - 1, py + 1, ff(Theme.ACCENT));
+        shadow(g, px, py, pw, ph, 8);
+        rr(g, px, py, pw, ph, 8, Theme.PANEL_BG);
+        g.fillGradient(px + 4, py + 1, px + pw - 4, py + 40,
+                ff(withAlpha(Theme.ACCENT, 50)), ff(withAlpha(Theme.ACCENT, 0)));
+        fadeLine(g, px + 8, py, pw - 16, Theme.ACCENT, 255);
 
         int sbW = 104;
         int midW = Math.max(120, (pw - sbW) * 2 / 5);
@@ -699,12 +739,9 @@ public class MenuScreen extends Screen {
             } else {
                 if (plainRow(g, sbLabel(id))) sbSel = id;
             }
-            if (id.equals(sbSel)) {   // рамка у выбранного модуля
-                int c = ff(Theme.ACCENT);
-                g.fill(mx0, rowY, mx0 + cw, rowY + 1, c);
-                g.fill(mx0, rowY + 21, mx0 + cw, rowY + 22, c);
-                g.fill(mx0, rowY, mx0 + 1, rowY + 22, c);
-                g.fill(mx0 + cw - 1, rowY, mx0 + cw, rowY + 22, c);
+            if (id.equals(sbSel)) {   // подсветка выбранного модуля
+                rr(g, mx0, rowY, cw, 22, 3, withAlpha(Theme.ACCENT, 0x30));
+                rr(g, mx0, rowY + 4, 3, 14, 1, Theme.ACCENT);
             }
         }
 
