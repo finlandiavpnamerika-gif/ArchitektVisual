@@ -14,8 +14,12 @@ public final class Theme {
         { 0xFF7CE38B, 0x807CE38B, 0xC0101010, 0x40000000, 0x60FFFFFF, 0xFFFFFFFF, 0xFFAAAAAA }, // 0 зелёный
         { 0xFF9C7CFF, 0x809C7CFF, 0xC0120A1E, 0x40000000, 0x60B07CFF, 0xFFFFFFFF, 0xFFB0A0D0 }, // 1 фиолетовый
         { 0xFF5A9CFF, 0x805A9CFF, 0xC00A0F1A, 0x40000000, 0x605A9CFF, 0xFFFFFFFF, 0xFFA0B0D0 }, // 2 синий
-        { 0xFFFFFFFF, 0x80FFFFFF, 0xC0101010, 0x40000000, 0x60FFFFFF, 0xFFFFFFFF, 0xFFAAAAAA }  // 3 белый
+        { 0xFFFFFFFF, 0x80FFFFFF, 0xC0101010, 0x40000000, 0x60FFFFFF, 0xFFFFFFFF, 0xFFAAAAAA }, // 3 белый
+        { 0xFFFF5A6E, 0x80FF5A6E, 0xC01A0A0E, 0x40000000, 0x60FF5A6E, 0xFFFFFFFF, 0xFFD0A0A8 }, // 4 красный
+        { 0xFF3DE0D0, 0x803DE0D0, 0xC00A1A1A, 0x40000000, 0x603DE0D0, 0xFFFFFFFF, 0xFFA0D0CC }, // 5 бирюзовый
+        { 0xFFFF7CC8, 0x80FF7CC8, 0xC01E0A16, 0x40000000, 0x60FF7CC8, 0xFFFFFFFF, 0xFFD0A0BC }  // 6 розовый
     };
+    public static final String[] NAMES = {"Зелёная", "Фиолетовая", "Синяя", "Белая", "Красная", "Бирюзовая", "Розовая"};
 
     // ================== ЦВЕТА (берутся из палитры) ==================
     public static int ACCENT     = PALETTES[THEME_ID][0];
