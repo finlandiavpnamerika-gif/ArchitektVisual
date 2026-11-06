@@ -277,7 +277,7 @@ public class MenuScreen extends Screen {
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5);
+        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5) + mh("part", 9);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
@@ -317,6 +317,19 @@ public class MenuScreen extends Screen {
             Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
             Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
             Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+        }
+
+        Config.particles = module(g, "part", "Particles", "", Config.particles, 9);
+        if (open.contains("part")) {
+            Config.partMode = ccycle(g, "Режим", Particles.MODES, Config.partMode);
+            Config.partShape = ccycle(g, "Форма", Particles.SHAPES, Config.partShape);
+            Config.partHue = cgradL(g, "Цвет", Config.partHue, pos -> hsv(pos, 0.75, 1.0));
+            Config.partRainbow = cbool(g, "Радуга", Config.partRainbow);
+            Config.partCount = cslider(g, "Количество", 5, 60, Config.partCount, true);
+            Config.partSize = cslider(g, "Размер", 0.05, 0.4, Config.partSize, false);
+            Config.partLife = cslider(g, "Время жизни", 0.3, 3.0, Config.partLife, false);
+            Config.partGravity = cslider(g, "Гравитация", -2.0, 10.0, Config.partGravity, false);
+            Config.partAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.partAlpha, false);
         }
 
         Config.skyShader = module(g, "sky", "Sky Shader", "", Config.skyShader, 5);
@@ -518,7 +531,7 @@ public class MenuScreen extends Screen {
 
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
-            {"fb", "cross", "trails", "zones", "tesp", "sky", "hat", "pred", "physic", "shulker", "hl"},
+            {"fb", "cross", "trails", "zones", "tesp", "sky", "part", "hat", "pred", "physic", "shulker", "hl"},
             {"hud", "array", "armor", "keys"},
             {"sprint", "zoom", "respawn", "freelook", "stream"},
             {"autoswap", "itembind", "friends", "macro"},
@@ -533,6 +546,7 @@ public class MenuScreen extends Screen {
             case "zones" -> "FunTime Zones";
             case "tesp" -> "Target ESP";
             case "sky" -> "Sky Shader";
+            case "part" -> "Particles";
             case "hat" -> "China Hat";
             case "pred" -> "Predictions";
             case "physic" -> "Item Physic";
@@ -569,6 +583,7 @@ public class MenuScreen extends Screen {
             case "zones" -> Config.zones;
             case "tesp" -> Config.targetEsp;
             case "sky" -> Config.skyShader;
+            case "part" -> Config.particles;
             case "hat" -> Config.chinaHat;
             case "pred" -> Config.predictions;
             case "physic" -> Config.itemPhysic;
@@ -599,6 +614,7 @@ public class MenuScreen extends Screen {
             case "zones": Config.zones = v; break;
             case "tesp": Config.targetEsp = v; break;
             case "sky": Config.skyShader = v; break;
+            case "part": Config.particles = v; break;
             case "hat": Config.chinaHat = v; break;
             case "pred": Config.predictions = v; break;
             case "physic": Config.itemPhysic = v; break;
@@ -736,6 +752,17 @@ public class MenuScreen extends Screen {
                 Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
                 Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
                 Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+            }
+            case "part" -> {
+                Config.partMode = ccycle(g, "Режим", Particles.MODES, Config.partMode);
+                Config.partShape = ccycle(g, "Форма", Particles.SHAPES, Config.partShape);
+                Config.partHue = cgradL(g, "Цвет", Config.partHue, pos -> hsv(pos, 0.75, 1.0));
+                Config.partRainbow = cbool(g, "Радуга", Config.partRainbow);
+                Config.partCount = cslider(g, "Количество", 5, 60, Config.partCount, true);
+                Config.partSize = cslider(g, "Размер", 0.05, 0.4, Config.partSize, false);
+                Config.partLife = cslider(g, "Время жизни", 0.3, 3.0, Config.partLife, false);
+                Config.partGravity = cslider(g, "Гравитация", -2.0, 10.0, Config.partGravity, false);
+                Config.partAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.partAlpha, false);
             }
             case "sky" -> {
                 Config.skyPreset = ccycle(g, "Небо", SkyRenderer.PRESETS, Config.skyPreset);
