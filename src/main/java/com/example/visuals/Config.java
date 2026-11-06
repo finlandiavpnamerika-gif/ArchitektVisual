@@ -142,6 +142,18 @@ public final class Config {
     public static boolean skyNightOnly = false;
     public static boolean skyStars = true;
 
+    // --- Particles ---
+    public static boolean particles = true;
+    public static int partMode = 0;                // 0 Удар, 1 Аура, 2 Оба
+    public static int partShape = 2;               // 0 Квадрат, 1 Ромб, 2 Звезда, 3 Точка
+    public static double partCount = 20;
+    public static double partSize = 0.12;
+    public static double partLife = 1.0;
+    public static double partGravity = 4.0;
+    public static double partAlpha = 0.9;
+    public static double partHue = 0.8;
+    public static boolean partRainbow = false;
+
     // --- Item Highlight ---
     public static boolean highlight = true;
     public static final List<ItemHighlight.Entry> highlights = new ArrayList<>();
@@ -203,6 +215,16 @@ public final class Config {
             o.addProperty("skySpeed", skySpeed);
             o.addProperty("skyNightOnly", skyNightOnly);
             o.addProperty("skyStars", skyStars);
+            o.addProperty("particles", particles);
+            o.addProperty("partMode", partMode);
+            o.addProperty("partShape", partShape);
+            o.addProperty("partCount", partCount);
+            o.addProperty("partSize", partSize);
+            o.addProperty("partLife", partLife);
+            o.addProperty("partGravity", partGravity);
+            o.addProperty("partAlpha", partAlpha);
+            o.addProperty("partHue", partHue);
+            o.addProperty("partRainbow", partRainbow);
 
             // HUD
             o.addProperty("hud", hud);
@@ -330,6 +352,16 @@ public final class Config {
                 skySpeed = d(o, "skySpeed", skySpeed);
                 skyNightOnly = b(o, "skyNightOnly", skyNightOnly);
                 skyStars = b(o, "skyStars", skyStars);
+                particles = b(o, "particles", particles);
+                partMode = (int) d(o, "partMode", partMode);
+                partShape = (int) d(o, "partShape", partShape);
+                partCount = d(o, "partCount", partCount);
+                partSize = d(o, "partSize", partSize);
+                partLife = d(o, "partLife", partLife);
+                partGravity = d(o, "partGravity", partGravity);
+                partAlpha = d(o, "partAlpha", partAlpha);
+                partHue = d(o, "partHue", partHue);
+                partRainbow = b(o, "partRainbow", partRainbow);
 
                 // HUD
                 hud = b(o, "hud", hud);
