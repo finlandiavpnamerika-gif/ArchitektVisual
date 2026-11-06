@@ -30,6 +30,8 @@ public final class Freelook {
     private static long keyPressedAt = 0L;
 
     public static float yaw, pitch;
+    /** поворот самого игрока на момент включения: он не должен меняться, пока работает Freelook */
+    private static float lockYaw, lockPitch;
     private static Perspective prev = null;
     private static long lastNanos = 0L;
 
@@ -77,6 +79,8 @@ public final class Freelook {
                 yaw = mc.player.getYaw();
                 pitch = mc.player.getPitch();
             }
+            lockYaw = mc.player.getYaw();
+            lockPitch = mc.player.getPitch();
             active = true;
             returning = false;
             mc.player.sendMessage(Text.literal("Freelook: ВКЛ"), true);
@@ -96,8 +100,22 @@ public final class Freelook {
 
     /** вызывается из FreelookCameraMixin раз за кадр: плавный возврат камеры */
     public static void frame() {
-        if (!returning) return;
         MinecraftClient mc = MinecraftClient.getInstance();
+        if (active) {
+            // Страховка: если игрок всё же повернулся от мыши - переносим этот поворот на камеру
+            // и возвращаем игроку прежний поворот, чтобы персонаж не крутился вместе с камерой.
+            if (mc.player == null) { reset(mc); return; }
+            float dy = MathHelper.wrapDegrees(mc.player.getYaw() - lockYaw);
+            float dp = mc.player.getPitch() - lockPitch;
+            if (dy != 0f || dp != 0f) {
+                yaw += dy;
+                pitch = MathHelper.clamp(pitch + dp, -90.0f, 90.0f);
+                mc.player.setYaw(lockYaw);
+                mc.player.setPitch(lockPitch);
+            }
+            return;
+        }
+        if (!returning) return;
         if (mc.player == null) { reset(mc); return; }
 
         long now = System.nanoTime();
