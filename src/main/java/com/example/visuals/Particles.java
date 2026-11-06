@@ -27,7 +27,7 @@ import org.joml.Vector3f;
 public final class Particles {
     private Particles() {}
 
-    public static final String[] MODES  = {"Удар", "Аура", "Оба"};
+    public static final String[] MODES  = {"Удар", "Аура", "Оба", "Мир"};
     public static final String[] SHAPES = {"Квадрат", "Ромб", "Звезда", "Точка"};
 
     private static final int MAX = 700;
@@ -37,16 +37,17 @@ public final class Particles {
         double x, y, z;
         float vx, vy, vz;
         float age, life, size, hue, spin, spinV;
+        boolean ambient;
     }
 
     private static final ArrayList<P> LIST = new ArrayList<>();
     private static long last = 0;
-    private static float auraAcc = 0f;
+    private static float auraAcc = 0f, worldAcc = 0f;
 
     /** Вызвать один раз из VisualsClient.onInitializeClient(). */
     public static void register() {
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hit) -> {
-            if (world.isClient() && Config.particles && Config.partMode != 1) {
+            if (world.isClient() && Config.particles && (Config.partMode == 0 || Config.partMode == 2)) {
                 MinecraftClient mc = MinecraftClient.getInstance();
                 if (mc.player != null && player == mc.player && entity instanceof LivingEntity le) burst(le);
             }
@@ -91,7 +92,7 @@ public final class Particles {
         if (!Config.particles) { LIST.clear(); return; }
 
         // аура вокруг игрока
-        if (Config.partMode != 0 && dt > 0f) {
+        if ((Config.partMode == 1 || Config.partMode == 2) && dt > 0f) {
             auraAcc += dt * (float) Config.partCount * 1.5f;
             double px = MathHelper.lerp((double) tickProgress, mc.player.lastX, mc.player.getX());
             double py = MathHelper.lerp((double) tickProgress, mc.player.lastY, mc.player.getY());
@@ -105,15 +106,32 @@ public final class Particles {
             if (auraAcc > 5f) auraAcc = 0f;
         }
 
+        // частицы, летающие по всему миру вокруг игрока
+        if (Config.partMode == 3 && dt > 0f) {
+            worldAcc += dt * (float) Config.partCount * 3f;
+            while (worldAcc >= 1f && LIST.size() < MAX) {
+                worldAcc -= 1f;
+                float ang = rand(0f, 6.28f), rad = rand(2f, 14f);
+                P p = make(mc.player.getX() + Math.cos(ang) * rad, mc.player.getY() + rand(-2f, 6f),
+                        mc.player.getZ() + Math.sin(ang) * rad, 0.25f, 0f);
+                p.ambient = true;
+                p.life *= 3f;
+                LIST.add(p);
+            }
+            if (worldAcc > 5f) worldAcc = 0f;
+        }
+
         // обновление
         float grav = (float) Config.partGravity;
         for (int i = LIST.size() - 1; i >= 0; i--) {
             P p = LIST.get(i);
             p.age += dt;
             if (p.age >= p.life) { LIST.remove(i); continue; }
-            p.vy -= grav * dt;
-            float drag = 1f - 1.5f * dt;
-            p.vx *= drag; p.vy *= drag; p.vz *= drag;
+            if (!p.ambient) {
+                p.vy -= grav * dt;
+                float drag = 1f - 1.5f * dt;
+                p.vx *= drag; p.vy *= drag; p.vz *= drag;
+            }
             p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt;
             p.spin += p.spinV * dt;
         }
