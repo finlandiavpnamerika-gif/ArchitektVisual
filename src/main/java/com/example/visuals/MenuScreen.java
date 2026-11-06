@@ -727,8 +727,18 @@ public class MenuScreen extends Screen {
         if (!found) sbSel = mods[0];
 
         int mx0 = px + sbW + 8;
+        int vTop = py + 30, vH = ph - 38;
+        sbSplitX = px + sbW + midW;
+        if (sbCat != sbLastCat) { sbLastCat = sbCat; sbScrollMid = 0; sbScrollRight = 0; }
         text(g, "Категория: " + SB_CATS[sbCat], mx0, py + 12, Theme.TEXT_DIM);
-        cx = mx0; cw = midW - 16; cy = py + 30;
+
+        // ---- центральная колонка (с прокруткой) ----
+        sbScrollMid = Math.max(0, Math.min(sbScrollMid, sbMaxMid));
+        cx = mx0; cw = midW - 22; cy = vTop - Math.round(sbScrollMid);
+        int startMid = cy;
+        int smx = mx, smy = my; boolean scl = clicked;
+        if (active == -1 && !hit(mx0 - 2, vTop, midW - 12, vH)) { mx = -1000; my = -1000; clicked = false; }
+        g.enableScissor(mx0 - 2, vTop, mx0 - 2 + midW - 12, vTop + vH);
         for (String id : mods) {
             int rowY = cy;
             if (sbHasSwitch(id)) {
@@ -744,12 +754,56 @@ public class MenuScreen extends Screen {
                 rr(g, mx0, rowY + 4, 3, 14, 1, Theme.ACCENT);
             }
         }
+        g.disableScissor();
+        mx = smx; my = smy; clicked = scl;
+        scrollbar(g, mx0 + midW - 18, vTop, vH, cy - startMid, 1);
 
-        // ---------- правая колонка: настройки выбранного модуля ----------
+        // ---- правая колонка: настройки выбранного модуля (с прокруткой) ----
+        if (!sbSel.equals(sbLastSel)) { sbLastSel = sbSel; sbScrollRight = 0; }
         int rx0 = px + sbW + midW + 10;
         text(g, sbLabel(sbSel), rx0, py + 12, Theme.TEXT);
-        cx = rx0; cw = rightW - 20; cy = py + 30; curId = sbSel;
+        sbScrollRight = Math.max(0, Math.min(sbScrollRight, sbMaxRight));
+        cx = rx0; cw = rightW - 24; cy = vTop - Math.round(sbScrollRight); curId = sbSel;
+        int startR = cy;
+        smx = mx; smy = my; scl = clicked;
+        if (active == -1 && !hit(rx0 - 2, vTop, rightW - 14, vH)) { mx = -1000; my = -1000; clicked = false; }
+        g.enableScissor(rx0 - 2, vTop, rx0 - 2 + rightW - 14, vTop + vH);
         sbSettings(g, sbSel);
+        g.disableScissor();
+        mx = smx; my = smy; clicked = scl;
+        scrollbar(g, rx0 + rightW - 18, vTop, vH, cy - startR, 2);
+    }
+
+    // ---- прокрутка колонок Sidebar ----
+    private static float sbScrollMid = 0, sbScrollRight = 0;
+    private static int sbMaxMid = 0, sbMaxRight = 0, sbDrag = 0, sbSplitX = 0, sbLastCat = -1;
+    private static String sbLastSel = "";
+
+    private void scrollbar(DrawContext g, int x, int top, int h, int content, int which) {
+        int max = Math.max(0, content - h);
+        if (which == 1) sbMaxMid = max; else sbMaxRight = max;
+        if (max <= 0) { if (which == 1) sbScrollMid = 0; else sbScrollRight = 0; return; }
+        float sc = which == 1 ? sbScrollMid : sbScrollRight;
+        int thumbH = Math.max(16, h * h / content);
+        boolean over = hit(x - 4, top, 11, h);
+        if (clicked && over) sbDrag = which;
+        if (!down) sbDrag = 0;
+        if (sbDrag == which) {
+            float t = (my - top - thumbH / 2f) / (float) (h - thumbH);
+            sc = Math.max(0f, Math.min((float) max, t * max));
+            if (which == 1) sbScrollMid = sc; else sbScrollRight = sc;
+        }
+        int thumbY = top + Math.round((h - thumbH) * (sc / max));
+        rr(g, x, top, 3, h, 1, 0x30FFFFFF);
+        rr(g, x, thumbY, 3, thumbH, 1, (sbDrag == which || over) ? Theme.ACCENT : Theme.ACCENT_DIM);
+    }
+
+    // колесо мыши (без @Override: сигнатура зависит от версии)
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (Config.menuStyle != 1) return false;
+        if (mouseX < sbSplitX) sbScrollMid = Math.max(0, Math.min(sbMaxMid, sbScrollMid - (float) verticalAmount * 22f));
+        else sbScrollRight = Math.max(0, Math.min(sbMaxRight, sbScrollRight - (float) verticalAmount * 22f));
+        return true;
     }
 
     private void noOptions(DrawContext g) {
