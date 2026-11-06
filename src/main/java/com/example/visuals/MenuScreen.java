@@ -80,15 +80,15 @@ public class MenuScreen extends Screen {
 
     // Мягкая тень под скруглённым блоком
     private void shadow(DrawContext g, int x, int y, int w, int h, int r) {
-        for (int i = 5; i >= 1; i--) rr(g, x - i, y - i + 3, w + 2 * i, h + 2 * i, r + i, 0x0A000000);
+        for (int i = 3; i >= 1; i--) rr(g, x - i, y - i + 2, w + 2 * i, h + 2 * i, r + i, 0x10000000);
     }
 
     // Горизонтальная линия, плавно исчезающая по краям
     private void fadeLine(DrawContext g, int x, int y, int w, int color, int maxAlpha) {
-        for (int i = 0; i < w; i += 2) {
-            double t = (i + 1.0) / w;
+        for (int i = 0; i < w; i += 4) {
+            double t = (i + 2.0) / w;
             int a = (int) (maxAlpha * Math.sin(Math.PI * t));
-            g.fill(x + i, y, x + Math.min(w, i + 2), y + 1, ff(withAlpha(color, Math.max(0, a))));
+            g.fill(x + i, y, x + Math.min(w, i + 4), y + 1, ff(withAlpha(color, Math.max(0, a))));
         }
     }
 
@@ -179,9 +179,9 @@ public class MenuScreen extends Screen {
         rr(g, cx + 6, cy + 12, tw, 4, 2, 0x45FFFFFF);
         if (fw > 1) {
             int c0 = mix(Theme.ACCENT, 0xFF14141C, 0.5f), c1 = Theme.ACCENT;
-            for (int i = 0; i < fw; i += 2) {
+            for (int i = 0; i < fw; i += 4) {
                 int c = mix(c0, c1, (float) i / Math.max(1, tw));
-                g.fill(cx + 6 + i, cy + 12, cx + 6 + Math.min(fw, i + 2), cy + 16, ff(0xFF000000 | (c & 0xFFFFFF)));
+                g.fill(cx + 6 + i, cy + 12, cx + 6 + Math.min(fw, i + 4), cy + 16, ff(0xFF000000 | (c & 0xFFFFFF)));
             }
             rr(g, cx + 6 + fw - 3, cy + 10, 6, 8, 3, 0xFFFFFFFF);
         }
@@ -206,9 +206,9 @@ public class MenuScreen extends Screen {
         if (clicked && hov) active = id;
         if (active == id && down) t = Math.max(0.0, Math.min(1.0, (double) (mx - cx) / (double) cw));
 
-        for (int x = 0; x < cw; x += 2) {
-            int x2 = Math.min(x + 2, cw);
-            g.fill(cx + x, cy, cx + x2, cy + 16, ff(0xFF000000 | colorAt.applyAsInt((x + 1.0) / cw)));
+        for (int x = 0; x < cw; x += 4) {
+            int x2 = Math.min(x + 4, cw);
+            g.fill(cx + x, cy, cx + x2, cy + 16, ff(0xFF000000 | colorAt.applyAsInt((x + 2.0) / cw)));
         }
         int mxp = cx + (int) (cw * t);
         g.fill(mxp - 2, cy - 1, mxp + 1, cy + 17, ff(0xFF000000));   // обводка маркера
@@ -286,7 +286,7 @@ public class MenuScreen extends Screen {
 
         // Фон: затемнение с градиентом и лёгкий дождь
         g.fillGradient(0, 0, width, height, 0x80080810, 0xC0000000);
-        RainyScene.drawRain(g, width, height, 0.6f);
+        RainyScene.drawRain(g, width, height, 0.3f);
 
         // Sidebar-стиль меню (переключается кнопкой снизу)
         if (Config.menuStyle == 1) { renderSidebar(g); drawBottom(g); return; }
@@ -311,7 +311,7 @@ public class MenuScreen extends Screen {
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5) + mh("part", 9);
+        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5) + mh("part", 9) + mh("dmg", 5);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
@@ -351,6 +351,15 @@ public class MenuScreen extends Screen {
             Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
             Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
             Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+        }
+
+        Config.damageFever = module(g, "dmg", "DamageViewer", "", Config.damageFever, 5);
+        if (open.contains("dmg")) {
+            Config.dfMine = cbool(g, "Только мои удары", Config.dfMine);
+            Config.dfDecimals = cbool(g, "Дробные числа", Config.dfDecimals);
+            Config.dfHue = cgradL(g, "Цвет", Config.dfHue, pos -> hsv(pos, 0.85, 1.0));
+            Config.dfSize = cslider(g, "Размер", 0.5, 2.5, Config.dfSize, false);
+            Config.dfLife = cslider(g, "Время (сек)", 0.5, 3.0, Config.dfLife, false);
         }
 
         Config.particles = module(g, "part", "Particles", "", Config.particles, 9);
@@ -569,7 +578,7 @@ public class MenuScreen extends Screen {
 
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
-            {"fb", "cross", "trails", "zones", "tesp", "sky", "part", "hat", "pred", "physic", "shulker", "hl"},
+            {"fb", "cross", "trails", "zones", "tesp", "sky", "part", "dmg", "hat", "pred", "physic", "shulker", "hl"},
             {"hud", "array", "armor", "keys"},
             {"sprint", "zoom", "respawn", "freelook", "stream"},
             {"autoswap", "itembind", "friends", "macro"},
@@ -585,6 +594,7 @@ public class MenuScreen extends Screen {
             case "tesp" -> "Target ESP";
             case "sky" -> "Sky Shader";
             case "part" -> "Particles";
+            case "dmg" -> "DamageViewer";
             case "hat" -> "China Hat";
             case "pred" -> "Predictions";
             case "physic" -> "Item Physic";
@@ -622,6 +632,7 @@ public class MenuScreen extends Screen {
             case "tesp" -> Config.targetEsp;
             case "sky" -> Config.skyShader;
             case "part" -> Config.particles;
+            case "dmg" -> Config.damageFever;
             case "hat" -> Config.chinaHat;
             case "pred" -> Config.predictions;
             case "physic" -> Config.itemPhysic;
@@ -653,6 +664,7 @@ public class MenuScreen extends Screen {
             case "tesp": Config.targetEsp = v; break;
             case "sky": Config.skyShader = v; break;
             case "part": Config.particles = v; break;
+            case "dmg": Config.damageFever = v; break;
             case "hat": Config.chinaHat = v; break;
             case "pred": Config.predictions = v; break;
             case "physic": Config.itemPhysic = v; break;
@@ -843,6 +855,13 @@ public class MenuScreen extends Screen {
                 Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
                 Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
                 Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+            }
+            case "dmg" -> {
+                Config.dfMine = cbool(g, "Только мои удары", Config.dfMine);
+                Config.dfDecimals = cbool(g, "Дробные числа", Config.dfDecimals);
+                Config.dfHue = cgradL(g, "Цвет", Config.dfHue, pos -> hsv(pos, 0.85, 1.0));
+                Config.dfSize = cslider(g, "Размер", 0.5, 2.5, Config.dfSize, false);
+                Config.dfLife = cslider(g, "Время (сек)", 0.5, 3.0, Config.dfLife, false);
             }
             case "part" -> {
                 Config.partMode = ccycle(g, "Режим", Particles.MODES, Config.partMode);
