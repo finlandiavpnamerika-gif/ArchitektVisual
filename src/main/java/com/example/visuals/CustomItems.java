@@ -16,9 +16,7 @@ import org.joml.Quaternionf;
 /**
  * CustomItems: своя 3D-модель вместо предмета в руке (от первого лица).
  * Сейчас: незеритовый меч -> керамбит.
- * Модель "Керамбит" by Laimix (https://sketchfab.com/Laimix), лицензия CC-BY-4.0:
- * https://sketchfab.com/3d-models/2b5fb78970474118826cba87c838587c
- * Файл karambit.bin получен из .glb: цвета текстуры запечены в вершины (assets/visualsmod/models/karambit.bin).
+ * Файл модели karambit.bin получен из .glb: цвета текстуры запечены в вершины (assets/visualsmod/models/karambit.bin).
  * Формат: "KRMB", int nVerts, int nTris, float[nVerts*3] позиции, int[nVerts] ARGB, int[nTris*3] индексы.
  * Начало координат модели - рукоять, лезвие направлено по +Y, длина модели = 1.
  */
