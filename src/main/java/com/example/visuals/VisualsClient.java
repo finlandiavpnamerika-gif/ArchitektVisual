@@ -31,6 +31,7 @@ public class VisualsClient implements ClientModInitializer {
         TargetEsp.register();
         Particles.register();
         DamageFever.register();
+        TargetHud.register();
         Theme.THEME_ID = Config.menuTheme;
         Theme.apply();
 
@@ -85,6 +86,7 @@ public class VisualsClient implements ClientModInitializer {
             }
             Features.tick(client);
             DamageFever.tick(client);
+            TargetHud.tick(client);
             ItemFeatures.tick(client);
             TrailRenderer.tick();
             FuntimeHelper.tick();
@@ -96,6 +98,7 @@ public class VisualsClient implements ClientModInitializer {
             Features.hud(drawContext, tickCounter);
             FuntimeHelper.hud(drawContext);
             DamageFever.hud(drawContext);
+            TargetHud.hud(drawContext);
             Macros.poll();   // и каждый кадр: тапы не теряются
         });
 
