@@ -301,20 +301,20 @@ public class MenuScreen extends Screen {
         // ========== ПЕРВЫЙ РЯД ==========
 
         // 1. Utilities
-        int hUtil = 34 + mh("sprint", 1) + mh("zoom", 1) + mh("respawn", 0) + mh("freelook", 0);
+        int hUtil = 34 + mh("sprint", 2) + mh("zoom", 2) + mh("respawn", 0) + mh("freelook", 0);
         panel(g, "Utilities", x0, y0, colW, hUtil);
         Config.sprint = module(g, "sprint", "AutoSprint", "", Config.sprint, 1);
-        if (open.contains("sprint")) { Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs); cy += 2; }
+        if (open.contains("sprint")) { Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs); cy += 2;  resetRow(g, "sprint");}
         Config.zoom = module(g, "zoom", "Zoom", "C", Config.zoom, 1);
-        if (open.contains("zoom")) { Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true); cy += 2; }
+        if (open.contains("zoom")) { Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true); cy += 2;  resetRow(g, "zoom");}
         Config.autoRespawn = module(g, "respawn", "AutoRespawn", "", Config.autoRespawn, 0);
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5) + mh("part", 9) + mh("dmg", 5) + mh("fog", 6) + mh("thud", 5) + mh("hv", 10) + mh("ci", 7);
+        int hVis = 34 + mh("fb", 2) + mh("cross", 5) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 2) + mh("tesp", 7) + mh("sky", 6) + mh("part", 10) + mh("dmg", 6) + mh("fog", 7) + mh("thud", 6) + mh("hv", 11) + mh("ci", 9);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
-        if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
+        if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2;  resetRow(g, "fb");}
 
         Config.customCrosshair = module(g, "cross", "Crosshair", "", Config.customCrosshair, 4);
         if (open.contains("cross")) {
@@ -322,6 +322,7 @@ public class MenuScreen extends Screen {
             Config.crosshairSize = (int) cslider(g, "Размер", 2, 20, Config.crosshairSize, true);
             Config.crosshairThickness = (int) cslider(g, "Толщина", 1, 5, Config.crosshairThickness, true);
             Config.crosshairDot = cbool(g, "Точка", Config.crosshairDot);
+            resetRow(g, "cross");
         }
 
         Config.trails = module(g, "trails", "Trails", "", Config.trails, Config.trailsCustom ? 6 : 4);
@@ -336,11 +337,13 @@ public class MenuScreen extends Screen {
             }
             Config.trailsLength = (int) cslider(g, "Длина (тики)", 10, 80, Config.trailsLength, true);
             Config.trailsHeight = cslider(g, "Высота", 0.1, 2.0, Config.trailsHeight, false);
+            resetRow(g, "trails");
         }
 
         Config.zones = module(g, "zones", "FunTime Zones", "", Config.zones, 1);
         if (open.contains("zones")) {
             Config.zonesHeld = cbool(g, "Чужие в руке", Config.zonesHeld);
+            resetRow(g, "zones");
         }
 
         Config.targetEsp = module(g, "tesp", "Target ESP", "", Config.targetEsp, 6);
@@ -351,6 +354,7 @@ public class MenuScreen extends Screen {
             Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
             Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
             Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+            resetRow(g, "tesp");
         }
 
         Config.customItems = module(g, "ci", "CustomItems", "", Config.customItems, 7);
@@ -362,6 +366,8 @@ public class MenuScreen extends Screen {
             Config.ciRX = cslider(g, "Поворот X (°)", -180, 180, Config.ciRX, true);
             Config.ciRY = cslider(g, "Поворот Y (°)", -180, 180, Config.ciRY, true);
             Config.ciRZ = cslider(g, "Поворот Z (°)", -180, 180, Config.ciRZ, true);
+            hint2(g, CustomItems.status(), CustomItems.status2());
+            resetRow(g, "ci");
         }
 
         Config.handView = module(g, "hv", "Hand View", "", Config.handView, 10);
@@ -377,6 +383,7 @@ public class MenuScreen extends Screen {
             Config.sv[HandView.RY][hh] = cslider(g, "Поворот Y (°)", -180, 180, Config.sv[HandView.RY][hh], true);
             Config.sv[HandView.RZ][hh] = cslider(g, "Поворот Z (°)", -180, 180, Config.sv[HandView.RZ][hh], true);
             Config.svNoSwing[hh] = cbool(g, "Без замаха", Config.svNoSwing[hh]);
+            resetRow(g, "hv");
         }
 
         Config.targetHud = module(g, "thud", "TargetHUD", "", Config.targetHud, 5);
@@ -386,6 +393,7 @@ public class MenuScreen extends Screen {
             Config.thY = cslider(g, "Позиция Y (%)", 5, 90, Config.thY, true);
             Config.thHue = cgradL(g, "Цвет", Config.thHue, pos -> hsv(pos, 0.75, 1.0));
             Config.thDist = cbool(g, "Расстояние", Config.thDist);
+            resetRow(g, "thud");
         }
 
         Config.customFog = module(g, "fog", "CustomFog", "", Config.customFog, 6);
@@ -396,6 +404,7 @@ public class MenuScreen extends Screen {
             Config.fogHue = cgradL(g, "Цвет", Config.fogHue, pos -> hsv(pos, 1.0, 1.0));
             Config.fogSat = cgradL(g, "Насыщенность", Config.fogSat, pos -> hsv(Config.fogHue, pos, Math.max(0.35, Config.fogVal)));
             Config.fogVal = cgradL(g, "Яркость", Config.fogVal, pos -> hsv(Config.fogHue, Config.fogSat, pos));
+            resetRow(g, "fog");
         }
 
         Config.damageFever = module(g, "dmg", "DamageViewer", "", Config.damageFever, 5);
@@ -405,6 +414,7 @@ public class MenuScreen extends Screen {
             Config.dfHue = cgradL(g, "Цвет", Config.dfHue, pos -> hsv(pos, 0.85, 1.0));
             Config.dfSize = cslider(g, "Размер", 0.5, 2.5, Config.dfSize, false);
             Config.dfLife = cslider(g, "Время (сек)", 0.5, 3.0, Config.dfLife, false);
+            resetRow(g, "dmg");
         }
 
         Config.particles = module(g, "part", "Particles", "", Config.particles, 9);
@@ -418,6 +428,7 @@ public class MenuScreen extends Screen {
             Config.partLife = cslider(g, "Время жизни", 0.3, 3.0, Config.partLife, false);
             Config.partGravity = cslider(g, "Гравитация", -2.0, 10.0, Config.partGravity, false);
             Config.partAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.partAlpha, false);
+            resetRow(g, "part");
         }
 
         Config.skyShader = module(g, "sky", "Sky Shader", "", Config.skyShader, 5);
@@ -427,10 +438,11 @@ public class MenuScreen extends Screen {
             Config.skySpeed = cslider(g, "Скорость", 0.2, 3.0, Config.skySpeed, false);
             Config.skyNightOnly = cbool(g, "Только ночью", Config.skyNightOnly);
             Config.skyStars = cbool(g, "Звёзды", Config.skyStars);
+            resetRow(g, "sky");
         }
 
         // 3. HUD
-        int hHud = 34 + mh("hud", 10) + mh("array", 6) + mh("armor", 6) + mh("keys", 7);
+        int hHud = 34 + mh("hud", 11) + mh("array", 7) + mh("armor", 7) + mh("keys", 8);
         panel(g, "HUD", x0 + step * 2, y0, colW, hHud);
 
         Config.hud = module(g, "hud", "Info HUD", "", Config.hud, 10);
@@ -446,6 +458,7 @@ public class MenuScreen extends Screen {
             Config.hudX = (int) cslider(g, "X", 0, 400, Config.hudX, true);
             Config.hudY = (int) cslider(g, "Y", 0, 250, Config.hudY, true);
             cy += 2;
+            resetRow(g, "hud");
         }
 
         Config.arrayList = module(g, "array", "ArrayList", "", Config.arrayList, 6);
@@ -457,6 +470,7 @@ public class MenuScreen extends Screen {
             Config.arrayListX = (int) cslider(g, "X", 0, 400, Config.arrayListX, true);
             Config.arrayListY = (int) cslider(g, "Y", 0, 250, Config.arrayListY, true);
             cy += 2;
+            resetRow(g, "array");
         }
 
         Config.armorHud = module(g, "armor", "Armor", "", Config.armorHud, 6);
@@ -468,6 +482,7 @@ public class MenuScreen extends Screen {
             Config.armorHudX = (int) cslider(g, "X", 0, 400, Config.armorHudX, true);
             Config.armorHudY = (int) cslider(g, "Y", 0, 400, Config.armorHudY, true);
             cy += 2;
+            resetRow(g, "armor");
         }
 
         Config.keystrokes = module(g, "keys", "Keystrokes", "", Config.keystrokes, 7);
@@ -480,6 +495,7 @@ public class MenuScreen extends Screen {
             Config.keystrokesX = (int) cslider(g, "X", 0, 400, Config.keystrokesX, true);
             Config.keystrokesY = (int) cslider(g, "Y", 0, 400, Config.keystrokesY, true);
             cy += 2;
+            resetRow(g, "keys");
         }
 
         // 4. Client (+48: строка Friends и кнопка под ней)
@@ -524,16 +540,18 @@ public class MenuScreen extends Screen {
         int y1 = y0 + maxH1 + 10;
 
         // 5. Time & Weather
-        int hTw = 34 + mh("time", 2) + mh("weather", 1);
+        int hTw = 34 + mh("time", 3) + mh("weather", 2);
         panel(g, "Time & Weather", x0, y1, colW, hTw);
         Config.customTime = module(g, "time", "Время", "", Config.customTime, 2);
         if (open.contains("time")) {
             Config.timeValue = (int) cslider(g, "Время", 0, 24000, Config.timeValue, true);
             cy += 20;
+            resetRow(g, "time");
         }
         Config.customWeather = module(g, "weather", "Погода", "", Config.customWeather, 1);
         if (open.contains("weather")) {
             Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
+            resetRow(g, "weather");
         }
 
         // 6. Extra Visuals 1
@@ -551,14 +569,15 @@ public class MenuScreen extends Screen {
             }
             Config.hatSize = cslider(g, "Размер", 0.5, 2.0, Config.hatSize, false);
             Config.hatHeight = cslider(g, "Высота", 0.5, 2.0, Config.hatHeight, false);
+            resetRow(g, "hat");
         }
         Config.predictions = module(g, "pred", "Predictions", "", Config.predictions, 0);
 
         // 7. Extra Visuals 2
-        int hEx2 = 34 + mh("physic", 1) + mh("shulker", 0) + mh("hl", 3 * Config.highlights.size() + 1);
+        int hEx2 = 34 + mh("physic", 2) + mh("shulker", 0) + mh("hl", 3 * Config.highlights.size() + 1);
         panel(g, "Extra Visuals 2", x0 + step * 2, y1, colW, hEx2);
         Config.itemPhysic = module(g, "physic", "Item Physic", "", Config.itemPhysic, 1);
-        if (open.contains("physic")) { Config.physicLift = cslider(g, "Высота (см)", -15, 15, Config.physicLift, true); cy += 2; }
+        if (open.contains("physic")) { Config.physicLift = cslider(g, "Высота (см)", -15, 15, Config.physicLift, true); cy += 2;  resetRow(g, "physic");}
         Config.shulkerPreview = module(g, "shulker", "Shulker Prev", "", Config.shulkerPreview, 0);
 
         Config.highlight = module(g, "hl", "Item Highlight", ItemHighlight.keyName(), Config.highlight, 3 * Config.highlights.size() + 1);
@@ -876,6 +895,15 @@ public class MenuScreen extends Screen {
         return true;
     }
 
+    private void resetRow(DrawContext g, String id) {
+        boolean hov = hit(cx, cy, cw, 18);
+        rbox(g, cx, cy, cw, 18, mix(0x30000000, 0x50FF5555, anim("rs:" + id, hov)));
+        String t = "Сбросить настройки";
+        text(g, t, cx + (cw - textRenderer.getWidth(t)) / 2, cy + 5, hov ? 0xFFFF7777 : Theme.TEXT_DIM);
+        if (clicked && hov) { ModuleDefaults.reset(id); Config.save(); }
+        cy += 20;
+    }
+
     private void noOptions(DrawContext g) {
         text(g, "Нет настроек", cx + 2, cy + 2, Theme.TEXT_DIM);
         cy += 20;
@@ -922,6 +950,7 @@ public class MenuScreen extends Screen {
                 Config.ciRX = cslider(g, "Поворот X (°)", -180, 180, Config.ciRX, true);
                 Config.ciRY = cslider(g, "Поворот Y (°)", -180, 180, Config.ciRY, true);
                 Config.ciRZ = cslider(g, "Поворот Z (°)", -180, 180, Config.ciRZ, true);
+                hint2(g, CustomItems.status(), CustomItems.status2());
             }
             case "hv" -> {
                 Config.leftHanded = cbool(g, "Левша (главная рука слева)", Config.leftHanded);
@@ -1070,6 +1099,7 @@ public class MenuScreen extends Screen {
             case "weather" -> Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
             default -> noOptions(g);
         }
+        if (ModuleDefaults.has(id)) resetRow(g, id);
     }
 
     @Override
