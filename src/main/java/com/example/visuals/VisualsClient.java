@@ -87,6 +87,7 @@ public class VisualsClient implements ClientModInitializer {
             Features.tick(client);
             DamageFever.tick(client);
             TargetHud.tick(client);
+            HandView.tick(client);
             ItemFeatures.tick(client);
             TrailRenderer.tick();
             FuntimeHelper.tick();
