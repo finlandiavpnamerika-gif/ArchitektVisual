@@ -143,6 +143,15 @@ public final class Config {
     public static boolean skyNightOnly = false;
     public static boolean skyStars = true;
 
+    // --- CustomFog ---
+    public static boolean customFog = false;
+    public static double fogStart = 16;
+    public static double fogEnd = 96;
+    public static double fogHue = 0.6;
+    public static double fogSat = 0.3;
+    public static double fogVal = 0.85;
+    public static double physicLift = 0;           // подстройка высоты Item Physic, см
+
     // --- DamageFever ---
     public static boolean damageFever = true;
     public static boolean dfMine = true;           // только урон от моих ударов
@@ -227,6 +236,13 @@ public final class Config {
             o.addProperty("skyStars", skyStars);
             o.addProperty("particles", particles);
             o.addProperty("damageFever", damageFever);
+            o.addProperty("customFog", customFog);
+            o.addProperty("fogStart", fogStart);
+            o.addProperty("fogEnd", fogEnd);
+            o.addProperty("fogHue", fogHue);
+            o.addProperty("fogSat", fogSat);
+            o.addProperty("fogVal", fogVal);
+            o.addProperty("physicLift", physicLift);
             o.addProperty("dfMine", dfMine);
             o.addProperty("dfDecimals", dfDecimals);
             o.addProperty("dfSize", dfSize);
@@ -371,6 +387,13 @@ public final class Config {
                 skyStars = b(o, "skyStars", skyStars);
                 particles = b(o, "particles", particles);
                 damageFever = b(o, "damageFever", damageFever);
+                customFog = b(o, "customFog", customFog);
+                fogStart = d(o, "fogStart", fogStart);
+                fogEnd = d(o, "fogEnd", fogEnd);
+                fogHue = d(o, "fogHue", fogHue);
+                fogSat = d(o, "fogSat", fogSat);
+                fogVal = d(o, "fogVal", fogVal);
+                physicLift = d(o, "physicLift", physicLift);
                 dfMine = b(o, "dfMine", dfMine);
                 dfDecimals = b(o, "dfDecimals", dfDecimals);
                 dfSize = d(o, "dfSize", dfSize);
