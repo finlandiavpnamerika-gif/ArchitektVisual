@@ -311,7 +311,7 @@ public class MenuScreen extends Screen {
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5) + mh("part", 9) + mh("dmg", 5) + mh("fog", 5);
+        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5) + mh("part", 9) + mh("dmg", 5) + mh("fog", 6);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
@@ -353,8 +353,9 @@ public class MenuScreen extends Screen {
             Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
         }
 
-        Config.customFog = module(g, "fog", "CustomFog", "", Config.customFog, 5);
+        Config.customFog = module(g, "fog", "CustomFog", "", Config.customFog, 6);
         if (open.contains("fog")) {
+            Config.fogOff = cbool(g, "Без тумана", Config.fogOff);
             Config.fogStart = cslider(g, "Начало (блоки)", 0, 200, Config.fogStart, true);
             Config.fogEnd = cslider(g, "Конец (блоки)", 16, 400, Config.fogEnd, true);
             Config.fogHue = cgradL(g, "Цвет", Config.fogHue, pos -> hsv(pos, 1.0, 1.0));
@@ -870,6 +871,7 @@ public class MenuScreen extends Screen {
                 Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
             }
             case "fog" -> {
+                Config.fogOff = cbool(g, "Без тумана", Config.fogOff);
                 Config.fogStart = cslider(g, "Начало (блоки)", 0, 200, Config.fogStart, true);
                 Config.fogEnd = cslider(g, "Конец (блоки)", 16, 400, Config.fogEnd, true);
                 Config.fogHue = cgradL(g, "Цвет", Config.fogHue, pos -> hsv(pos, 1.0, 1.0));
