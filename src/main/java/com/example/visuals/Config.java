@@ -143,6 +143,12 @@ public final class Config {
     public static boolean skyNightOnly = false;
     public static boolean skyStars = true;
 
+    // --- CustomItems (своя модель в руке) ---
+    public static boolean customItems = true;
+    public static double ciScale = 0.75;           // длина модели, блоки
+    public static double ciX = 0, ciY = 0, ciZ = 0; // смещение, см
+    public static double ciRX = -30, ciRY = 20, ciRZ = 0;   // поворот, градусы
+
     // --- Hand View (вид предмета в руке) ---
     public static boolean handView = true;
     public static boolean leftHanded = false;     // главная рука слева
@@ -258,6 +264,14 @@ public final class Config {
             o.addProperty("customFog", customFog);
             o.addProperty("targetHud", targetHud);
             o.addProperty("handView", handView);
+            o.addProperty("customItems", customItems);
+            o.addProperty("ciScale", ciScale);
+            o.addProperty("ciX", ciX);
+            o.addProperty("ciY", ciY);
+            o.addProperty("ciZ", ciZ);
+            o.addProperty("ciRX", ciRX);
+            o.addProperty("ciRY", ciRY);
+            o.addProperty("ciRZ", ciRZ);
             o.addProperty("leftHanded", leftHanded);
             for (int k = 0; k < sv.length; k++) for (int h = 0; h < 2; h++) o.addProperty("sv" + k + "_" + h, sv[k][h]);
             for (int h = 0; h < 2; h++) o.addProperty("svNoSwing" + h, svNoSwing[h]);
@@ -420,6 +434,14 @@ public final class Config {
                 customFog = b(o, "customFog", customFog);
                 targetHud = b(o, "targetHud", targetHud);
                 handView = b(o, "handView", handView);
+                customItems = b(o, "customItems", customItems);
+                ciScale = d(o, "ciScale", ciScale);
+                ciX = d(o, "ciX", ciX);
+                ciY = d(o, "ciY", ciY);
+                ciZ = d(o, "ciZ", ciZ);
+                ciRX = d(o, "ciRX", ciRX);
+                ciRY = d(o, "ciRY", ciRY);
+                ciRZ = d(o, "ciRZ", ciRZ);
                 leftHanded = b(o, "leftHanded", leftHanded);
                 for (int k = 0; k < sv.length; k++) for (int h = 0; h < 2; h++) sv[k][h] = d(o, "sv" + k + "_" + h, sv[k][h]);
                 for (int h = 0; h < 2; h++) svNoSwing[h] = b(o, "svNoSwing" + h, svNoSwing[h]);
