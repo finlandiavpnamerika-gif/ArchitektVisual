@@ -19,6 +19,11 @@ public final class CustomFog {
         return !(mc.player.hasStatusEffect(StatusEffects.BLINDNESS) || mc.player.hasStatusEffect(StatusEffects.DARKNESS));
     }
 
+    /** режим "Без тумана" */
+    public static boolean none() { return Config.fogOff && active(); }
+
+    public static final float FAR = 100000f;
+
     public static float start() { return (float) Math.max(0.0, Config.fogStart); }
 
     public static float end() { return (float) Math.max(Config.fogEnd, Config.fogStart + 4.0); }
