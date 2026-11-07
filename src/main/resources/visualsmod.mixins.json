@@ -14,7 +14,10 @@
     "HandledScreenMixin",
     "WorldRendererMixin",
     "FreelookEntityMixin",
-    "FreelookCameraMixin"
+    "FreelookCameraMixin",
+    "ItemEntityMixin",
+    "ItemEntityRendererMixin",
+    "FogRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
