@@ -6,7 +6,10 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
+import com.example.visuals.CustomItems;
 import net.minecraft.util.Hand;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,6 +24,17 @@ public class HeldItemRendererMixin {
             "renderFirstPersonItem(Lnet/minecraft/client/network/AbstractClientPlayerEntity;FFLnet/minecraft/util/Hand;F"
             + "Lnet/minecraft/item/ItemStack;FLnet/minecraft/client/util/math/MatrixStack;"
             + "Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;I)V";
+
+    private static final String RENDER_ITEM =
+            "renderItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemDisplayContext;"
+            + "Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;I)V";
+
+    // CustomItems: своя модель вместо предмета в руке
+    @Inject(method = RENDER_ITEM, at = @At("HEAD"), cancellable = true, require = 0)
+    private void visuals$customItem(LivingEntity entity, ItemStack stack, ItemDisplayContext context, MatrixStack matrices,
+                                    OrderedRenderCommandQueue queue, int light, CallbackInfo ci) {
+        if (CustomItems.renderHeld(stack, context, matrices, queue)) ci.cancel();
+    }
 
     // смещение / поворот / размер предмета в руке
     @Inject(method = RENDER, at = @At("HEAD"), require = 0)
