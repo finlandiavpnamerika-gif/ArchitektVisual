@@ -145,6 +145,7 @@ public final class Config {
 
     // --- CustomFog ---
     public static boolean customFog = false;
+    public static boolean fogOff = false;          // совсем без тумана
     public static double fogStart = 16;
     public static double fogEnd = 96;
     public static double fogHue = 0.6;
@@ -237,6 +238,7 @@ public final class Config {
             o.addProperty("particles", particles);
             o.addProperty("damageFever", damageFever);
             o.addProperty("customFog", customFog);
+            o.addProperty("fogOff", fogOff);
             o.addProperty("fogStart", fogStart);
             o.addProperty("fogEnd", fogEnd);
             o.addProperty("fogHue", fogHue);
@@ -388,6 +390,7 @@ public final class Config {
                 particles = b(o, "particles", particles);
                 damageFever = b(o, "damageFever", damageFever);
                 customFog = b(o, "customFog", customFog);
+                fogOff = b(o, "fogOff", fogOff);
                 fogStart = d(o, "fogStart", fogStart);
                 fogEnd = d(o, "fogEnd", fogEnd);
                 fogHue = d(o, "fogHue", fogHue);
