@@ -17,7 +17,8 @@
     "FreelookCameraMixin",
     "ItemEntityMixin",
     "ItemEntityRendererMixin",
-    "FogRendererMixin"
+    "FogRendererMixin",
+    "HeldItemRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
