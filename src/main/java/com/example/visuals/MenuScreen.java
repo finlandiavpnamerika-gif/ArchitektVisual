@@ -311,7 +311,7 @@ public class MenuScreen extends Screen {
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5) + mh("part", 9) + mh("dmg", 5);
+        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5) + mh("part", 9) + mh("dmg", 5) + mh("fog", 5);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
@@ -351,6 +351,15 @@ public class MenuScreen extends Screen {
             Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
             Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
             Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+        }
+
+        Config.customFog = module(g, "fog", "CustomFog", "", Config.customFog, 5);
+        if (open.contains("fog")) {
+            Config.fogStart = cslider(g, "Начало (блоки)", 0, 200, Config.fogStart, true);
+            Config.fogEnd = cslider(g, "Конец (блоки)", 16, 400, Config.fogEnd, true);
+            Config.fogHue = cgradL(g, "Цвет", Config.fogHue, pos -> hsv(pos, 1.0, 1.0));
+            Config.fogSat = cgradL(g, "Насыщенность", Config.fogSat, pos -> hsv(Config.fogHue, pos, Math.max(0.35, Config.fogVal)));
+            Config.fogVal = cgradL(g, "Яркость", Config.fogVal, pos -> hsv(Config.fogHue, Config.fogSat, pos));
         }
 
         Config.damageFever = module(g, "dmg", "DamageViewer", "", Config.damageFever, 5);
@@ -510,9 +519,10 @@ public class MenuScreen extends Screen {
         Config.predictions = module(g, "pred", "Predictions", "", Config.predictions, 0);
 
         // 7. Extra Visuals 2
-        int hEx2 = 34 + mh("physic", 0) + mh("shulker", 0) + mh("hl", 3 * Config.highlights.size() + 1);
+        int hEx2 = 34 + mh("physic", 1) + mh("shulker", 0) + mh("hl", 3 * Config.highlights.size() + 1);
         panel(g, "Extra Visuals 2", x0 + step * 2, y1, colW, hEx2);
-        Config.itemPhysic = module(g, "physic", "Item Physic", "", Config.itemPhysic, 0);
+        Config.itemPhysic = module(g, "physic", "Item Physic", "", Config.itemPhysic, 1);
+        if (open.contains("physic")) { Config.physicLift = cslider(g, "Высота (см)", -15, 15, Config.physicLift, true); cy += 2; }
         Config.shulkerPreview = module(g, "shulker", "Shulker Prev", "", Config.shulkerPreview, 0);
 
         Config.highlight = module(g, "hl", "Item Highlight", ItemHighlight.keyName(), Config.highlight, 3 * Config.highlights.size() + 1);
@@ -578,7 +588,7 @@ public class MenuScreen extends Screen {
 
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
-            {"fb", "cross", "trails", "zones", "tesp", "sky", "part", "dmg", "hat", "pred", "physic", "shulker", "hl"},
+            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "hat", "pred", "physic", "shulker", "hl"},
             {"hud", "array", "armor", "keys"},
             {"sprint", "zoom", "respawn", "freelook", "stream"},
             {"autoswap", "itembind", "friends", "macro"},
@@ -595,6 +605,7 @@ public class MenuScreen extends Screen {
             case "sky" -> "Sky Shader";
             case "part" -> "Particles";
             case "dmg" -> "DamageViewer";
+            case "fog" -> "CustomFog";
             case "hat" -> "China Hat";
             case "pred" -> "Predictions";
             case "physic" -> "Item Physic";
@@ -633,6 +644,7 @@ public class MenuScreen extends Screen {
             case "sky" -> Config.skyShader;
             case "part" -> Config.particles;
             case "dmg" -> Config.damageFever;
+            case "fog" -> Config.customFog;
             case "hat" -> Config.chinaHat;
             case "pred" -> Config.predictions;
             case "physic" -> Config.itemPhysic;
@@ -665,6 +677,7 @@ public class MenuScreen extends Screen {
             case "sky": Config.skyShader = v; break;
             case "part": Config.particles = v; break;
             case "dmg": Config.damageFever = v; break;
+            case "fog": Config.customFog = v; break;
             case "hat": Config.chinaHat = v; break;
             case "pred": Config.predictions = v; break;
             case "physic": Config.itemPhysic = v; break;
@@ -856,6 +869,14 @@ public class MenuScreen extends Screen {
                 Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
                 Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
             }
+            case "fog" -> {
+                Config.fogStart = cslider(g, "Начало (блоки)", 0, 200, Config.fogStart, true);
+                Config.fogEnd = cslider(g, "Конец (блоки)", 16, 400, Config.fogEnd, true);
+                Config.fogHue = cgradL(g, "Цвет", Config.fogHue, pos -> hsv(pos, 1.0, 1.0));
+                Config.fogSat = cgradL(g, "Насыщенность", Config.fogSat, pos -> hsv(Config.fogHue, pos, Math.max(0.35, Config.fogVal)));
+                Config.fogVal = cgradL(g, "Яркость", Config.fogVal, pos -> hsv(Config.fogHue, Config.fogSat, pos));
+            }
+            case "physic" -> Config.physicLift = cslider(g, "Высота (см)", -15, 15, Config.physicLift, true);
             case "dmg" -> {
                 Config.dfMine = cbool(g, "Только мои удары", Config.dfMine);
                 Config.dfDecimals = cbool(g, "Дробные числа", Config.dfDecimals);
