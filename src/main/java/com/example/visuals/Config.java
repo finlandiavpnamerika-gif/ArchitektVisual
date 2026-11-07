@@ -143,6 +143,14 @@ public final class Config {
     public static boolean skyNightOnly = false;
     public static boolean skyStars = true;
 
+    // --- TargetHUD ---
+    public static boolean targetHud = true;
+    public static double thScale = 1.0;
+    public static double thX = 50;                 // положение центра, % ширины экрана
+    public static double thY = 62;                 // положение верха, % высоты экрана
+    public static double thHue = 0.75;
+    public static boolean thDist = true;
+
     // --- CustomFog ---
     public static boolean customFog = false;
     public static boolean fogOff = false;          // совсем без тумана
@@ -238,6 +246,12 @@ public final class Config {
             o.addProperty("particles", particles);
             o.addProperty("damageFever", damageFever);
             o.addProperty("customFog", customFog);
+            o.addProperty("targetHud", targetHud);
+            o.addProperty("thScale", thScale);
+            o.addProperty("thX", thX);
+            o.addProperty("thY", thY);
+            o.addProperty("thHue", thHue);
+            o.addProperty("thDist", thDist);
             o.addProperty("fogOff", fogOff);
             o.addProperty("fogStart", fogStart);
             o.addProperty("fogEnd", fogEnd);
@@ -390,6 +404,12 @@ public final class Config {
                 particles = b(o, "particles", particles);
                 damageFever = b(o, "damageFever", damageFever);
                 customFog = b(o, "customFog", customFog);
+                targetHud = b(o, "targetHud", targetHud);
+                thScale = d(o, "thScale", thScale);
+                thX = d(o, "thX", thX);
+                thY = d(o, "thY", thY);
+                thHue = d(o, "thHue", thHue);
+                thDist = b(o, "thDist", thDist);
                 fogOff = b(o, "fogOff", fogOff);
                 fogStart = d(o, "fogStart", fogStart);
                 fogEnd = d(o, "fogEnd", fogEnd);
