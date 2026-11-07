@@ -311,7 +311,7 @@ public class MenuScreen extends Screen {
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5) + mh("part", 9) + mh("dmg", 5) + mh("fog", 6) + mh("thud", 5) + mh("hv", 10);
+        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5) + mh("part", 9) + mh("dmg", 5) + mh("fog", 6) + mh("thud", 5) + mh("hv", 10) + mh("ci", 7);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
@@ -351,6 +351,17 @@ public class MenuScreen extends Screen {
             Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
             Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
             Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+        }
+
+        Config.customItems = module(g, "ci", "CustomItems", "", Config.customItems, 7);
+        if (open.contains("ci")) {
+            Config.ciScale = cslider(g, "Размер", 0.2, 2.0, Config.ciScale, false);
+            Config.ciX = cslider(g, "Смещение X (см)", -60, 60, Config.ciX, true);
+            Config.ciY = cslider(g, "Смещение Y (см)", -60, 60, Config.ciY, true);
+            Config.ciZ = cslider(g, "Смещение Z (см)", -60, 60, Config.ciZ, true);
+            Config.ciRX = cslider(g, "Поворот X (°)", -180, 180, Config.ciRX, true);
+            Config.ciRY = cslider(g, "Поворот Y (°)", -180, 180, Config.ciRY, true);
+            Config.ciRZ = cslider(g, "Поворот Z (°)", -180, 180, Config.ciRZ, true);
         }
 
         Config.handView = module(g, "hv", "Hand View", "", Config.handView, 10);
@@ -613,7 +624,7 @@ public class MenuScreen extends Screen {
 
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
-            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "hat", "pred", "physic", "shulker", "hl"},
+            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "hat", "pred", "physic", "shulker", "hl"},
             {"hud", "array", "armor", "keys"},
             {"sprint", "zoom", "respawn", "freelook", "stream"},
             {"autoswap", "itembind", "friends", "macro"},
@@ -633,6 +644,7 @@ public class MenuScreen extends Screen {
             case "fog" -> "CustomFog";
             case "thud" -> "TargetHUD";
             case "hv" -> "Hand View";
+            case "ci" -> "CustomItems";
             case "hat" -> "China Hat";
             case "pred" -> "Predictions";
             case "physic" -> "Item Physic";
@@ -674,6 +686,7 @@ public class MenuScreen extends Screen {
             case "fog" -> Config.customFog;
             case "thud" -> Config.targetHud;
             case "hv" -> Config.handView;
+            case "ci" -> Config.customItems;
             case "hat" -> Config.chinaHat;
             case "pred" -> Config.predictions;
             case "physic" -> Config.itemPhysic;
@@ -709,6 +722,7 @@ public class MenuScreen extends Screen {
             case "fog": Config.customFog = v; break;
             case "thud": Config.targetHud = v; break;
             case "hv": Config.handView = v; break;
+            case "ci": Config.customItems = v; break;
             case "hat": Config.chinaHat = v; break;
             case "pred": Config.predictions = v; break;
             case "physic": Config.itemPhysic = v; break;
@@ -899,6 +913,15 @@ public class MenuScreen extends Screen {
                 Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
                 Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
                 Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+            }
+            case "ci" -> {
+                Config.ciScale = cslider(g, "Размер", 0.2, 2.0, Config.ciScale, false);
+                Config.ciX = cslider(g, "Смещение X (см)", -60, 60, Config.ciX, true);
+                Config.ciY = cslider(g, "Смещение Y (см)", -60, 60, Config.ciY, true);
+                Config.ciZ = cslider(g, "Смещение Z (см)", -60, 60, Config.ciZ, true);
+                Config.ciRX = cslider(g, "Поворот X (°)", -180, 180, Config.ciRX, true);
+                Config.ciRY = cslider(g, "Поворот Y (°)", -180, 180, Config.ciRY, true);
+                Config.ciRZ = cslider(g, "Поворот Z (°)", -180, 180, Config.ciRZ, true);
             }
             case "hv" -> {
                 Config.leftHanded = cbool(g, "Левша (главная рука слева)", Config.leftHanded);
