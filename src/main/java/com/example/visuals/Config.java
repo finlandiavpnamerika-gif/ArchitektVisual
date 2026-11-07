@@ -143,6 +143,16 @@ public final class Config {
     public static boolean skyNightOnly = false;
     public static boolean skyStars = true;
 
+    // --- Hand View (вид предмета в руке) ---
+    public static boolean handView = true;
+    public static boolean leftHanded = false;     // главная рука слева
+    public static int svHand = 0;                  // какая рука сейчас редактируется в меню
+    /** [параметр][рука]: параметры SCALE, X, Y, Z, RX, RY, RZ (см. HandView); рука 0 = правая, 1 = левая */
+    public static final double[][] sv = {
+            {1.0, 1.0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}
+    };
+    public static final boolean[] svNoSwing = new boolean[2];
+
     // --- TargetHUD ---
     public static boolean targetHud = true;
     public static double thScale = 1.0;
@@ -247,6 +257,10 @@ public final class Config {
             o.addProperty("damageFever", damageFever);
             o.addProperty("customFog", customFog);
             o.addProperty("targetHud", targetHud);
+            o.addProperty("handView", handView);
+            o.addProperty("leftHanded", leftHanded);
+            for (int k = 0; k < sv.length; k++) for (int h = 0; h < 2; h++) o.addProperty("sv" + k + "_" + h, sv[k][h]);
+            for (int h = 0; h < 2; h++) o.addProperty("svNoSwing" + h, svNoSwing[h]);
             o.addProperty("thScale", thScale);
             o.addProperty("thX", thX);
             o.addProperty("thY", thY);
@@ -405,6 +419,10 @@ public final class Config {
                 damageFever = b(o, "damageFever", damageFever);
                 customFog = b(o, "customFog", customFog);
                 targetHud = b(o, "targetHud", targetHud);
+                handView = b(o, "handView", handView);
+                leftHanded = b(o, "leftHanded", leftHanded);
+                for (int k = 0; k < sv.length; k++) for (int h = 0; h < 2; h++) sv[k][h] = d(o, "sv" + k + "_" + h, sv[k][h]);
+                for (int h = 0; h < 2; h++) svNoSwing[h] = b(o, "svNoSwing" + h, svNoSwing[h]);
                 thScale = d(o, "thScale", thScale);
                 thX = d(o, "thX", thX);
                 thY = d(o, "thY", thY);
