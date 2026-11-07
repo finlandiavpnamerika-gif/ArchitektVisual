@@ -311,7 +311,7 @@ public class MenuScreen extends Screen {
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5) + mh("part", 9) + mh("dmg", 5) + mh("fog", 6);
+        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5) + mh("part", 9) + mh("dmg", 5) + mh("fog", 6) + mh("thud", 5);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
@@ -351,6 +351,15 @@ public class MenuScreen extends Screen {
             Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
             Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
             Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+        }
+
+        Config.targetHud = module(g, "thud", "TargetHUD", "", Config.targetHud, 5);
+        if (open.contains("thud")) {
+            Config.thScale = cslider(g, "Размер", 0.6, 2.0, Config.thScale, false);
+            Config.thX = cslider(g, "Позиция X (%)", 5, 95, Config.thX, true);
+            Config.thY = cslider(g, "Позиция Y (%)", 5, 90, Config.thY, true);
+            Config.thHue = cgradL(g, "Цвет", Config.thHue, pos -> hsv(pos, 0.75, 1.0));
+            Config.thDist = cbool(g, "Расстояние", Config.thDist);
         }
 
         Config.customFog = module(g, "fog", "CustomFog", "", Config.customFog, 6);
@@ -589,7 +598,7 @@ public class MenuScreen extends Screen {
 
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
-            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "hat", "pred", "physic", "shulker", "hl"},
+            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hat", "pred", "physic", "shulker", "hl"},
             {"hud", "array", "armor", "keys"},
             {"sprint", "zoom", "respawn", "freelook", "stream"},
             {"autoswap", "itembind", "friends", "macro"},
@@ -607,6 +616,7 @@ public class MenuScreen extends Screen {
             case "part" -> "Particles";
             case "dmg" -> "DamageViewer";
             case "fog" -> "CustomFog";
+            case "thud" -> "TargetHUD";
             case "hat" -> "China Hat";
             case "pred" -> "Predictions";
             case "physic" -> "Item Physic";
@@ -646,6 +656,7 @@ public class MenuScreen extends Screen {
             case "part" -> Config.particles;
             case "dmg" -> Config.damageFever;
             case "fog" -> Config.customFog;
+            case "thud" -> Config.targetHud;
             case "hat" -> Config.chinaHat;
             case "pred" -> Config.predictions;
             case "physic" -> Config.itemPhysic;
@@ -679,6 +690,7 @@ public class MenuScreen extends Screen {
             case "part": Config.particles = v; break;
             case "dmg": Config.damageFever = v; break;
             case "fog": Config.customFog = v; break;
+            case "thud": Config.targetHud = v; break;
             case "hat": Config.chinaHat = v; break;
             case "pred": Config.predictions = v; break;
             case "physic": Config.itemPhysic = v; break;
@@ -869,6 +881,13 @@ public class MenuScreen extends Screen {
                 Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
                 Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
                 Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+            }
+            case "thud" -> {
+                Config.thScale = cslider(g, "Размер", 0.6, 2.0, Config.thScale, false);
+                Config.thX = cslider(g, "Позиция X (%)", 5, 95, Config.thX, true);
+                Config.thY = cslider(g, "Позиция Y (%)", 5, 90, Config.thY, true);
+                Config.thHue = cgradL(g, "Цвет", Config.thHue, pos -> hsv(pos, 0.75, 1.0));
+                Config.thDist = cbool(g, "Расстояние", Config.thDist);
             }
             case "fog" -> {
                 Config.fogOff = cbool(g, "Без тумана", Config.fogOff);
