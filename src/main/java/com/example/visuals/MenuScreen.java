@@ -311,7 +311,7 @@ public class MenuScreen extends Screen {
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5) + mh("part", 9) + mh("dmg", 5) + mh("fog", 6) + mh("thud", 5);
+        int hVis = 34 + mh("fb", 1) + mh("cross", 4) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 1) + mh("tesp", 6) + mh("sky", 5) + mh("part", 9) + mh("dmg", 5) + mh("fog", 6) + mh("thud", 5) + mh("hv", 10);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2; }
@@ -351,6 +351,21 @@ public class MenuScreen extends Screen {
             Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
             Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
             Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+        }
+
+        Config.handView = module(g, "hv", "Hand View", "", Config.handView, 10);
+        if (open.contains("hv")) {
+            Config.leftHanded = cbool(g, "Левша (главная рука слева)", Config.leftHanded);
+            Config.svHand = ccycle(g, "Рука", HandView.HANDS, Config.svHand);
+            int hh = Config.svHand;
+            Config.sv[HandView.SCALE][hh] = cslider(g, "Размер", 0.2, 2.5, Config.sv[HandView.SCALE][hh], false);
+            Config.sv[HandView.X][hh] = cslider(g, "Смещение X (см)", -60, 60, Config.sv[HandView.X][hh], true);
+            Config.sv[HandView.Y][hh] = cslider(g, "Смещение Y (см)", -60, 60, Config.sv[HandView.Y][hh], true);
+            Config.sv[HandView.Z][hh] = cslider(g, "Смещение Z (см)", -60, 60, Config.sv[HandView.Z][hh], true);
+            Config.sv[HandView.RX][hh] = cslider(g, "Поворот X (°)", -180, 180, Config.sv[HandView.RX][hh], true);
+            Config.sv[HandView.RY][hh] = cslider(g, "Поворот Y (°)", -180, 180, Config.sv[HandView.RY][hh], true);
+            Config.sv[HandView.RZ][hh] = cslider(g, "Поворот Z (°)", -180, 180, Config.sv[HandView.RZ][hh], true);
+            Config.svNoSwing[hh] = cbool(g, "Без замаха", Config.svNoSwing[hh]);
         }
 
         Config.targetHud = module(g, "thud", "TargetHUD", "", Config.targetHud, 5);
@@ -598,7 +613,7 @@ public class MenuScreen extends Screen {
 
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
-            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hat", "pred", "physic", "shulker", "hl"},
+            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "hat", "pred", "physic", "shulker", "hl"},
             {"hud", "array", "armor", "keys"},
             {"sprint", "zoom", "respawn", "freelook", "stream"},
             {"autoswap", "itembind", "friends", "macro"},
@@ -617,6 +632,7 @@ public class MenuScreen extends Screen {
             case "dmg" -> "DamageViewer";
             case "fog" -> "CustomFog";
             case "thud" -> "TargetHUD";
+            case "hv" -> "Hand View";
             case "hat" -> "China Hat";
             case "pred" -> "Predictions";
             case "physic" -> "Item Physic";
@@ -657,6 +673,7 @@ public class MenuScreen extends Screen {
             case "dmg" -> Config.damageFever;
             case "fog" -> Config.customFog;
             case "thud" -> Config.targetHud;
+            case "hv" -> Config.handView;
             case "hat" -> Config.chinaHat;
             case "pred" -> Config.predictions;
             case "physic" -> Config.itemPhysic;
@@ -691,6 +708,7 @@ public class MenuScreen extends Screen {
             case "dmg": Config.damageFever = v; break;
             case "fog": Config.customFog = v; break;
             case "thud": Config.targetHud = v; break;
+            case "hv": Config.handView = v; break;
             case "hat": Config.chinaHat = v; break;
             case "pred": Config.predictions = v; break;
             case "physic": Config.itemPhysic = v; break;
@@ -881,6 +899,19 @@ public class MenuScreen extends Screen {
                 Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
                 Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
                 Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+            }
+            case "hv" -> {
+                Config.leftHanded = cbool(g, "Левша (главная рука слева)", Config.leftHanded);
+                Config.svHand = ccycle(g, "Рука", HandView.HANDS, Config.svHand);
+                int hh = Config.svHand;
+                Config.sv[HandView.SCALE][hh] = cslider(g, "Размер", 0.2, 2.5, Config.sv[HandView.SCALE][hh], false);
+                Config.sv[HandView.X][hh] = cslider(g, "Смещение X (см)", -60, 60, Config.sv[HandView.X][hh], true);
+                Config.sv[HandView.Y][hh] = cslider(g, "Смещение Y (см)", -60, 60, Config.sv[HandView.Y][hh], true);
+                Config.sv[HandView.Z][hh] = cslider(g, "Смещение Z (см)", -60, 60, Config.sv[HandView.Z][hh], true);
+                Config.sv[HandView.RX][hh] = cslider(g, "Поворот X (°)", -180, 180, Config.sv[HandView.RX][hh], true);
+                Config.sv[HandView.RY][hh] = cslider(g, "Поворот Y (°)", -180, 180, Config.sv[HandView.RY][hh], true);
+                Config.sv[HandView.RZ][hh] = cslider(g, "Поворот Z (°)", -180, 180, Config.sv[HandView.RZ][hh], true);
+                Config.svNoSwing[hh] = cbool(g, "Без замаха", Config.svNoSwing[hh]);
             }
             case "thud" -> {
                 Config.thScale = cslider(g, "Размер", 0.6, 2.0, Config.thScale, false);
