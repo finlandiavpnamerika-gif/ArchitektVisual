@@ -27,11 +27,24 @@ public final class CustomItems {
     private static float[] pos;
     private static int[] argb, idx;
 
+    // диагностика (показывается в меню)
+    public static int hookCalls = 0, swordCalls = 0, drawn = 0;
+    private static String err = "";
+
+    public static String status() {
+        String model = loaded ? "модель OK" : failed ? "модель НЕ найдена" : "модель не загружена";
+        return model + (err.isEmpty() ? "" : " | " + err);
+    }
+
+    public static String status2() {
+        return "хук: " + hookCalls + " | меч: " + swordCalls + " | нарисовано: " + drawn;
+    }
+
     private static boolean load() {
         if (loaded) return true;
         if (failed) return false;
         try (InputStream in = CustomItems.class.getResourceAsStream("/assets/visualsmod/models/karambit.bin")) {
-            if (in == null) { failed = true; return false; }
+            if (in == null) { failed = true; err = "нет karambit.bin"; return false; }
             ByteBuffer b = ByteBuffer.wrap(in.readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);
             b.position(4);   // "KRMB"
             int nv = b.getInt(), nt = b.getInt();
@@ -44,15 +57,18 @@ public final class CustomItems {
             loaded = true;
             return true;
         } catch (Exception e) {
-            failed = true;
+            failed = true; err = String.valueOf(e.getClass().getSimpleName());
             return false;
         }
     }
 
     /** true, если предмет нарисован нашей моделью (ванильный рендер тогда отменяется). */
     public static boolean renderHeld(ItemStack stack, ItemDisplayContext ctx, MatrixStack m, OrderedRenderCommandQueue queue) {
+        hookCalls++;
         if (!Config.customItems || !ctx.isFirstPerson() || !stack.isOf(Items.NETHERITE_SWORD)) return false;
+        swordCalls++;
         if (!load()) return false;
+        drawn++;
 
         m.push();
         if (ctx.isLeftHand()) m.scale(-1f, 1f, 1f);                        // зеркалим для левой руки
