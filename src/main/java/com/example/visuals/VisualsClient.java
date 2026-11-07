@@ -25,6 +25,7 @@ public class VisualsClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ModuleDefaults.capture();
         Config.load();
         AltManagerInit.register();
         FuntimeHelper.register();
