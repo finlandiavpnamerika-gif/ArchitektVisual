@@ -459,11 +459,12 @@ public class MenuScreen extends Screen {
         }
 
         // 3. HUD
-        int hHud = 34 + mh("hud", 10) + mh("array", 7) + mh("armor", 7) + mh("potion", 10) + mh("keys", 8);
+        int hHud = 34 + mh("hud", 11) + mh("array", 8) + mh("armor", 8) + mh("potion", 11) + mh("keys", 9);
         panel(g, "HUD", x0 + step * 2, y0, colW, hHud);
 
         Config.hud = module(g, "hud", "Info HUD", "", Config.hud, 9);
         if (open.contains("hud")) {
+            Config.hudHoriz = cbool(g, "Горизонтально", Config.hudHoriz);
             Config.hudFps = cbool(g, "FPS", Config.hudFps);
             Config.hudPing = cbool(g, "Ping", Config.hudPing);
             Config.hudCoords = cbool(g, "Координаты", Config.hudCoords);
@@ -479,6 +480,7 @@ public class MenuScreen extends Screen {
 
         Config.arrayList = module(g, "array", "ArrayList", "", Config.arrayList, 6);
         if (open.contains("array")) {
+            Config.arrayListHoriz = cbool(g, "Горизонтально", Config.arrayListHoriz);
             Config.arrayListColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.arrayListColor);
             Config.arrayListShadow = cbool(g, "Тень", Config.arrayListShadow);
             Config.arrayListScale = cslider(g, "Размер", 0.5, 2.0, Config.arrayListScale, false);
@@ -491,6 +493,7 @@ public class MenuScreen extends Screen {
 
         Config.armorHud = module(g, "armor", "Armor", "", Config.armorHud, 6);
         if (open.contains("armor")) {
+            Config.armorHudHoriz = cbool(g, "Горизонтально", Config.armorHudHoriz);
             Config.armorHudShowTool = cbool(g, "Инструмент", Config.armorHudShowTool);
             Config.armorHudShowDurability = cbool(g, "Прочность", Config.armorHudShowDurability);
             Config.armorHudScale = cslider(g, "Размер", 0.5, 2.0, Config.armorHudScale, false);
@@ -503,6 +506,7 @@ public class MenuScreen extends Screen {
 
         Config.potionHud = module(g, "potion", "Potion HUD", "", Config.potionHud, 9);
         if (open.contains("potion")) {
+            Config.potionHoriz = cbool(g, "Горизонтально", Config.potionHoriz);
             Config.potionIcons = cbool(g, "Иконки", Config.potionIcons);
             Config.potionBars = cbool(g, "Полоска времени", Config.potionBars);
             Config.potionLevel = cbool(g, "Уровень (II, III)", Config.potionLevel);
@@ -516,6 +520,7 @@ public class MenuScreen extends Screen {
 
         Config.keystrokes = module(g, "keys", "Keystrokes", "", Config.keystrokes, 7);
         if (open.contains("keys")) {
+            Config.keystrokesHoriz = cbool(g, "Горизонтально", Config.keystrokesHoriz);
             Config.keystrokesShowMouse = cbool(g, "ЛКМ/ПКМ", Config.keystrokesShowMouse);
             Config.keystrokesShowSpace = cbool(g, "Space", Config.keystrokesShowSpace);
             Config.keystrokesScale = cslider(g, "Размер", 0.5, 2.0, Config.keystrokesScale, false);
@@ -1060,6 +1065,7 @@ public class MenuScreen extends Screen {
                 if (toRemove != null) { Config.highlights.remove(toRemove); Config.save(); }
             }
             case "hud" -> {
+                Config.hudHoriz = cbool(g, "Горизонтально", Config.hudHoriz);
                 Config.hudFps = cbool(g, "FPS", Config.hudFps);
                 Config.hudPing = cbool(g, "Ping", Config.hudPing);
                 Config.hudCoords = cbool(g, "Координаты", Config.hudCoords);
@@ -1071,6 +1077,7 @@ public class MenuScreen extends Screen {
                 Config.hudY = (int) cslider(g, "Y", 0, 250, Config.hudY, true);
             }
             case "array" -> {
+                Config.arrayListHoriz = cbool(g, "Горизонтально", Config.arrayListHoriz);
                 Config.arrayListColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.arrayListColor);
                 Config.arrayListShadow = cbool(g, "Тень", Config.arrayListShadow);
                 Config.arrayListScale = cslider(g, "Размер", 0.5, 2.0, Config.arrayListScale, false);
@@ -1079,6 +1086,7 @@ public class MenuScreen extends Screen {
                 Config.arrayListY = (int) cslider(g, "Y", 0, 250, Config.arrayListY, true);
             }
             case "potion" -> {
+                Config.potionHoriz = cbool(g, "Горизонтально", Config.potionHoriz);
                 Config.potionIcons = cbool(g, "Иконки", Config.potionIcons);
                 Config.potionBars = cbool(g, "Полоска времени", Config.potionBars);
                 Config.potionLevel = cbool(g, "Уровень (II, III)", Config.potionLevel);
@@ -1089,6 +1097,7 @@ public class MenuScreen extends Screen {
                 Config.potionY = (int) cslider(g, "Y", 0, 250, Config.potionY, true);
             }
             case "armor" -> {
+                Config.armorHudHoriz = cbool(g, "Горизонтально", Config.armorHudHoriz);
                 Config.armorHudShowTool = cbool(g, "Инструмент", Config.armorHudShowTool);
                 Config.armorHudShowDurability = cbool(g, "Прочность", Config.armorHudShowDurability);
                 Config.armorHudScale = cslider(g, "Размер", 0.5, 2.0, Config.armorHudScale, false);
@@ -1097,6 +1106,7 @@ public class MenuScreen extends Screen {
                 Config.armorHudY = (int) cslider(g, "Y", 0, 400, Config.armorHudY, true);
             }
             case "keys" -> {
+                Config.keystrokesHoriz = cbool(g, "Горизонтально", Config.keystrokesHoriz);
                 Config.keystrokesShowMouse = cbool(g, "ЛКМ/ПКМ", Config.keystrokesShowMouse);
                 Config.keystrokesShowSpace = cbool(g, "Space", Config.keystrokesShowSpace);
                 Config.keystrokesScale = cslider(g, "Размер", 0.5, 2.0, Config.keystrokesScale, false);
