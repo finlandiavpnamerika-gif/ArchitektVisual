@@ -319,14 +319,21 @@ public class MenuScreen extends Screen {
         // ========== ПЕРВЫЙ РЯД ==========
 
         // 1. Utilities
-        int hUtil = 34 + mh("sprint", 2) + mh("zoom", 2) + mh("respawn", 0) + mh("freelook", 0);
+        int hUtil = 34 + mh("sprint", 2) + mh("zoom", 2) + mh("respawn", 0) + mh("freelook", 5);
         panel(g, "Utilities", x0, y0, colW, hUtil);
         Config.sprint = module(g, "sprint", "AutoSprint", "", Config.sprint, 1);
         if (open.contains("sprint")) { Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs); cy += 2;  resetRow(g, "sprint");}
         Config.zoom = module(g, "zoom", "Zoom", "C", Config.zoom, 1);
         if (open.contains("zoom")) { Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true); cy += 2;  resetRow(g, "zoom");}
         Config.autoRespawn = module(g, "respawn", "AutoRespawn", "", Config.autoRespawn, 0);
-        Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
+        Config.thirdPerson = module(g, "freelook", "Freelook", "Alt", Config.thirdPerson, 4);
+        if (open.contains("freelook")) {
+            Config.freelookToggle = cbool(g, "Переключатель (вместо зажатия)", Config.freelookToggle);
+            Config.freelookThird = cbool(g, "Третье лицо при включении", Config.freelookThird);
+            Config.freelookSmooth = cbool(g, "Плавный возврат", Config.freelookSmooth);
+            Config.freelookSens = cslider(g, "Чувствительность", 0.2, 2.0, Config.freelookSens, false);
+            cy += 2; resetRow(g, "freelook");
+        }
 
         // 2. Visuals
         int hVis = 34 + mh("fb", 2) + mh("cross", 5) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 2) + mh("tesp", 7) + mh("sky", 6) + mh("part", 10) + mh("dmg", 6) + mh("fog", 7) + mh("thud", 6) + mh("hv", 11) + mh("ci", 2) + mh("jc", 10);
@@ -1128,6 +1135,12 @@ public class MenuScreen extends Screen {
                 Config.keystrokesY = (int) cslider(g, "Y", 0, 400, Config.keystrokesY, true);
             }
             case "sprint" -> Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs);
+            case "freelook" -> {
+                Config.freelookToggle = cbool(g, "Переключатель (вместо зажатия)", Config.freelookToggle);
+                Config.freelookThird = cbool(g, "Третье лицо при включении", Config.freelookThird);
+                Config.freelookSmooth = cbool(g, "Плавный возврат", Config.freelookSmooth);
+                Config.freelookSens = cslider(g, "Чувствительность", 0.2, 2.0, Config.freelookSens, false);
+            }
             case "zoom" -> Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true);
             case "autoswap" -> {
                 SwapPair toRebind = null, toRemove = null;
