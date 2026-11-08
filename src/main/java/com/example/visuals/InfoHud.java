@@ -63,14 +63,6 @@ public final class InfoHud {
 
         List<String> effNames = new ArrayList<>();
         List<String> effTimes = new ArrayList<>();
-        if (Config.hudEffects) {
-            for (StatusEffectInstance e : mc.player.getStatusEffects()) {
-                String name = e.getEffectType().value().getName().getString();
-                if (e.getAmplifier() > 0) name = name + " " + (e.getAmplifier() + 1);
-                effNames.add(name);
-                effTimes.add(time(e));
-            }
-        }
 
         // ---- размеры ----
         String title = "ArchitektVisuals";
