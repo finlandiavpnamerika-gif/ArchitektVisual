@@ -38,6 +38,7 @@ public final class ArrayListHud {
         if (Config.targetHud) mods.add("TargetHUD");
         if (Config.handView) mods.add("HandView");
         if (Config.customItems) mods.add("CustomItems");
+        if (Config.jumpCircle) mods.add("JumpCircle");
         if (mods.isEmpty()) return null;
 
         mods.sort((p, q) -> tr.getWidth(q) - tr.getWidth(p));   // длинные первыми
