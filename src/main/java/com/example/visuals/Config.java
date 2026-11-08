@@ -106,6 +106,11 @@ public final class Config {
     public static boolean potionIcons = true;
     public static boolean potionBars = true;
     public static boolean potionLevel = true;
+    public static boolean potionHoriz = false;
+    public static boolean hudHoriz = false;
+    public static boolean arrayListHoriz = false;
+    public static boolean armorHudHoriz = false;
+    public static boolean keystrokesHoriz = false;
 
     // --- Utils (Остальное) ---
     public static boolean sprint = false;
@@ -360,6 +365,11 @@ public final class Config {
             o.addProperty("potionIcons", potionIcons);
             o.addProperty("potionBars", potionBars);
             o.addProperty("potionLevel", potionLevel);
+            o.addProperty("potionHoriz", potionHoriz);
+            o.addProperty("hudHoriz", hudHoriz);
+            o.addProperty("arrayListHoriz", arrayListHoriz);
+            o.addProperty("armorHudHoriz", armorHudHoriz);
+            o.addProperty("keystrokesHoriz", keystrokesHoriz);
 
             // Время и погода
             o.addProperty("customTime", customTime);
@@ -539,6 +549,11 @@ public final class Config {
                 potionIcons = b(o, "potionIcons", potionIcons);
                 potionBars = b(o, "potionBars", potionBars);
                 potionLevel = b(o, "potionLevel", potionLevel);
+                potionHoriz = b(o, "potionHoriz", potionHoriz);
+                hudHoriz = b(o, "hudHoriz", hudHoriz);
+                arrayListHoriz = b(o, "arrayListHoriz", arrayListHoriz);
+                armorHudHoriz = b(o, "armorHudHoriz", armorHudHoriz);
+                keystrokesHoriz = b(o, "keystrokesHoriz", keystrokesHoriz);
 
                 // Время и погода
                 customTime = b(o, "customTime", customTime);
