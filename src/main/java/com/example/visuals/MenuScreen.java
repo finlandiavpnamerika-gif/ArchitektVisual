@@ -329,7 +329,7 @@ public class MenuScreen extends Screen {
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 2) + mh("cross", 5) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 2) + mh("tesp", 7) + mh("sky", 6) + mh("part", 10) + mh("dmg", 6) + mh("fog", 7) + mh("thud", 6) + mh("hv", 11) + mh("ci", 11 + (Config.ciSkin == 1 ? 2 : 0)) + mh("jc", 10);
+        int hVis = 34 + mh("fb", 2) + mh("cross", 5) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 2) + mh("tesp", 7) + mh("sky", 6) + mh("part", 10) + mh("dmg", 6) + mh("fog", 7) + mh("thud", 6) + mh("hv", 11) + mh("ci", 2) + mh("jc", 10);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2;  resetRow(g, "fb");}
@@ -388,23 +388,10 @@ public class MenuScreen extends Screen {
             resetRow(g, "jc");
         }
 
-        Config.customItems = module(g, "ci", "CustomItems", "", Config.customItems, 10);
+        Config.customItems = module(g, "ci", "CustomItems", "", Config.customItems, 2);
         if (open.contains("ci")) {
-            Config.ciModel = ccycle(g, "Модель", CustomItems.MODELS, Config.ciModel);
-            Config.ciSkin = ccycle(g, "Текстура", CustomItems.SKINS, Config.ciSkin);
-            if (Config.ciSkin == 1) {
-                Config.ciHue = cgradL(g, "Цвет", Config.ciHue, pos -> hsv(pos, 0.85, 1.0));
-                Config.ciSat = cslider(g, "Насыщенность", 0.0, 1.0, Config.ciSat, false);
-            }
-            Config.ciTarget = ccycle(g, "Заменяет", CustomItems.TARGETS, Config.ciTarget);
-            Config.ciScale = cslider(g, "Размер", 0.2, 2.0, Config.ciScale, false);
-            Config.ciX = cslider(g, "Смещение X (см)", -60, 60, Config.ciX, true);
-            Config.ciY = cslider(g, "Смещение Y (см)", -60, 60, Config.ciY, true);
-            Config.ciZ = cslider(g, "Смещение Z (см)", -60, 60, Config.ciZ, true);
-            Config.ciRX = cslider(g, "Поворот X (°)", -180, 180, Config.ciRX, true);
-            Config.ciRY = cslider(g, "Поворот Y (°)", -180, 180, Config.ciRY, true);
-            Config.ciRZ = cslider(g, "Поворот Z (°)", -180, 180, Config.ciRZ, true);
-            resetRow(g, "ci");
+            screenButton(g, "-> Открыть редактор", () -> new CustomItemsScreen(this));
+            cy += 2;
         }
 
         Config.handView = module(g, "hv", "Hand View", "", Config.handView, 10);
@@ -1012,22 +999,7 @@ public class MenuScreen extends Screen {
                 Config.jcAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.jcAlpha, false);
                 Config.jcLand = cbool(g, "При приземлении", Config.jcLand);
             }
-            case "ci" -> {
-                Config.ciModel = ccycle(g, "Модель", CustomItems.MODELS, Config.ciModel);
-                Config.ciSkin = ccycle(g, "Текстура", CustomItems.SKINS, Config.ciSkin);
-                if (Config.ciSkin == 1) {
-                    Config.ciHue = cgradL(g, "Цвет", Config.ciHue, pos -> hsv(pos, 0.85, 1.0));
-                    Config.ciSat = cslider(g, "Насыщенность", 0.0, 1.0, Config.ciSat, false);
-                }
-                Config.ciTarget = ccycle(g, "Заменяет", CustomItems.TARGETS, Config.ciTarget);
-                Config.ciScale = cslider(g, "Размер", 0.2, 2.0, Config.ciScale, false);
-                Config.ciX = cslider(g, "Смещение X (см)", -60, 60, Config.ciX, true);
-                Config.ciY = cslider(g, "Смещение Y (см)", -60, 60, Config.ciY, true);
-                Config.ciZ = cslider(g, "Смещение Z (см)", -60, 60, Config.ciZ, true);
-                Config.ciRX = cslider(g, "Поворот X (°)", -180, 180, Config.ciRX, true);
-                Config.ciRY = cslider(g, "Поворот Y (°)", -180, 180, Config.ciRY, true);
-                Config.ciRZ = cslider(g, "Поворот Z (°)", -180, 180, Config.ciRZ, true);
-            }
+            case "ci" -> screenButton(g, "-> Открыть редактор", () -> new CustomItemsScreen(this));
             case "hv" -> {
                 Config.leftHanded = cbool(g, "Левша (главная рука слева)", Config.leftHanded);
                 Config.svHand = ccycle(g, "Рука", HandView.HANDS, Config.svHand);
