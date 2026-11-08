@@ -311,7 +311,7 @@ public class MenuScreen extends Screen {
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 2) + mh("cross", 5) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 2) + mh("tesp", 7) + mh("sky", 6) + mh("part", 10) + mh("dmg", 6) + mh("fog", 7) + mh("thud", 6) + mh("hv", 11) + mh("ci", 9);
+        int hVis = 34 + mh("fb", 2) + mh("cross", 5) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 2) + mh("tesp", 7) + mh("sky", 6) + mh("part", 10) + mh("dmg", 6) + mh("fog", 7) + mh("thud", 6) + mh("hv", 11) + mh("ci", 8);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2;  resetRow(g, "fb");}
@@ -366,7 +366,6 @@ public class MenuScreen extends Screen {
             Config.ciRX = cslider(g, "Поворот X (°)", -180, 180, Config.ciRX, true);
             Config.ciRY = cslider(g, "Поворот Y (°)", -180, 180, Config.ciRY, true);
             Config.ciRZ = cslider(g, "Поворот Z (°)", -180, 180, Config.ciRZ, true);
-            hint2(g, CustomItems.status(), CustomItems.status2());
             resetRow(g, "ci");
         }
 
@@ -442,16 +441,15 @@ public class MenuScreen extends Screen {
         }
 
         // 3. HUD
-        int hHud = 34 + mh("hud", 11) + mh("array", 7) + mh("armor", 7) + mh("keys", 8);
+        int hHud = 34 + mh("hud", 10) + mh("array", 7) + mh("armor", 7) + mh("potion", 10) + mh("keys", 8);
         panel(g, "HUD", x0 + step * 2, y0, colW, hHud);
 
-        Config.hud = module(g, "hud", "Info HUD", "", Config.hud, 10);
+        Config.hud = module(g, "hud", "Info HUD", "", Config.hud, 9);
         if (open.contains("hud")) {
             Config.hudFps = cbool(g, "FPS", Config.hudFps);
             Config.hudPing = cbool(g, "Ping", Config.hudPing);
             Config.hudCoords = cbool(g, "Координаты", Config.hudCoords);
             Config.hudFacing = cbool(g, "Направление", Config.hudFacing);
-            Config.hudEffects = cbool(g, "Эффекты", Config.hudEffects);
             Config.hudScale = cslider(g, "Размер", 0.5, 3.0, Config.hudScale, false);
             Config.hudAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.hudAlpha, false);
             Config.hudColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.hudColor);
@@ -483,6 +481,19 @@ public class MenuScreen extends Screen {
             Config.armorHudY = (int) cslider(g, "Y", 0, 400, Config.armorHudY, true);
             cy += 2;
             resetRow(g, "armor");
+        }
+
+        Config.potionHud = module(g, "potion", "Potion HUD", "", Config.potionHud, 9);
+        if (open.contains("potion")) {
+            Config.potionIcons = cbool(g, "Иконки", Config.potionIcons);
+            Config.potionBars = cbool(g, "Полоска времени", Config.potionBars);
+            Config.potionLevel = cbool(g, "Уровень (II, III)", Config.potionLevel);
+            Config.potionColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.potionColor);
+            Config.potionScale = cslider(g, "Размер", 0.5, 2.0, Config.potionScale, false);
+            Config.potionAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.potionAlpha, false);
+            Config.potionX = (int) cslider(g, "X", 0, 400, Config.potionX, true);
+            Config.potionY = (int) cslider(g, "Y", 0, 250, Config.potionY, true);
+            resetRow(g, "potion");
         }
 
         Config.keystrokes = module(g, "keys", "Keystrokes", "", Config.keystrokes, 7);
@@ -644,7 +655,7 @@ public class MenuScreen extends Screen {
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
             {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "hat", "pred", "physic", "shulker", "hl"},
-            {"hud", "array", "armor", "keys"},
+            {"hud", "array", "armor", "potion", "keys"},
             {"sprint", "zoom", "respawn", "freelook", "stream"},
             {"autoswap", "itembind", "friends", "macro"},
             {"time", "weather"}
@@ -672,6 +683,7 @@ public class MenuScreen extends Screen {
             case "hud" -> "Info HUD";
             case "array" -> "ArrayList";
             case "armor" -> "Armor";
+            case "potion" -> "Potion HUD";
             case "keys" -> "Keystrokes";
             case "sprint" -> "AutoSprint";
             case "zoom" -> "Zoom";
@@ -714,6 +726,7 @@ public class MenuScreen extends Screen {
             case "hud" -> Config.hud;
             case "array" -> Config.arrayList;
             case "armor" -> Config.armorHud;
+            case "potion" -> Config.potionHud;
             case "keys" -> Config.keystrokes;
             case "sprint" -> Config.sprint;
             case "zoom" -> Config.zoom;
@@ -750,6 +763,7 @@ public class MenuScreen extends Screen {
             case "hud": Config.hud = v; break;
             case "array": Config.arrayList = v; break;
             case "armor": Config.armorHud = v; break;
+            case "potion": Config.potionHud = v; break;
             case "keys": Config.keystrokes = v; break;
             case "sprint": Config.sprint = v; break;
             case "zoom": Config.zoom = v; break;
@@ -950,7 +964,6 @@ public class MenuScreen extends Screen {
                 Config.ciRX = cslider(g, "Поворот X (°)", -180, 180, Config.ciRX, true);
                 Config.ciRY = cslider(g, "Поворот Y (°)", -180, 180, Config.ciRY, true);
                 Config.ciRZ = cslider(g, "Поворот Z (°)", -180, 180, Config.ciRZ, true);
-                hint2(g, CustomItems.status(), CustomItems.status2());
             }
             case "hv" -> {
                 Config.leftHanded = cbool(g, "Левша (главная рука слева)", Config.leftHanded);
@@ -1033,8 +1046,7 @@ public class MenuScreen extends Screen {
                 Config.hudPing = cbool(g, "Ping", Config.hudPing);
                 Config.hudCoords = cbool(g, "Координаты", Config.hudCoords);
                 Config.hudFacing = cbool(g, "Направление", Config.hudFacing);
-                Config.hudEffects = cbool(g, "Эффекты", Config.hudEffects);
-                Config.hudScale = cslider(g, "Размер", 0.5, 3.0, Config.hudScale, false);
+                    Config.hudScale = cslider(g, "Размер", 0.5, 3.0, Config.hudScale, false);
                 Config.hudAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.hudAlpha, false);
                 Config.hudColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.hudColor);
                 Config.hudX = (int) cslider(g, "X", 0, 400, Config.hudX, true);
@@ -1047,6 +1059,16 @@ public class MenuScreen extends Screen {
                 Config.arrayListAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.arrayListAlpha, false);
                 Config.arrayListX = (int) cslider(g, "X", 0, 400, Config.arrayListX, true);
                 Config.arrayListY = (int) cslider(g, "Y", 0, 250, Config.arrayListY, true);
+            }
+            case "potion" -> {
+                Config.potionIcons = cbool(g, "Иконки", Config.potionIcons);
+                Config.potionBars = cbool(g, "Полоска времени", Config.potionBars);
+                Config.potionLevel = cbool(g, "Уровень (II, III)", Config.potionLevel);
+                Config.potionColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.potionColor);
+                Config.potionScale = cslider(g, "Размер", 0.5, 2.0, Config.potionScale, false);
+                Config.potionAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.potionAlpha, false);
+                Config.potionX = (int) cslider(g, "X", 0, 400, Config.potionX, true);
+                Config.potionY = (int) cslider(g, "Y", 0, 250, Config.potionY, true);
             }
             case "armor" -> {
                 Config.armorHudShowTool = cbool(g, "Инструмент", Config.armorHudShowTool);
