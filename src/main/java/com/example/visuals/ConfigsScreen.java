@@ -114,7 +114,8 @@ public class ConfigsScreen extends Screen {
         HudStyle.roundRing(g, px, py, pw, ph, 6, al(Theme.ACCENT, 0x70));
 
         text(g, "Конфиги", px + 10, py + 9, Theme.ACCENT);
-        String cur = ProfileManager.current.isEmpty() ? "" : "текущий: " + ProfileManager.current;
+        String cur = (ProfileManager.current.isEmpty() ? "" : "● " + ProfileManager.current + "   ")
+                + (ProfileManager.autoName().isEmpty() ? "" : "★ " + ProfileManager.autoName());
         text(g, cur, px + 70, py + 9, Theme.TEXT_DIM);
         if (button(g, px + pw - 62, py + 5, 54, 18, "← Назад", Theme.ACCENT, "back", true)) close();
 
@@ -130,7 +131,7 @@ public class ConfigsScreen extends Screen {
         }
 
         // список
-        int top = py + 62, bottom = py + ph - 62;
+        int top = py + 62, bottom = py + ph - 84;
         int lx = px + 12, lw = pw - 24;
         maxScroll = Math.max(0, items.size() * 24 - (bottom - top));
         scroll = Math.max(0, Math.min(scroll, maxScroll));
@@ -150,6 +151,7 @@ public class ConfigsScreen extends Screen {
             boolean isCur = it.name().equals(ProfileManager.current);
             text(g, textRenderer.trimToWidth(it.name(), lw - 120), lx + 8, y + 7, Theme.TEXT);
             if (isCur) text(g, "●", lx + lw - 112, y + 7, Theme.ACCENT);
+            if (it.name().equals(ProfileManager.autoName())) text(g, "★", lx + lw - 124, y + 7, 0xFFFFD34D);
             String when = FMT.format(Instant.ofEpochMilli(it.modified()));
             text(g, when, lx + lw - 8 - textRenderer.getWidth(when), y + 7, Theme.TEXT_DIM);
             if (clicked && hov) {
@@ -171,11 +173,11 @@ public class ConfigsScreen extends Screen {
         if (System.currentTimeMillis() < noteUntil)
             g.drawCenteredTextWithShadow(textRenderer, note, px + pw / 2, bottom + 6, noteBad ? 0xFFFF7777 : 0xFF77FF99);
         else
-            g.drawCenteredTextWithShadow(textRenderer, "В конфиг входят все модули и положения HUD. Друзья и макросы не меняются.",
+            g.drawCenteredTextWithShadow(textRenderer, "В конфиг входят все модули и HUD. Друзья и макросы не меняются.",
                     px + pw / 2, bottom + 6, Theme.TEXT_DIM);
 
         // кнопки действий
-        int by = py + ph - 46, gap = 4, bw = (pw - 24 - gap * 3) / 4, bx = px + 12;
+        int by = py + ph - 72, gap = 4, bw = (pw - 24 - gap * 3) / 4, bx = px + 12;
         boolean has = sel != null && ProfileManager.exists(sel);
         if (button(g, bx, by, bw, 20, "Загрузить", 0xFF66DD88, "load", has)) {
             if (ProfileManager.load(sel)) say("Загружено: " + sel, false); else say("Не удалось загрузить", true);
@@ -193,13 +195,26 @@ public class ConfigsScreen extends Screen {
         String delKey = "del:" + sel;
         if (button(g, bx + (bw + gap) * 3, by, bw, 20, confirm(delKey) ? "Точно?" : "Удалить", 0xFFFF6666, "del", has)) {
             if (confirm(delKey)) {
+                if (sel.equals(ProfileManager.autoName())) ProfileManager.setAuto("");
                 ProfileManager.delete(sel);
                 say("Удалено: " + sel, false);
                 sel = null; refresh(); confirmKey = "";
             } else { confirmKey = delKey; confirmUntil = System.currentTimeMillis() + 2500; }
         }
+        // авто-конфиг: выбранный загружается сам при запуске игры (и при заходе в мир, если включено)
+        int half = (pw - 24 - gap) / 2;
+        boolean isAuto = has && sel.equals(ProfileManager.autoName());
+        String autoLabel = isAuto ? "★ Авто: снять" : "★ Сделать авто-конфигом";
+        if (button(g, bx, by + 24, half, 20, autoLabel, 0xFFFFD34D, "auto", has)) {
+            ProfileManager.setAuto(isAuto ? "" : sel);
+            say(isAuto ? "Авто-конфиг снят" : "Авто-конфиг: " + sel, false);
+        }
+        boolean onJoin = ProfileManager.autoOnJoin();
+        if (button(g, bx + half + gap, by + 24, half, 20, "При заходе в мир: " + (onJoin ? "вкл" : "выкл"), onJoin ? 0xFF66DD88 : Theme.ACCENT, "join", true)) {
+            ProfileManager.setAutoOnJoin(!onJoin);
+        }
         String rstKey = "reset";
-        if (button(g, bx, by + 24, pw - 24, 18, confirm(rstKey) ? "Точно сбросить всё?" : "Сбросить все настройки к значениям по умолчанию", 0xFFFF9955, "rst", true)) {
+        if (button(g, bx, by + 48, pw - 24, 18, confirm(rstKey) ? "Точно сбросить всё?" : "Сбросить все настройки по умолчанию", 0xFFFF9955, "rst", true)) {
             if (confirm(rstKey)) { ProfileManager.resetAll(); say("Всё сброшено", false); confirmKey = ""; }
             else { confirmKey = rstKey; confirmUntil = System.currentTimeMillis() + 2500; }
         }
