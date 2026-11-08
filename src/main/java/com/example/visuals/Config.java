@@ -41,6 +41,10 @@ public final class Config {
     // --- Утилиты ---
     public static boolean autoRespawn = true;
     public static boolean thirdPerson = false;
+    public static boolean freelookToggle = false;      // false = зажатие, true = переключатель
+    public static boolean freelookThird = true;        // переключать на третье лицо
+    public static boolean freelookSmooth = true;       // плавный возврат камеры
+    public static double freelookSens = 1.0;           // чувствительность
     public static boolean itemScroller = false;
     public static final List<Macro> macros = new ArrayList<>();
 
@@ -266,6 +270,10 @@ public final class Config {
             o.addProperty("shulkerPreview", shulkerPreview);
             o.addProperty("autoRespawn", autoRespawn);
             o.addProperty("thirdPerson", thirdPerson);
+            o.addProperty("freelookToggle", freelookToggle);
+            o.addProperty("freelookThird", freelookThird);
+            o.addProperty("freelookSmooth", freelookSmooth);
+            o.addProperty("freelookSens", freelookSens);
             o.addProperty("itemScroller", itemScroller);
             o.addProperty("streamerMode", streamerMode);
             o.addProperty("boardSpoofer", boardSpoofer);
@@ -470,6 +478,10 @@ public final class Config {
                 shulkerPreview = b(o, "shulkerPreview", shulkerPreview);
                 autoRespawn = b(o, "autoRespawn", autoRespawn);
                 thirdPerson = b(o, "thirdPerson", thirdPerson);
+                freelookToggle = b(o, "freelookToggle", freelookToggle);
+                freelookThird = b(o, "freelookThird", freelookThird);
+                freelookSmooth = b(o, "freelookSmooth", freelookSmooth);
+                freelookSens = d(o, "freelookSens", freelookSens);
                 itemScroller = b(o, "itemScroller", itemScroller);
                 streamerMode = b(o, "streamerMode", streamerMode);
                 boardSpoofer = b(o, "boardSpoofer", boardSpoofer);
