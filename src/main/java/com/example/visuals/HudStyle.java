@@ -163,4 +163,22 @@ public final class HudStyle {
                     pressed ? 0xFF101018 : 0xFFFFFFFF, a, !pressed);
         }
     }
+
+    /** Смешивает два цвета ARGB (t 0..1). */
+    public static int mix(int c0, int c1, float t) {
+        t = Math.max(0f, Math.min(1f, t));
+        int a = (int) (((c0 >>> 24) & 255) + (((c1 >>> 24) & 255) - ((c0 >>> 24) & 255)) * t);
+        int r = (int) (((c0 >> 16) & 255) + (((c1 >> 16) & 255) - ((c0 >> 16) & 255)) * t);
+        int g = (int) (((c0 >> 8) & 255) + (((c1 >> 8) & 255) - ((c0 >> 8) & 255)) * t);
+        int b = (int) ((c0 & 255) + ((c1 & 255) - (c0 & 255)) * t);
+        return (a << 24) | (r << 16) | (g << 8) | b;
+    }
+
+    /** Плашка: тень, фон, тонкая рамка и цветная полоска слева (barColor). */
+    public static void pill(DrawContext g, int x, int y, int w, int h, float a, int barColor) {
+        roundFill(g, x + 1, y + 1, w, h, 2, withAlpha(0x30000000, a));
+        roundFill(g, x, y, w, h, 2, withAlpha(Theme.BG, a));
+        roundRing(g, x, y, w, h, 2, withAlpha(withAlpha(barColor, 0.35f), a));
+        roundFill(g, x + 1, y + 2, 2, h - 4, 1, withAlpha(barColor, a));
+    }
 }
