@@ -112,6 +112,17 @@ public final class Config {
     public static boolean armorHudHoriz = false;
     public static boolean keystrokesHoriz = false;
 
+    // JumpCircle
+    public static boolean jumpCircle = true;
+    public static int jcStyle = 0;
+    public static double jcSize = 1.6;
+    public static double jcLife = 0.9;
+    public static double jcWidth = 0.35;
+    public static double jcAlpha = 0.85;
+    public static double jcHue = 0.75;
+    public static boolean jcRainbow = false;
+    public static boolean jcLand = false;
+
     // --- Utils (Остальное) ---
     public static boolean sprint = false;
     public static boolean sprintAllDirs = false;
@@ -370,6 +381,15 @@ public final class Config {
             o.addProperty("arrayListHoriz", arrayListHoriz);
             o.addProperty("armorHudHoriz", armorHudHoriz);
             o.addProperty("keystrokesHoriz", keystrokesHoriz);
+            o.addProperty("jumpCircle", jumpCircle);
+            o.addProperty("jcStyle", jcStyle);
+            o.addProperty("jcSize", jcSize);
+            o.addProperty("jcLife", jcLife);
+            o.addProperty("jcWidth", jcWidth);
+            o.addProperty("jcAlpha", jcAlpha);
+            o.addProperty("jcHue", jcHue);
+            o.addProperty("jcRainbow", jcRainbow);
+            o.addProperty("jcLand", jcLand);
 
             // Время и погода
             o.addProperty("customTime", customTime);
@@ -554,6 +574,15 @@ public final class Config {
                 arrayListHoriz = b(o, "arrayListHoriz", arrayListHoriz);
                 armorHudHoriz = b(o, "armorHudHoriz", armorHudHoriz);
                 keystrokesHoriz = b(o, "keystrokesHoriz", keystrokesHoriz);
+                jumpCircle = b(o, "jumpCircle", jumpCircle);
+                jcStyle = (int) d(o, "jcStyle", jcStyle);
+                jcSize = d(o, "jcSize", jcSize);
+                jcLife = d(o, "jcLife", jcLife);
+                jcWidth = d(o, "jcWidth", jcWidth);
+                jcAlpha = d(o, "jcAlpha", jcAlpha);
+                jcHue = d(o, "jcHue", jcHue);
+                jcRainbow = b(o, "jcRainbow", jcRainbow);
+                jcLand = b(o, "jcLand", jcLand);
 
                 // Время и погода
                 customTime = b(o, "customTime", customTime);
