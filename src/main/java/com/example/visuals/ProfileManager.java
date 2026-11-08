@@ -21,6 +21,9 @@ public final class ProfileManager {
     /** имя профиля, который загружали/сохраняли последним (для пометки в списке) */
     public static String current = "";
 
+    /** Встроенный профиль: все модули выключены. */
+    public static final String EMPTY = "Пустой";
+
     private static Path dir() { return FabricLoader.getInstance().getConfigDir().resolve("visualsmod_profiles"); }
 
     private static Path file(String name) { return dir().resolve(name + ".json"); }
@@ -28,7 +31,7 @@ public final class ProfileManager {
     /** Оставляет в имени только буквы, цифры, пробел, _ и -. */
     public static String clean(String s) {
         if (s == null) return "";
-        String r = s.trim().replaceAll("[^\\p{L}\\p{N} _\\-]", "").trim();
+        String r = s.trim().replaceAll("[^\\p{L}\\p{N} _\\-]", "").replaceAll("^[_ ]+", "").trim();
         return r.length() > 32 ? r.substring(0, 32).trim() : r;
     }
 
@@ -39,7 +42,7 @@ public final class ProfileManager {
         try {
             if (!Files.isDirectory(dir())) return out;
             try (Stream<Path> st = Files.list(dir())) {
-                st.filter(p -> p.getFileName().toString().endsWith(".json")).forEach(p -> {
+                st.filter(p -> p.getFileName().toString().endsWith(".json") && !p.getFileName().toString().startsWith("_")).forEach(p -> {
                     String n = p.getFileName().toString();
                     n = n.substring(0, n.length() - 5);
                     long t = 0;
@@ -129,5 +132,73 @@ public final class ProfileManager {
             Files.writeString(file(name), new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(o));
             return name;
         } catch (Exception e) { return null; }
+    }
+
+    // ---------- авто-конфиг ----------
+    private static Path autoFile() { return dir().resolve("_auto.json"); }
+
+    private static JsonObject readAuto() {
+        try {
+            if (Files.exists(autoFile())) return JsonParser.parseString(Files.readString(autoFile())).getAsJsonObject();
+        } catch (Exception ignored) {}
+        return new JsonObject();
+    }
+
+    private static void writeAuto(JsonObject o) {
+        try {
+            Files.createDirectories(dir());
+            Files.writeString(autoFile(), new Gson().toJson(o));
+        } catch (Exception ignored) {}
+    }
+
+    /** имя авто-конфига или "" */
+    public static String autoName() {
+        JsonObject o = readAuto();
+        return o.has("auto") ? o.get("auto").getAsString() : "";
+    }
+
+    public static void setAuto(String name) {
+        JsonObject o = readAuto();
+        o.addProperty("auto", name == null ? "" : name);
+        writeAuto(o);
+    }
+
+    /** загружать авто-конфиг при каждом заходе в мир (а не только при запуске игры) */
+    public static boolean autoOnJoin() {
+        JsonObject o = readAuto();
+        return o.has("onJoin") && o.get("onJoin").getAsBoolean();
+    }
+
+    public static void setAutoOnJoin(boolean v) {
+        JsonObject o = readAuto();
+        o.addProperty("onJoin", v);
+        writeAuto(o);
+    }
+
+    public static void applyAuto() {
+        String n = autoName();
+        if (!n.isEmpty() && exists(n)) load(n);
+    }
+
+    /** Создаёт встроенный профиль "Пустой": все модули выключены, остальное по умолчанию. */
+    private static void ensureEmpty() {
+        if (exists(EMPTY)) return;
+        try {
+            Config.save();
+            ModuleDefaults.resetAll();
+            ModuleDefaults.disableAll();
+            Config.saveTo(file(EMPTY));
+        } catch (Exception ignored) {
+        } finally {
+            ModuleDefaults.resetAll();     // вернуть текущие настройки из основного файла
+            Config.reload();
+        }
+    }
+
+    /** Вызывается один раз при запуске игры после загрузки настроек. */
+    public static void startup() {
+        ensureEmpty();
+        if (Config.freshInstall && autoName().isEmpty()) setAuto(EMPTY);   // первый запуск: всё выключено
+        applyAuto();
     }
 }
