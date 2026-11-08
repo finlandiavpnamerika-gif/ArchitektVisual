@@ -30,6 +30,7 @@ public final class ArrayListHud {
         if (Config.itembind) mods.add("ItemBind");
         if (Config.keystrokes) mods.add("Keystrokes");
         if (Config.armorHud) mods.add("ArmorHUD");
+        if (Config.potionHud) mods.add("PotionHUD");
 
         if (mods.isEmpty()) return null;
 
