@@ -13,13 +13,13 @@ public final class ModuleDefaults {
     /** какие поля Config относятся к настройкам каждого модуля (без самого переключателя модуля) */
     private static final Map<String, String[]> FIELDS = Map.ofEntries(
             Map.entry("sprint", new String[]{"sprintAllDirs"}),
+            Map.entry("freelook", new String[]{"freelookToggle", "freelookThird", "freelookSmooth", "freelookSens"}),
             Map.entry("zoom", new String[]{"zoomFov"}),
             Map.entry("fb", new String[]{"gamma"}),
             Map.entry("cross", new String[]{"crosshairColor", "crosshairSize", "crosshairThickness", "crosshairDot"}),
             Map.entry("trails", new String[]{"trailsCustom", "trailsHue", "trailsSat", "trailsVal", "trailsColor", "trailsLength", "trailsHeight"}),
             Map.entry("zones", new String[]{"zonesHeld"}),
             Map.entry("tesp", new String[]{"targetEspShape", "targetEspHue", "targetEspHitHue", "targetEspSize", "targetEspSpeed", "targetEspAlpha"}),
-            Map.entry("ci", new String[]{"ciModel", "ciSkin", "ciHue", "ciSat", "ciTarget", "ciScale", "ciX", "ciY", "ciZ", "ciRX", "ciRY", "ciRZ"}),
             Map.entry("hv", new String[]{"leftHanded", "svHand", "sv", "svNoSwing"}),
             Map.entry("thud", new String[]{"thScale", "thX", "thY", "thHue", "thDist"}),
             Map.entry("fog", new String[]{"fogOff", "fogStart", "fogEnd", "fogHue", "fogSat", "fogVal"}),
