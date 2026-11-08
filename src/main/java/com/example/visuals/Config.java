@@ -177,6 +177,8 @@ public final class Config {
     public static double ciHue = 0.6;
     public static double ciSat = 0.8;
     public static int ciTarget = 0;                // какой предмет заменяем
+    public static final List<CiRule> ciRules = new ArrayList<>();   // правила: предмет -> модель
+    private static boolean ciRulesSaved = false;
     public static double ciScale = 0.75;           // длина модели, блоки
     public static double ciX = 0, ciY = 0, ciZ = 0; // смещение, см
     public static double ciRX = -30, ciRY = 20, ciRZ = 0;   // поворот, градусы
@@ -407,6 +409,11 @@ public final class Config {
             o.addProperty("customWeather", customWeather);
             o.addProperty("weatherType", weatherType);
 
+            // CustomItems: правила
+            JsonArray cir = new JsonArray();
+            for (CiRule r : ciRules) cir.add(r.toJson());
+            o.add("ciRules", cir);
+
             // Макросы
             JsonArray mac = new JsonArray();
             for (Macro m : macros) {
@@ -440,6 +447,7 @@ public final class Config {
     }
 
     public static void load() {
+        if (ciRules.isEmpty() && !ciRulesSaved) ciRules.add(new CiRule("minecraft:netherite_sword", 0));
         try {
             if (Files.exists(FILE)) {
                 JsonObject o = JsonParser.parseString(Files.readString(FILE)).getAsJsonObject();
@@ -604,6 +612,20 @@ public final class Config {
                 timeValue = (int) d(o, "timeValue", timeValue);
                 customWeather = b(o, "customWeather", customWeather);
                 weatherType = (int) d(o, "weatherType", weatherType);
+
+                ciRules.clear();
+                if (o.has("ciRules")) {
+                    ciRulesSaved = true;
+                    for (JsonElement el : o.getAsJsonArray("ciRules")) {
+                        try { ciRules.add(CiRule.fromJson(el.getAsJsonObject())); } catch (Exception ignored) {}
+                    }
+                } else {
+                    // старый формат: одна модель для незеритового меча
+                    CiRule r = new CiRule("minecraft:netherite_sword", ciModel);
+                    r.skin = ciSkin; r.hue = ciHue; r.sat = ciSat;
+                    r.scale = ciScale; r.x = ciX; r.y = ciY; r.z = ciZ; r.rx = ciRX; r.ry = ciRY; r.rz = ciRZ;
+                    ciRules.add(r);
+                }
 
                 macros.clear();
                 if (o.has("macroList")) {
