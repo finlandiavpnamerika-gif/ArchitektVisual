@@ -64,6 +64,25 @@ public final class InfoHud {
         List<String> effNames = new ArrayList<>();
         List<String> effTimes = new ArrayList<>();
 
+        if (Config.hudHoriz) {
+            int n = labels.size();
+            if (n == 0) return new int[] {1, 1};
+            int w = PAD;
+            for (int i = 0; i < n; i++) w += tr.getWidth(labels.get(i)) + 4 + tr.getWidth(values.get(i)) + (i < n - 1 ? 14 : 0);
+            w += PAD;
+            int h = 16;
+            HudStyle.panel(g, 0, 0, w, h, a, accent);
+            int x = PAD;
+            for (int i = 0; i < n; i++) {
+                HudStyle.text(g, tr, labels.get(i), x, 4, Theme.TEXT_DIM, a, true);
+                x += tr.getWidth(labels.get(i)) + 4;
+                HudStyle.text(g, tr, values.get(i), x, 4, colors.get(i), a, true);
+                x += tr.getWidth(values.get(i));
+                if (i < n - 1) { g.fill(x + 6, 3, x + 7, h - 3, HudStyle.withAlpha(0x40FFFFFF, a)); x += 14; }
+            }
+            return new int[] {w, h};
+        }
+
         // ---- размеры ----
         String title = "ArchitektVisuals";
         int inner = tr.getWidth(title);
