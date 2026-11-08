@@ -73,6 +73,43 @@ public final class PotionHud {
         }
         MAX.keySet().retainAll(alive);
 
+        if (Config.potionHoriz && !demo) {
+            int tile = Math.max(30, 0);
+            int[] tw = new int[n];
+            int w = PAD;
+            for (int i = 0; i < n; i++) { tw[i] = Math.max(tile, tr.getWidth(times[i]) + 8); w += tw[i] + (i < n - 1 ? 3 : 0); }
+            w += PAD;
+            int h = PAD * 2 + 38;
+            HudStyle.panel(g, 0, 0, w, h, a, accent);
+            long nowH = System.currentTimeMillis();
+            int x = PAD;
+            for (int i = 0; i < n; i++) {
+                StatusEffectInstance e = list.get(i);
+                int side = e.getEffectType().value().isBeneficial() ? HudStyle.GOOD : HudStyle.BAD;
+                HudStyle.roundFill(g, x, PAD, tw[i], 38, 2, HudStyle.withAlpha(0x38000000, a));
+                HudStyle.roundFill(g, x + 2, PAD, tw[i] - 4, 2, 1, HudStyle.withAlpha(side, a));
+                if (Config.potionIcons) {
+                    Identifier id = e.getEffectType().getKey().map(k -> k.getValue().withPrefixedPath("mob_effect/")).orElse(null);
+                    if (id != null) g.drawGuiTexture(RenderPipelines.GUI_TEXTURED, id, x + (tw[i] - ICON) / 2, PAD + 4, ICON, ICON, a);
+                }
+                if (Config.potionLevel && e.getAmplifier() > 0) {
+                    String lv = roman(e.getAmplifier() + 1);
+                    HudStyle.text(g, tr, lv, x + tw[i] - tr.getWidth(lv) - 2, PAD + 4, Theme.TEXT, a, true);
+                }
+                int sec = e.getDuration() / 20;
+                int tc = e.isInfinite() ? HudStyle.GOOD : sec <= 10 ? HudStyle.BAD : sec <= 30 ? HudStyle.MID : Theme.TEXT;
+                float ta = (!e.isInfinite() && sec <= 10) ? a * (0.55f + 0.45f * (float) Math.abs(Math.sin(nowH / 220.0))) : a;
+                HudStyle.text(g, tr, times[i], x + (tw[i] - tr.getWidth(times[i])) / 2, PAD + 24, tc, ta, true);
+                if (Config.potionBars) {
+                    int max = MAX.getOrDefault(key(e.getEffectType()), Math.max(1, e.getDuration()));
+                    float ratio = e.isInfinite() ? 1f : Math.max(0f, Math.min(1f, e.getDuration() / (float) Math.max(1, max)));
+                    HudStyle.bar(g, x + 3, PAD + 34, tw[i] - 6, 2, ratio, e.isInfinite() ? HudStyle.GOOD : HudStyle.ratioColor(ratio), a);
+                }
+                x += tw[i] + 3;
+            }
+            return new int[] {w, h};
+        }
+
         String title = "Effects";
         String count = demo ? "0" : String.valueOf(n);
         int textW = tr.getWidth(title) + 12 + tr.getWidth(count);
