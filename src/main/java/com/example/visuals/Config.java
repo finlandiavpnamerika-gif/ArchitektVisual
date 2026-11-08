@@ -248,7 +248,10 @@ public final class Config {
     private static final Path FILE = FabricLoader.getInstance().getConfigDir().resolve("visualsmod.json");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    public static void save() {
+    public static void save() { saveTo(FILE); }
+
+    /** Сохраняет все настройки в указанный файл (для профилей). */
+    public static void saveTo(Path file) {
         try {
             JsonObject o = new JsonObject();
             o.addProperty("customMainMenu", customMainMenu);
@@ -450,15 +453,19 @@ public final class Config {
             for (String f : friends) fArr.add(f);
             o.add("friends", fArr);
 
-            Files.writeString(FILE, GSON.toJson(o));
+            if (file.getParent() != null) Files.createDirectories(file.getParent());
+            Files.writeString(file, GSON.toJson(o));
         } catch (Exception ignored) {}
     }
 
-    public static void load() {
+    public static void load() { loadFrom(FILE); }
+
+    /** Загружает настройки из указанного файла (для профилей). */
+    public static void loadFrom(Path file) {
         if (ciRules.isEmpty() && !ciRulesSaved) ciRules.add(new CiRule("minecraft:netherite_sword", 0));
         try {
-            if (Files.exists(FILE)) {
-                JsonObject o = JsonParser.parseString(Files.readString(FILE)).getAsJsonObject();
+            if (Files.exists(file)) {
+                JsonObject o = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
                 customMainMenu = b(o, "customMainMenu", customMainMenu);
                 menuStyle = (int) d(o, "menuStyle", menuStyle);
                 menuTheme = (int) d(o, "menuTheme", menuTheme);
