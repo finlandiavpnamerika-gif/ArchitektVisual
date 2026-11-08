@@ -172,6 +172,11 @@ public final class Config {
 
     // --- CustomItems (своя модель в руке) ---
     public static boolean customItems = true;
+    public static int ciModel = 0;                 // какая модель
+    public static int ciSkin = 0;                  // текстура (перекраска)
+    public static double ciHue = 0.6;
+    public static double ciSat = 0.8;
+    public static int ciTarget = 0;                // какой предмет заменяем
     public static double ciScale = 0.75;           // длина модели, блоки
     public static double ciX = 0, ciY = 0, ciZ = 0; // смещение, см
     public static double ciRX = -30, ciRY = 20, ciRZ = 0;   // поворот, градусы
@@ -292,6 +297,11 @@ public final class Config {
             o.addProperty("targetHud", targetHud);
             o.addProperty("handView", handView);
             o.addProperty("customItems", customItems);
+            o.addProperty("ciModel", ciModel);
+            o.addProperty("ciSkin", ciSkin);
+            o.addProperty("ciHue", ciHue);
+            o.addProperty("ciSat", ciSat);
+            o.addProperty("ciTarget", ciTarget);
             o.addProperty("ciScale", ciScale);
             o.addProperty("ciX", ciX);
             o.addProperty("ciY", ciY);
@@ -485,6 +495,11 @@ public final class Config {
                 targetHud = b(o, "targetHud", targetHud);
                 handView = b(o, "handView", handView);
                 customItems = b(o, "customItems", customItems);
+                ciModel = (int) d(o, "ciModel", ciModel);
+                ciSkin = (int) d(o, "ciSkin", ciSkin);
+                ciHue = d(o, "ciHue", ciHue);
+                ciSat = d(o, "ciSat", ciSat);
+                ciTarget = (int) d(o, "ciTarget", ciTarget);
                 ciScale = d(o, "ciScale", ciScale);
                 ciX = d(o, "ciX", ciX);
                 ciY = d(o, "ciY", ciY);
