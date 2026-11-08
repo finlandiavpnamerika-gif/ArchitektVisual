@@ -95,9 +95,13 @@ public class MenuScreen extends Screen {
     private void panel(DrawContext g, String title, int x, int y, int w, int h) {
         shadow(g, x, y, w, h, 6);
         rr(g, x, y, w, h, 6, Theme.PANEL_BG);
-        g.fillGradient(x + 3, y + 1, x + w - 3, y + 24,
-                ff(withAlpha(Theme.ACCENT, 70)), ff(withAlpha(Theme.ACCENT, 0)));
+        g.fillGradient(x + 3, y + 1, x + w - 3, y + 26,
+                ff(withAlpha(Theme.ACCENT, 90)), ff(withAlpha(Theme.ACCENT, 0)));
+        if (h > 48) g.fillGradient(x + 4, y + h - 26, x + w - 4, y + h - 4,
+                ff(withAlpha(Theme.ACCENT, 0)), ff(withAlpha(Theme.ACCENT, 26)));            // тонировка низа
+        HudStyle.roundRing(g, x, y, w, h, 6, ff(withAlpha(Theme.ACCENT, 0x70)));          // рамка
         fadeLine(g, x + 6, y, w - 12, Theme.ACCENT, 255);
+        fadeLine(g, x + 6, y + 1, w - 12, 0xFFFFFFFF, 70);                                 // блик
         g.drawCenteredTextWithShadow(textRenderer, Text.literal(title).formatted(Formatting.BOLD),
                 x + w / 2, y + 8, ff(Theme.TEXT));
         fadeLine(g, x + 10, y + 22, w - 20, Theme.ACCENT, 160);
@@ -109,8 +113,10 @@ public class MenuScreen extends Screen {
         float p = anim(key, on);
         if (p > 0.05f) rr(g, x - 2, y - 2, 28, 16, 8, withAlpha(Theme.ACCENT, (int) (46 * p)));
         rr(g, x, y, 24, 12, 6, mix(Theme.TOGGLE_OFF, Theme.TOGGLE_ON, p));
+        HudStyle.roundRing(g, x, y, 24, 12, 6, ff(mix(0x30FFFFFF, withAlpha(0xFFFFFF, 0x90), p)));
         int kx = x + 2 + Math.round(p * 12);
-        rr(g, kx, y + 2, 8, 8, 4, 0xFFFFFFFF);
+        rr(g, kx - 1, y + 1, 10, 10, 5, withAlpha(0xFFFFFF, (int) (40 * p)));
+        rr(g, kx, y + 2, 8, 8, 4, mix(0xFFCCCCCC, 0xFFFFFFFF, p));
     }
 
     private int mh(String id, int options) { return 24 + (open.contains(id) ? options * 20 + 4 : 0); }
@@ -121,10 +127,19 @@ public class MenuScreen extends Screen {
         boolean hov = hit(cx, cy, cw, 22);
         float hv = anim("h:" + id, hov);
         int rowCol = mix(Theme.ROW, Theme.ROW_HOVER, hv * 0.6f);
-        if (on) rowCol = mix(rowCol, withAlpha(Theme.ACCENT, 0x40), 0.45f);
         rbox(g, cx, cy, cw, 22, rowCol);
-
-        if (on) rr(g, cx, cy + 4, 3, 14, 1, Theme.ACCENT); // Полоска слева, если включено
+        float onp = anim("on:" + id, on);
+        if (onp > 0.02f) {   // градиент акцента слева направо
+            for (int i = 0; i < cw - 2; i += 3) {
+                float t = 1f - (float) i / (cw - 2);
+                g.fill(cx + 1 + i, cy + 1, cx + 1 + Math.min(cw - 2, i + 3), cy + 21,
+                        ff(withAlpha(Theme.ACCENT, (int) (0x58 * t * t * onp))));
+            }
+        }
+        if (onp > 0.02f) {
+            rr(g, cx - 1, cy + 3, 5, 16, 2, withAlpha(Theme.ACCENT, (int) (40 * onp)));    // свечение
+            rr(g, cx, cy + 4, 3, Math.max(2, Math.round(14 * onp)), 1, Theme.ACCENT);     // полоска слева
+        } else if (hv > 0.1f) rr(g, cx, cy + 8, 2, 6, 1, withAlpha(Theme.ACCENT, (int) (160 * hv)));
 
         text(g, label + (hint.isEmpty() ? "" : " [" + hint + "]"), cx + 8, cy + 7, on ? Theme.TEXT : Theme.TEXT_DIM);
 
@@ -183,6 +198,7 @@ public class MenuScreen extends Screen {
                 int c = mix(c0, c1, (float) i / Math.max(1, tw));
                 g.fill(cx + 6 + i, cy + 12, cx + 6 + Math.min(fw, i + 4), cy + 16, ff(0xFF000000 | (c & 0xFFFFFF)));
             }
+            rr(g, cx + 6 + fw - 6, cy + 8, 12, 12, 6, withAlpha(Theme.ACCENT, active == id ? 90 : 45));
             rr(g, cx + 6 + fw - 3, cy + 10, 6, 8, 3, 0xFFFFFFFF);
         }
         cy += 20;
@@ -286,6 +302,8 @@ public class MenuScreen extends Screen {
 
         // Фон: затемнение с градиентом и лёгкий дождь
         g.fillGradient(0, 0, width, height, 0x80080810, 0xC0000000);
+        g.fillGradient(0, height / 2, width, height, 0x00000000, ff(withAlpha(Theme.ACCENT, 0x38)));   // свечение акцента снизу
+        g.fillGradient(0, 0, width, height / 4, ff(withAlpha(Theme.ACCENT, 0x18)), 0x00000000);        // лёгкий блик сверху
         RainyScene.drawRain(g, width, height, 0.3f);
 
         // Sidebar-стиль меню (переключается кнопкой снизу)
