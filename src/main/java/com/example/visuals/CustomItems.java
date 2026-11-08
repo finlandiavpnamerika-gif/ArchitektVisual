@@ -28,8 +28,6 @@ public final class CustomItems {
     private static final float[] SIZE = {1.0f, 1.5f, 1.3f, 0.95f, 0.75f, 0.85f, 1.4f};   // множитель длины под каждую модель
 
     public static final String[] SKINS = {"Оригинал", "Свой цвет", "Радуга", "Тёмная", "Золото", "Лёд", "Кровь"};
-    public static final String[] TARGETS = {"Незеритовый меч", "Алмазный меч", "Железный меч", "Золотой меч", "Каменный меч", "Деревянный меч", "Любой меч"};
-    private static final String[] TARGET_IDS = {"netherite_sword", "diamond_sword", "iron_sword", "golden_sword", "stone_sword", "wooden_sword"};
 
     private static final class Model {
         boolean loaded, failed;
@@ -37,7 +35,7 @@ public final class CustomItems {
         int[] idx;          // по 3 на треугольник
         int[] base;         // исходные цвета (RGB), на вершину (KRMB) или на треугольник (KRM2)
         boolean perTri;
-        int[] cache; int cacheKey = Integer.MIN_VALUE;
+        final java.util.HashMap<Integer, int[]> skins = new java.util.HashMap<>();
     }
 
     private static final Model[] CACHE = new Model[FILES.length];
@@ -80,12 +78,12 @@ public final class CustomItems {
         return 0xFF000000 | (ri << 16) | (gi << 8) | bi;
     }
 
-    private static int skinColor(int c, int skin, float hue) {
+    private static int skinColor(int c, int skin, float hue, float sat) {
         float r = (c >> 16) & 255, g = (c >> 8) & 255, b = c & 255;
         float l = (0.3f * r + 0.59f * g + 0.11f * b);
         switch (skin) {
             case 1, 2: {
-                int t = MathHelper.hsvToRgb(hue, (float) Config.ciSat, 1f) & 0xFFFFFF;
+                int t = MathHelper.hsvToRgb(hue, sat, 1f) & 0xFFFFFF;
                 float k = l / 255f * 1.15f;
                 return rgb(((t >> 16) & 255) * k, ((t >> 8) & 255) * k, (t & 255) * k);
             }
@@ -97,42 +95,46 @@ public final class CustomItems {
         }
     }
 
-    private static int[] colors(Model m, int modelIdx) {
-        int skin = Config.ciSkin;
+    private static int[] colors(Model m, CiRule r) {
+        int skin = r.skin;
         if (skin <= 0 || skin >= SKINS.length) return m.base;
-        float hue = (float) Config.ciHue;
+        float hue = (float) r.hue;
         if (skin == 2) hue = (System.currentTimeMillis() % 6000L) / 6000f;
-        int key = modelIdx * 1000 + skin * 100 + (int) (hue * 90f) + (int) (Config.ciSat * 10) * 7;
-        if (m.cache == null || m.cacheKey != key) {
-            if (m.cache == null) m.cache = new int[m.base.length];
-            for (int i = 0; i < m.base.length; i++) m.cache[i] = skinColor(m.base[i], skin, hue);
-            m.cacheKey = key;
+        int key = skin * 100000 + (int) (hue * 90f) * 100 + (int) (r.sat * 10);
+        int[] arr = m.skins.get(key);
+        if (arr == null) {
+            if (m.skins.size() > 12) m.skins.clear();
+            arr = new int[m.base.length];
+            for (int i = 0; i < arr.length; i++) arr[i] = skinColor(m.base[i], skin, hue, (float) r.sat);
+            m.skins.put(key, arr);
         }
-        return m.cache;
+        return arr;
     }
 
-    // ---------- какой предмет заменяем ----------
-    private static boolean matches(ItemStack stack) {
-        String path = Registries.ITEM.getId(stack.getItem()).getPath();
-        int t = Config.ciTarget;
-        if (t >= 0 && t < TARGET_IDS.length) return path.equals(TARGET_IDS[t]);
-        return path.endsWith("_sword");
+    // ---------- поиск правила для предмета ----------
+    private static CiRule find(ItemStack stack) {
+        if (Config.ciRules.isEmpty()) return null;
+        String id = Registries.ITEM.getId(stack.getItem()).toString();
+        for (CiRule r : Config.ciRules) if (r.enabled && r.item.equals(id)) return r;
+        return null;
     }
 
     /** true, если предмет нарисован нашей моделью (ванильный рендер тогда отменяется). */
     public static boolean renderHeld(ItemStack stack, ItemDisplayContext ctx, MatrixStack m, OrderedRenderCommandQueue queue) {
-        if (!Config.customItems || !ctx.isFirstPerson() || !matches(stack)) return false;
-        int mi = Math.max(0, Math.min(Config.ciModel, FILES.length - 1));
+        if (!Config.customItems || !ctx.isFirstPerson()) return false;
+        CiRule r = find(stack);
+        if (r == null) return false;
+        int mi = Math.max(0, Math.min(r.model, FILES.length - 1));
         Model mod = model(mi);
         if (!mod.loaded) return false;
-        final int[] col = colors(mod, mi);
+        final int[] col = colors(mod, r);
 
         m.push();
         if (ctx.isLeftHand()) m.scale(-1f, 1f, 1f);                        // зеркалим для левой руки
-        m.translate(Config.ciX / 100.0, Config.ciY / 100.0, -Config.ciZ / 100.0);
+        m.translate(r.x / 100.0, r.y / 100.0, -r.z / 100.0);
         m.multiply(new Quaternionf().rotationXYZ(
-                (float) Math.toRadians(Config.ciRX), (float) Math.toRadians(Config.ciRY), (float) Math.toRadians(Config.ciRZ)));
-        float s = (float) Config.ciScale * SIZE[mi];
+                (float) Math.toRadians(r.rx), (float) Math.toRadians(r.ry), (float) Math.toRadians(r.rz)));
+        float s = (float) r.scale * SIZE[mi];
         m.scale(s, s, s);
         queue.submitCustom(m, RenderLayers.debugQuads(), (entry, vc) -> emit(mod, col, entry.getPositionMatrix(), vc));
         m.pop();
