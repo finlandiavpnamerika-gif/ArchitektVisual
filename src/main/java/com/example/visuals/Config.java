@@ -96,6 +96,17 @@ public final class Config {
     public static boolean armorHudShowTool = true;
     public static boolean armorHudShowDurability = true;
 
+    // Potion HUD
+    public static boolean potionHud = true;
+    public static int potionX = 130;
+    public static int potionY = 4;
+    public static double potionScale = 1.0;
+    public static double potionAlpha = 1.0;
+    public static int potionColor = 2;
+    public static boolean potionIcons = true;
+    public static boolean potionBars = true;
+    public static boolean potionLevel = true;
+
     // --- Utils (Остальное) ---
     public static boolean sprint = false;
     public static boolean sprintAllDirs = false;
@@ -340,6 +351,15 @@ public final class Config {
             o.addProperty("armorHudAlpha", armorHudAlpha);
             o.addProperty("armorHudShowTool", armorHudShowTool);
             o.addProperty("armorHudShowDurability", armorHudShowDurability);
+            o.addProperty("potionHud", potionHud);
+            o.addProperty("potionX", potionX);
+            o.addProperty("potionY", potionY);
+            o.addProperty("potionScale", potionScale);
+            o.addProperty("potionAlpha", potionAlpha);
+            o.addProperty("potionColor", potionColor);
+            o.addProperty("potionIcons", potionIcons);
+            o.addProperty("potionBars", potionBars);
+            o.addProperty("potionLevel", potionLevel);
 
             // Время и погода
             o.addProperty("customTime", customTime);
@@ -510,6 +530,15 @@ public final class Config {
                 armorHudAlpha = d(o, "armorHudAlpha", armorHudAlpha);
                 armorHudShowTool = b(o, "armorHudShowTool", armorHudShowTool);
                 armorHudShowDurability = b(o, "armorHudShowDurability", armorHudShowDurability);
+                potionHud = b(o, "potionHud", potionHud);
+                potionX = (int) d(o, "potionX", potionX);
+                potionY = (int) d(o, "potionY", potionY);
+                potionScale = d(o, "potionScale", potionScale);
+                potionAlpha = d(o, "potionAlpha", potionAlpha);
+                potionColor = (int) d(o, "potionColor", potionColor);
+                potionIcons = b(o, "potionIcons", potionIcons);
+                potionBars = b(o, "potionBars", potionBars);
+                potionLevel = b(o, "potionLevel", potionLevel);
 
                 // Время и погода
                 customTime = b(o, "customTime", customTime);
