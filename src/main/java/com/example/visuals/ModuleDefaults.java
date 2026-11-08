@@ -63,6 +63,21 @@ public final class ModuleDefaults {
         }
     }
 
+    /** Переключатели модулей (то, что включается в меню). */
+    private static final String[] TOGGLES = {
+        "sprint", "zoom", "autoRespawn", "thirdPerson", "fullbright", "customCrosshair", "trails", "zones", "targetEsp",
+        "jumpCircle", "customItems", "handView", "targetHud", "customFog", "damageFever", "particles", "skyShader",
+        "hud", "arrayList", "armorHud", "potionHud", "keystrokes", "autoswap", "itembind", "customTime", "customWeather",
+        "chinaHat", "predictions", "itemPhysic", "shulkerPreview", "highlight", "streamerMode"
+    };
+
+    /** Выключает все модули (настройки внутри модулей не трогает). */
+    public static void disableAll() {
+        for (String n : TOGGLES) {
+            try { Config.class.getField(n).setBoolean(null, false); } catch (Exception ignored) {}
+        }
+    }
+
     public static boolean has(String id) { return FIELDS.containsKey(id); }
 
     public static void reset(String id) {
