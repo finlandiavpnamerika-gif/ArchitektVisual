@@ -8,70 +8,92 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 
-/** Armor + Tool HUD: иконки брони и предмета в руке, цифра и полоска прочности. */
+/** Armor + Tool HUD: слоты с иконкой, прочностью и полоской. Вертикально или горизонтально. */
 public final class ArmorHud {
     private ArmorHud() {}
 
     private static final int PAD = 4;
     private static final int ICON = 16;
-    private static final int ROW = 18;
-    private static final int TOOL_GAP = 4;   // отступ перед предметом в руке
-    private static final int MIN_BAR = 26;
+    private static final int SLOT = 22;      // плитка слота (иконка + поля)
+    private static final int GAP = 2;
+
+    private static int slotColor(ItemStack st) {
+        if (st.isEmpty() || !st.isDamageable()) return 0xFF8890A0;
+        float ratio = (float) (st.getMaxDamage() - st.getDamage()) / Math.max(1, st.getMaxDamage());
+        return HudStyle.ratioColor(ratio);
+    }
 
     /** Рисует в (0,0), возвращает {w, h}. */
     public static int[] draw(DrawContext g, MinecraftClient mc, float a) {
         TextRenderer tr = mc.textRenderer;
 
         List<ItemStack> items = new ArrayList<>();
-        items.add(mc.player.getEquippedStack(EquipmentSlot.HEAD));   // шлем
-        items.add(mc.player.getEquippedStack(EquipmentSlot.CHEST));   // нагрудник
-        items.add(mc.player.getEquippedStack(EquipmentSlot.LEGS));   // поножи
-        items.add(mc.player.getEquippedStack(EquipmentSlot.FEET));   // ботинки
+        items.add(mc.player.getEquippedStack(EquipmentSlot.HEAD));
+        items.add(mc.player.getEquippedStack(EquipmentSlot.CHEST));
+        items.add(mc.player.getEquippedStack(EquipmentSlot.LEGS));
+        items.add(mc.player.getEquippedStack(EquipmentSlot.FEET));
         boolean tool = Config.armorHudShowTool;
         if (tool) items.add(mc.player.getMainHandStack());
-
         boolean showDur = Config.armorHudShowDurability;
+        int n = items.size();
+        int accent = Theme.ACCENT;
 
-        // ширина колонки с цифрой/полоской
-        int barW = MIN_BAR;
-        if (showDur) {
-            for (ItemStack st : items) {
-                if (!st.isEmpty() && st.isDamageable()) {
-                    barW = Math.max(barW, tr.getWidth(String.valueOf(st.getMaxDamage() - st.getDamage())));
+        if (Config.armorHudHoriz) {
+            // плитки в ряд: иконка сверху, цифра и полоска снизу
+            int tileW = SLOT + (showDur ? 8 : 0);
+            int tileH = SLOT + (showDur ? 13 : 0);
+            int w = n * tileW + (n - 1) * GAP + PAD * 2 - 2;
+            int h = tileH + PAD * 2 - 2;
+            HudStyle.panel(g, 0, 0, w, h, a, accent);
+            for (int i = 0; i < n; i++) {
+                ItemStack st = items.get(i);
+                int x = PAD - 1 + i * (tileW + GAP), y = PAD - 1;
+                int col = slotColor(st);
+                HudStyle.roundFill(g, x, y, tileW, tileH, 2, HudStyle.withAlpha(0x38000000, a));
+                if (tool && i == 4) HudStyle.roundRing(g, x, y, tileW, tileH, 2, HudStyle.withAlpha(accent, a * 0.6f));
+                if (st.isEmpty()) {
+                    HudStyle.roundFill(g, x + (tileW - ICON) / 2, y + 3, ICON, ICON, 2, HudStyle.withAlpha(0x22FFFFFF, a));
+                    continue;
+                }
+                g.drawItem(st, x + (tileW - ICON) / 2, y + 3);
+                if (showDur && st.isDamageable()) {
+                    int left = st.getMaxDamage() - st.getDamage();
+                    float ratio = (float) left / Math.max(1, st.getMaxDamage());
+                    String t = String.valueOf(left);
+                    HudStyle.text(g, tr, t, x + (tileW - tr.getWidth(t)) / 2, y + SLOT - 1, col, a, true);
+                    HudStyle.bar(g, x + 3, y + tileH - 5, tileW - 6, 3, ratio, col, a);
                 }
             }
+            return new int[] {w, h};
         }
 
-        int w = PAD * 2 + ICON + (showDur ? 4 + barW : 0);
-        int h = PAD * 2 + items.size() * ROW - (ROW - ICON) + (tool ? TOOL_GAP : 0);
-
-        HudStyle.panel(g, 0, 0, w, h, a, Theme.ACCENT);
-
-        for (int i = 0; i < items.size(); i++) {
+        // вертикально: строка на слот, справа цифра и полоска
+        int barW = 26;
+        if (showDur) for (ItemStack st : items)
+            if (!st.isEmpty() && st.isDamageable())
+                barW = Math.max(barW, tr.getWidth(String.valueOf(st.getMaxDamage() - st.getDamage())));
+        int rowW = ICON + 6 + (showDur ? barW + 4 : 0);
+        int rowH = 20;
+        int w = rowW + PAD * 2;
+        int h = n * rowH + (n - 1) * 1 + PAD * 2 - 2 + (tool ? 3 : 0);
+        HudStyle.panel(g, 0, 0, w, h, a, accent);
+        for (int i = 0; i < n; i++) {
             ItemStack st = items.get(i);
-            int y = PAD + i * ROW + (tool && i == 4 ? TOOL_GAP : 0);
-
-            if (tool && i == 4) {
-                HudStyle.divider(g, PAD, w - PAD, y - TOOL_GAP / 2 - 1, 0x30FFFFFF, a);
-            }
-
+            int x = PAD, y = PAD - 1 + i * (rowH + 1) + (tool && i == 4 ? 3 : 0);
+            if (tool && i == 4) HudStyle.divider(g, PAD, w - PAD, y - 2, 0x40FFFFFF, a);
+            int col = slotColor(st);
+            HudStyle.roundFill(g, x, y, rowW, rowH, 2, HudStyle.withAlpha(0x38000000, a));
             if (st.isEmpty()) {
-                // пустой слот: еле заметная плашка, чтобы раскладка не прыгала
-                HudStyle.roundFill(g, PAD, y, ICON, ICON, 2, HudStyle.withAlpha(0x22FFFFFF, a));
+                HudStyle.roundFill(g, x + 3, y + 2, ICON, ICON, 2, HudStyle.withAlpha(0x22FFFFFF, a));
                 continue;
             }
-
-            g.drawItem(st, PAD, y);   // иконка (прозрачность на неё не действует)
-
+            g.drawItem(st, x + 3, y + 2);
             if (showDur && st.isDamageable()) {
-                int max = st.getMaxDamage();
-                int left = max - st.getDamage();
-                float ratio = max > 0 ? (float) left / max : 0f;
-                int col = HudStyle.ratioColor(ratio);
-                int tx = PAD + ICON + 4;
-
-                HudStyle.text(g, tr, String.valueOf(left), tx, y + 1, col, a, true);
-                HudStyle.bar(g, tx, y + 11, barW, 3, ratio, col, a);
+                int left = st.getMaxDamage() - st.getDamage();
+                float ratio = (float) left / Math.max(1, st.getMaxDamage());
+                int tx = x + ICON + 7;
+                HudStyle.text(g, tr, String.valueOf(left), tx, y + 3, col, a, true);
+                HudStyle.bar(g, tx, y + 13, barW, 3, ratio, col, a);
             }
         }
         return new int[] {w, h};
