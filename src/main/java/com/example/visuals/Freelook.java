@@ -7,35 +7,33 @@ import net.minecraft.util.math.MathHelper;
 
 /**
  * Freelook: камера крутится вокруг игрока отдельно от его поворота.
- * Персонаж не поворачивается и идёт туда, куда смотрел.
+ * Игрок не поворачивается и идёт туда, куда смотрел до включения.
  *
  * Включение (модуль "Freelook" в меню должен быть включён):
- *  - клавиша: зажал = Freelook пока держишь; быстрый тап = закрепить (ещё тап = выключить)
- *  - команда /freelook = закрепить/выключить (работает и без клавиатуры)
- * Отпустил / выключил - камера плавно возвращается за спину игрока.
+ *  - клавиша (по умолчанию Left Alt): режим "зажатие" - работает, пока держишь;
+ *    режим "переключатель" - нажал = включил, нажал ещё раз = выключил
+ *  - команда /freelook: включить/выключить в любом режиме
+ * Выключение: камера плавно возвращается за спину игрока (или сразу, если выключен плавный возврат).
  */
 public final class Freelook {
     private Freelook() {}
 
-    private static final long TAP_MS = 250L;
-
-    /** Freelook работает: мышь крутит камеру, а не игрока */
+    /** мышь крутит камеру, а не игрока */
     public static boolean active = false;
-    /** плавный возврат камеры к игроку */
+    /** камера плавно возвращается к игроку */
     private static boolean returning = false;
-    /** закреплён тапом по клавише или командой */
+    /** включён командой или переключателем */
     private static boolean latched = false;
 
-    private static boolean keyPrev = false;
-    private static long keyPressedAt = 0L;
-
     public static float yaw, pitch;
-    /** поворот самого игрока на момент включения: он не должен меняться, пока работает Freelook */
+    /** поворот игрока на момент включения: пока Freelook работает, он не меняется */
     private static float lockYaw, lockPitch;
+
     private static Perspective prev = null;
+    private static boolean forced = false;     // мы сами переключили вид на третье лицо
     private static long lastNanos = 0L;
 
-    /** камера должна использовать yaw/pitch отсюда */
+    /** камера должна брать yaw/pitch отсюда */
     public static boolean overriding() { return active || returning; }
 
     /** команда /freelook */
@@ -49,62 +47,75 @@ public final class Freelook {
         latched = !latched;
     }
 
-    /** вызывается каждый тик из Features.tick */
+    /** каждый тик (из Features.tick) */
     public static void tick(MinecraftClient mc) {
-        if (mc.player == null || mc.options == null) {
+        if (mc.options == null || mc.player == null || mc.world == null || !mc.player.isAlive() || !Config.thirdPerson) {
             latched = false;
-            keyPrev = false;
             if (overriding()) reset(mc);
-            return;
-        }
-        if (!Config.thirdPerson) {
-            latched = false;
-            keyPrev = false;
-            if (overriding()) reset(mc);
+            if (VisualsClient.freelookKey != null) while (VisualsClient.freelookKey.wasPressed()) { /* сброс очереди нажатий */ }
             return;
         }
 
-        boolean down = mc.currentScreen == null && VisualsClient.freelookKey.isPressed();
-        long now = System.currentTimeMillis();
-        if (down && !keyPrev) keyPressedAt = now;
-        if (!down && keyPrev && now - keyPressedAt < TAP_MS) latched = !latched;   // быстрый тап = закрепить / снять
-        keyPrev = down;
+        boolean pressed = false;
+        while (VisualsClient.freelookKey.wasPressed()) pressed = true;     // нажатия за тик (для переключателя)
+        if (mc.currentScreen != null) return;                              // в меню/инвентаре состояние не меняем
 
-        boolean want = mc.currentScreen == null && (down || latched);
+        boolean want;
+        if (Config.freelookToggle) {
+            if (pressed) latched = !latched;
+            want = latched;
+        } else {
+            want = VisualsClient.freelookKey.isPressed() || latched;
+        }
 
-        if (want && !active) {
-            if (!returning) {                       // новый заход (не продолжение возврата)
-                prev = mc.options.getPerspective();
-                if (prev == Perspective.FIRST_PERSON) mc.options.setPerspective(Perspective.THIRD_PERSON_BACK);
-                yaw = mc.player.getYaw();
-                pitch = mc.player.getPitch();
+        if (want && !active) start(mc);
+        else if (!want && active) stop(mc);
+    }
+
+    private static void start(MinecraftClient mc) {
+        if (!returning) {                                   // новый заход, а не продолжение возврата
+            prev = mc.options.getPerspective();
+            forced = false;
+            if (Config.freelookThird && prev == Perspective.FIRST_PERSON) {
+                mc.options.setPerspective(Perspective.THIRD_PERSON_BACK);
+                forced = true;
             }
-            lockYaw = mc.player.getYaw();
-            lockPitch = mc.player.getPitch();
-            active = true;
-            returning = false;
-            mc.player.sendMessage(Text.literal("Freelook: ВКЛ"), true);
-        } else if (!want && active) {
-            active = false;
+            yaw = mc.player.getYaw();
+            pitch = mc.player.getPitch();
+        }
+        lockYaw = mc.player.getYaw();
+        lockPitch = mc.player.getPitch();
+        active = true;
+        returning = false;
+        mc.player.sendMessage(Text.literal("Freelook: ВКЛ"), true);
+    }
+
+    private static void stop(MinecraftClient mc) {
+        active = false;
+        mc.player.sendMessage(Text.literal("Freelook: ВЫКЛ"), true);
+        if (Config.freelookSmooth) {
             returning = true;
             lastNanos = System.nanoTime();
-            mc.player.sendMessage(Text.literal("Freelook: ВЫКЛ"), true);
+        } else {
+            reset(mc);
         }
     }
 
-    /** мышь: вместо поворота игрока крутим камеру (вызывается из FreelookEntityMixin) */
+    /** мышь: вместо поворота игрока крутим камеру (из FreelookEntityMixin) */
     public static void rotate(double dx, double dy) {
-        yaw += (float) dx * 0.15f;
-        pitch = MathHelper.clamp(pitch + (float) dy * 0.15f, -90.0f, 90.0f);
+        float k = 0.15f * (float) Config.freelookSens;
+        yaw += (float) dx * k;
+        pitch = MathHelper.clamp(pitch + (float) dy * k, -90.0f, 90.0f);
     }
 
-    /** вызывается из FreelookCameraMixin раз за кадр: плавный возврат камеры */
+    /** раз за кадр из FreelookCameraMixin */
     public static void frame() {
         MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.player == null) { reset(mc); return; }
+
         if (active) {
-            // Страховка: если игрок всё же повернулся от мыши - переносим этот поворот на камеру
-            // и возвращаем игроку прежний поворот, чтобы персонаж не крутился вместе с камерой.
-            if (mc.player == null) { reset(mc); return; }
+            // Страховка: если игрок всё же повернулся (не от мыши) - переносим поворот на камеру
+            // и возвращаем игроку прежний, чтобы персонаж не крутился вместе с камерой.
             float dy = MathHelper.wrapDegrees(mc.player.getYaw() - lockYaw);
             float dp = mc.player.getPitch() - lockPitch;
             if (dy != 0f || dp != 0f) {
@@ -116,7 +127,6 @@ public final class Freelook {
             return;
         }
         if (!returning) return;
-        if (mc.player == null) { reset(mc); return; }
 
         long now = System.nanoTime();
         float dt = Math.min(0.1f, (now - lastNanos) / 1.0e9f);
@@ -134,7 +144,12 @@ public final class Freelook {
     private static void reset(MinecraftClient mc) {
         active = false;
         returning = false;
-        if (prev != null && mc != null && mc.options != null) mc.options.setPerspective(prev);
+        // вид возвращаем, только если игрок сам не сменил его (F5) за это время
+        if (forced && prev != null && mc != null && mc.options != null
+                && mc.options.getPerspective() == Perspective.THIRD_PERSON_BACK) {
+            mc.options.setPerspective(prev);
+        }
+        forced = false;
         prev = null;
     }
 }
