@@ -48,6 +48,21 @@ public final class ModuleDefaults {
         }
     }
 
+    /** Сбрасывает все числовые/булевы/массивные настройки Config к значениям по умолчанию (списки не трогает). */
+    public static void resetAll() {
+        for (Field f : Config.class.getFields()) {
+            if (!Modifier.isStatic(f.getModifiers())) continue;
+            try {
+                Object d = DEFAULTS.get(f.getName());
+                if (d == null) continue;
+                Object cur = f.get(null);
+                if (cur instanceof java.util.Collection) continue;
+                if (cur != null && cur.getClass().isArray()) fill(cur, d);
+                else if (!Modifier.isFinal(f.getModifiers())) f.set(null, copy(d));
+            } catch (Exception ignored) {}
+        }
+    }
+
     public static boolean has(String id) { return FIELDS.containsKey(id); }
 
     public static void reset(String id) {
