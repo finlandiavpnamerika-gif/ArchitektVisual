@@ -31,6 +31,20 @@ public final class KeystrokesHud {
         boolean lmb = GLFW.glfwGetMouseButton(window, GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
         boolean rmb = GLFW.glfwGetMouseButton(window, GLFW.GLFW_MOUSE_BUTTON_RIGHT) == GLFW.GLFW_PRESS;
 
+        if (Config.keystrokesHoriz) {
+            int x = 0;
+            String[] lab = {"W", "A", "S", "D"};
+            boolean[] st = {w, aa, s, d};
+            for (int i = 0; i < 4; i++) { HudStyle.keyBox(g, tr, x, 0, BOX, BOX, lab[i], st[i], accent, a); x += BOX + GAP; }
+            if (Config.keystrokesShowSpace) { HudStyle.keyBox(g, tr, x, 0, 38, BOX, "SPACE", space, accent, a); x += 38 + GAP; }
+            HudStyle.keyBox(g, tr, x, 0, 34, BOX, "SHIFT", shift, accent, a); x += 34 + GAP;
+            if (Config.keystrokesShowMouse) {
+                HudStyle.keyBox(g, tr, x, 0, 24, BOX, "LMB", lmb, accent, a); x += 24 + GAP;
+                HudStyle.keyBox(g, tr, x, 0, 24, BOX, "RMB", rmb, accent, a); x += 24 + GAP;
+            }
+            return new int[] {x - GAP, BOX};
+        }
+
         int wideW = BOX * 3 + GAP * 2;
 
         // WASD
