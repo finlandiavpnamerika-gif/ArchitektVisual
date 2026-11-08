@@ -641,10 +641,12 @@ public class MenuScreen extends Screen {
         }
 
         // 8. Misc (+24: кнопка под Macros)
-        int hMisc = 34 + mh("macro", 0) + mh("stream", 0) + 24;
+        int hMisc = 34 + mh("macro", 0) + mh("stream", 0) + 24 + mh("configs", 0) + 24;
         panel(g, "Misc", x0 + step * 3, y1, colW, hMisc);
         module(g, "macro", "Macros", "", true, 0);
         screenButton(g, "-> Настроить макросы", () -> new MacrosScreen(this));
+        module(g, "configs", "Configs", "", true, 0);
+        screenButton(g, "-> Конфиги (сохранить/загрузить)", () -> new ConfigsScreen(this));
         Config.streamerMode = module(g, "stream", "StreamerMode", "", Config.streamerMode, 0);
 
         drawBottom(g);
@@ -694,7 +696,7 @@ public class MenuScreen extends Screen {
             {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "pred", "physic", "shulker", "hl"},
             {"hud", "array", "armor", "potion", "keys"},
             {"sprint", "zoom", "respawn", "freelook", "stream"},
-            {"autoswap", "itembind", "friends", "macro"},
+            {"autoswap", "itembind", "friends", "macro", "configs"},
             {"time", "weather"}
     };
 
@@ -732,6 +734,7 @@ public class MenuScreen extends Screen {
             case "itembind" -> "ItemBind";
             case "friends" -> "Friends";
             case "macro" -> "Macros";
+            case "configs" -> "Configs";
             case "time" -> "Время";
             case "weather" -> "Погода";
             default -> id;
@@ -739,7 +742,7 @@ public class MenuScreen extends Screen {
     }
 
     private static boolean sbHasSwitch(String id) {
-        return !id.equals("friends") && !id.equals("macro");
+        return !id.equals("friends") && !id.equals("macro") && !id.equals("configs");
     }
 
     private static boolean sbGet(String id) {
@@ -1170,6 +1173,7 @@ public class MenuScreen extends Screen {
             }
             case "friends" -> screenButton(g, "-> Открыть Friends", () -> new FriendsScreen(this));
             case "macro" -> screenButton(g, "-> Настроить макросы", () -> new MacrosScreen(this));
+            case "configs" -> screenButton(g, "-> Открыть конфиги", () -> new ConfigsScreen(this));
             case "time" -> Config.timeValue = (int) cslider(g, "Время", 0, 24000, Config.timeValue, true);
             case "weather" -> Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
             default -> noOptions(g);
