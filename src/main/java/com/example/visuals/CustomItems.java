@@ -9,93 +9,156 @@ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 /**
- * CustomItems: своя 3D-модель вместо предмета в руке (от первого лица).
- * Сейчас: незеритовый меч -> керамбит.
- * Файл модели karambit.bin получен из .glb: цвета текстуры запечены в вершины (assets/visualsmod/models/karambit.bin).
- * Формат: "KRMB", int nVerts, int nTris, float[nVerts*3] позиции, int[nVerts] ARGB, int[nTris*3] индексы.
- * Начало координат модели - рукоять, лезвие направлено по +Y, длина модели = 1.
+ * CustomItems: своя 3D-модель вместо меча в руке (от первого лица).
+ * Модели лежат в assets/visualsmod/models/*.bin (запечены из .glb). Начало координат - конец рукояти,
+ * лезвие направлено по +Y, длина модели = 1.
+ * Форматы: "KRMB" (цвет в вершинах) и "KRM2" (общие вершины, цвет на каждый треугольник).
  */
 public final class CustomItems {
     private CustomItems() {}
 
-    private static boolean loaded = false, failed = false;
-    private static float[] pos;
-    private static int[] argb, idx;
+    public static final String[] MODELS = {"Керамбит", "Катана", "Красный световой меч", "Нож-бабочка", "Кунай", "Штык-нож", "Майнкрафт-меч"};
+    private static final String[] FILES = {"karambit", "katana", "redsword", "butterfly", "kunai", "bayonet", "mcsword"};
+    private static final float[] SIZE = {1.0f, 1.5f, 1.3f, 0.95f, 0.75f, 0.85f, 1.4f};   // множитель длины под каждую модель
 
-    // диагностика (показывается в меню)
-    public static int hookCalls = 0, swordCalls = 0, drawn = 0;
-    private static String err = "";
+    public static final String[] SKINS = {"Оригинал", "Свой цвет", "Радуга", "Тёмная", "Золото", "Лёд", "Кровь"};
+    public static final String[] TARGETS = {"Незеритовый меч", "Алмазный меч", "Железный меч", "Золотой меч", "Каменный меч", "Деревянный меч", "Любой меч"};
+    private static final String[] TARGET_IDS = {"netherite_sword", "diamond_sword", "iron_sword", "golden_sword", "stone_sword", "wooden_sword"};
 
-    public static String status() {
-        String model = loaded ? "модель OK" : failed ? "модель НЕ найдена" : "модель не загружена";
-        return model + (err.isEmpty() ? "" : " | " + err);
+    private static final class Model {
+        boolean loaded, failed;
+        float[] pos;
+        int[] idx;          // по 3 на треугольник
+        int[] base;         // исходные цвета (RGB), на вершину (KRMB) или на треугольник (KRM2)
+        boolean perTri;
+        int[] cache; int cacheKey = Integer.MIN_VALUE;
     }
 
-    public static String status2() {
-        return "хук: " + hookCalls + " | меч: " + swordCalls + " | нарисовано: " + drawn;
-    }
+    private static final Model[] CACHE = new Model[FILES.length];
 
-    private static boolean load() {
-        if (loaded) return true;
-        if (failed) return false;
-        try (InputStream in = CustomItems.class.getResourceAsStream("/assets/visualsmod/models/karambit.bin")) {
-            if (in == null) { failed = true; err = "нет karambit.bin"; return false; }
+    private static Model model(int i) {
+        i = Math.max(0, Math.min(i, FILES.length - 1));
+        Model m = CACHE[i];
+        if (m == null) { m = new Model(); CACHE[i] = m; }
+        if (m.loaded || m.failed) return m;
+        try (InputStream in = CustomItems.class.getResourceAsStream("/assets/visualsmod/models/" + FILES[i] + ".bin")) {
+            if (in == null) { m.failed = true; return m; }
             ByteBuffer b = ByteBuffer.wrap(in.readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);
-            b.position(4);   // "KRMB"
+            byte k = b.get(3);
+            b.position(4);
             int nv = b.getInt(), nt = b.getInt();
-            pos = new float[nv * 3];
-            for (int i = 0; i < pos.length; i++) pos[i] = b.getFloat();
-            argb = new int[nv];
-            for (int i = 0; i < nv; i++) argb[i] = b.getInt();
-            idx = new int[nt * 3];
-            for (int i = 0; i < idx.length; i++) idx[i] = b.getInt();
-            loaded = true;
-            return true;
+            m.pos = new float[nv * 3];
+            for (int j = 0; j < m.pos.length; j++) m.pos[j] = b.getFloat();
+            if (k == '2') {
+                m.perTri = true;
+                m.idx = new int[nt * 3];
+                for (int j = 0; j < m.idx.length; j++) m.idx[j] = b.getInt();
+                m.base = new int[nt];
+                for (int j = 0; j < nt; j++) m.base[j] = b.getInt();
+            } else {
+                m.base = new int[nv];
+                for (int j = 0; j < nv; j++) m.base[j] = b.getInt();
+                m.idx = new int[nt * 3];
+                for (int j = 0; j < m.idx.length; j++) m.idx[j] = b.getInt();
+            }
+            m.loaded = true;
         } catch (Exception e) {
-            failed = true; err = String.valueOf(e.getClass().getSimpleName());
-            return false;
+            m.failed = true;
         }
+        return m;
+    }
+
+    // ---------- текстуры (перекраска) ----------
+    private static int rgb(float r, float g, float b) {
+        int ri = Math.max(0, Math.min(255, (int) r)), gi = Math.max(0, Math.min(255, (int) g)), bi = Math.max(0, Math.min(255, (int) b));
+        return 0xFF000000 | (ri << 16) | (gi << 8) | bi;
+    }
+
+    private static int skinColor(int c, int skin, float hue) {
+        float r = (c >> 16) & 255, g = (c >> 8) & 255, b = c & 255;
+        float l = (0.3f * r + 0.59f * g + 0.11f * b);
+        switch (skin) {
+            case 1, 2: {
+                int t = MathHelper.hsvToRgb(hue, (float) Config.ciSat, 1f) & 0xFFFFFF;
+                float k = l / 255f * 1.15f;
+                return rgb(((t >> 16) & 255) * k, ((t >> 8) & 255) * k, (t & 255) * k);
+            }
+            case 3: return rgb(r * 0.38f, g * 0.38f, b * 0.4f);
+            case 4: { float k = l / 255f * 1.25f; return rgb(255 * k, 200 * k, 70 * k); }
+            case 5: { float k = l / 255f * 1.2f; return rgb(140 * k, 215 * k, 255 * k); }
+            case 6: { float k = l / 255f * 1.25f; return rgb(255 * k, 25 * k, 30 * k); }
+            default: return 0xFF000000 | (c & 0xFFFFFF);
+        }
+    }
+
+    private static int[] colors(Model m, int modelIdx) {
+        int skin = Config.ciSkin;
+        if (skin <= 0 || skin >= SKINS.length) return m.base;
+        float hue = (float) Config.ciHue;
+        if (skin == 2) hue = (System.currentTimeMillis() % 6000L) / 6000f;
+        int key = modelIdx * 1000 + skin * 100 + (int) (hue * 90f) + (int) (Config.ciSat * 10) * 7;
+        if (m.cache == null || m.cacheKey != key) {
+            if (m.cache == null) m.cache = new int[m.base.length];
+            for (int i = 0; i < m.base.length; i++) m.cache[i] = skinColor(m.base[i], skin, hue);
+            m.cacheKey = key;
+        }
+        return m.cache;
+    }
+
+    // ---------- какой предмет заменяем ----------
+    private static boolean matches(ItemStack stack) {
+        String path = Registries.ITEM.getId(stack.getItem()).getPath();
+        int t = Config.ciTarget;
+        if (t >= 0 && t < TARGET_IDS.length) return path.equals(TARGET_IDS[t]);
+        return path.endsWith("_sword");
     }
 
     /** true, если предмет нарисован нашей моделью (ванильный рендер тогда отменяется). */
     public static boolean renderHeld(ItemStack stack, ItemDisplayContext ctx, MatrixStack m, OrderedRenderCommandQueue queue) {
-        hookCalls++;
-        if (!Config.customItems || !ctx.isFirstPerson() || !stack.isOf(Items.NETHERITE_SWORD)) return false;
-        swordCalls++;
-        if (!load()) return false;
-        drawn++;
+        if (!Config.customItems || !ctx.isFirstPerson() || !matches(stack)) return false;
+        int mi = Math.max(0, Math.min(Config.ciModel, FILES.length - 1));
+        Model mod = model(mi);
+        if (!mod.loaded) return false;
+        final int[] col = colors(mod, mi);
 
         m.push();
         if (ctx.isLeftHand()) m.scale(-1f, 1f, 1f);                        // зеркалим для левой руки
         m.translate(Config.ciX / 100.0, Config.ciY / 100.0, -Config.ciZ / 100.0);
         m.multiply(new Quaternionf().rotationXYZ(
                 (float) Math.toRadians(Config.ciRX), (float) Math.toRadians(Config.ciRY), (float) Math.toRadians(Config.ciRZ)));
-        float s = (float) Config.ciScale;
+        float s = (float) Config.ciScale * SIZE[mi];
         m.scale(s, s, s);
-        queue.submitCustom(m, RenderLayers.debugQuads(), (entry, vc) -> emit(entry.getPositionMatrix(), vc));
+        queue.submitCustom(m, RenderLayers.debugQuads(), (entry, vc) -> emit(mod, col, entry.getPositionMatrix(), vc));
         m.pop();
         return true;
     }
 
-    private static void emit(Matrix4f mat, VertexConsumer vc) {
-        for (int t = 0; t < idx.length; t += 3) {
+    private static void emit(Model md, int[] col, Matrix4f mat, VertexConsumer vc) {
+        int[] idx = md.idx;
+        for (int t = 0, n = 0; t < idx.length; t += 3, n++) {
             int a = idx[t], b = idx[t + 1], c = idx[t + 2];
-            // треугольник как вырожденный четырёхугольник, обе стороны (чтобы не зависеть от отсечения граней)
-            tri(mat, vc, a, b, c);
-            tri(mat, vc, c, b, a);
+            if (md.perTri) {
+                int cc = col[n];
+                tri(mat, vc, md.pos, a, cc, b, cc, c, cc);
+                tri(mat, vc, md.pos, c, cc, b, cc, a, cc);
+            } else {
+                tri(mat, vc, md.pos, a, col[a], b, col[b], c, col[c]);
+                tri(mat, vc, md.pos, c, col[c], b, col[b], a, col[a]);
+            }
         }
     }
 
-    private static void tri(Matrix4f mat, VertexConsumer vc, int a, int b, int c) {
-        v(mat, vc, a); v(mat, vc, b); v(mat, vc, c); v(mat, vc, c);
-    }
-
-    private static void v(Matrix4f mat, VertexConsumer vc, int i) {
-        vc.vertex(mat, pos[i * 3], pos[i * 3 + 1], pos[i * 3 + 2]).color(argb[i]);
+    // треугольник как вырожденный четырёхугольник, обе стороны (чтобы не зависеть от отсечения граней)
+    private static void tri(Matrix4f mat, VertexConsumer vc, float[] p, int a, int ca, int b, int cb, int c, int cc) {
+        vc.vertex(mat, p[a * 3], p[a * 3 + 1], p[a * 3 + 2]).color(ca);
+        vc.vertex(mat, p[b * 3], p[b * 3 + 1], p[b * 3 + 2]).color(cb);
+        vc.vertex(mat, p[c * 3], p[c * 3 + 1], p[c * 3 + 2]).color(cc);
+        vc.vertex(mat, p[c * 3], p[c * 3 + 1], p[c * 3 + 2]).color(cc);
     }
 }
