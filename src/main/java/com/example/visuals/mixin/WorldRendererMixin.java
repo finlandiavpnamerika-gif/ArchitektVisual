@@ -3,6 +3,7 @@ package com.example.visuals.mixin;
 import com.example.visuals.ChinaHatRenderer;
 import com.example.visuals.Config;
 import com.example.visuals.FuntimeHelper;
+import com.example.visuals.JumpCircle;
 import com.example.visuals.Particles;
 import com.example.visuals.SkyRenderer;
 import com.example.visuals.TargetEsp;
@@ -43,6 +44,7 @@ public class WorldRendererMixin {
         if (Config.trails) TrailRenderer.render(camera, positionMatrix, consumers, tickProgress);
         if (Config.zones) FuntimeHelper.render(camera, positionMatrix, consumers, tickProgress);
         if (Config.targetEsp) TargetEsp.render(camera, positionMatrix, consumers, tickProgress);
+        if (Config.jumpCircle) JumpCircle.render(camera, positionMatrix, consumers, tickProgress);
         Particles.render(camera, positionMatrix, consumers, tickProgress);
     }
 }
