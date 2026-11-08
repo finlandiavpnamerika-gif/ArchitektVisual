@@ -47,6 +47,15 @@ public final class HudManager {
             public double alpha() { return Config.armorHudAlpha; }
             public int[] draw(DrawContext g, MinecraftClient mc, float a) { return ArmorHud.draw(g, mc, a); }
         });
+        ELEMENTS.add(new HudElement("Potion") {
+            public boolean enabled() { return Config.potionHud; }
+            public int x() { return Config.potionX; }
+            public int y() { return Config.potionY; }
+            public void setPos(int x, int y) { Config.potionX = x; Config.potionY = y; }
+            public double scale() { return Config.potionScale; }
+            public double alpha() { return Config.potionAlpha; }
+            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return PotionHud.draw(g, mc, a); }
+        });
         ELEMENTS.add(new HudElement("Info") {
             public boolean enabled() { return Config.hud; }
             public int x() { return Config.hudX; }
