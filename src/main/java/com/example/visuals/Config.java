@@ -458,7 +458,13 @@ public final class Config {
         } catch (Exception ignored) {}
     }
 
-    public static void load() { loadFrom(FILE); }
+    /** true, если файла настроек раньше не было (первый запуск мода) */
+    public static boolean freshInstall = false;
+
+    public static void load() { freshInstall = !Files.exists(FILE); loadFrom(FILE); }
+
+    /** Перечитать основной файл настроек (без изменения freshInstall). */
+    public static void reload() { loadFrom(FILE); }
 
     /** Загружает настройки из указанного файла (для профилей). */
     public static void loadFrom(Path file) {
