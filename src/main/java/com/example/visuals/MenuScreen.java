@@ -329,7 +329,7 @@ public class MenuScreen extends Screen {
         Config.thirdPerson = module(g, "freelook", "Freelook", "", Config.thirdPerson, 0);
 
         // 2. Visuals
-        int hVis = 34 + mh("fb", 2) + mh("cross", 5) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 2) + mh("tesp", 7) + mh("sky", 6) + mh("part", 10) + mh("dmg", 6) + mh("fog", 7) + mh("thud", 6) + mh("hv", 11) + mh("ci", 8);
+        int hVis = 34 + mh("fb", 2) + mh("cross", 5) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 2) + mh("tesp", 7) + mh("sky", 6) + mh("part", 10) + mh("dmg", 6) + mh("fog", 7) + mh("thud", 6) + mh("hv", 11) + mh("ci", 8) + mh("jc", 10);
         panel(g, "Visuals", x0 + step, y0, colW, hVis);
         Config.fullbright = module(g, "fb", "Fullbright", "", Config.fullbright, 1);
         if (open.contains("fb")) { Config.gamma = cslider(g, "Яркость", 1, 15, Config.gamma, false); cy += 2;  resetRow(g, "fb");}
@@ -373,6 +373,19 @@ public class MenuScreen extends Screen {
             Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
             Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
             resetRow(g, "tesp");
+        }
+
+        Config.jumpCircle = module(g, "jc", "JumpCircle", "", Config.jumpCircle, 9);
+        if (open.contains("jc")) {
+            Config.jcStyle = ccycle(g, "Стиль", JumpCircle.STYLES, Config.jcStyle);
+            Config.jcRainbow = cbool(g, "Радуга", Config.jcRainbow);
+            Config.jcHue = cgradL(g, "Цвет", Config.jcHue, pos -> hsv(pos, 0.7, 1.0));
+            Config.jcSize = cslider(g, "Размер", 0.5, 4.0, Config.jcSize, false);
+            Config.jcWidth = cslider(g, "Толщина", 0.1, 1.0, Config.jcWidth, false);
+            Config.jcLife = cslider(g, "Длительность (с)", 0.3, 3.0, Config.jcLife, false);
+            Config.jcAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.jcAlpha, false);
+            Config.jcLand = cbool(g, "При приземлении", Config.jcLand);
+            resetRow(g, "jc");
         }
 
         Config.customItems = module(g, "ci", "CustomItems", "", Config.customItems, 7);
@@ -677,7 +690,7 @@ public class MenuScreen extends Screen {
 
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
-            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "hat", "pred", "physic", "shulker", "hl"},
+            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "pred", "physic", "shulker", "hl"},
             {"hud", "array", "armor", "potion", "keys"},
             {"sprint", "zoom", "respawn", "freelook", "stream"},
             {"autoswap", "itembind", "friends", "macro"},
@@ -698,6 +711,7 @@ public class MenuScreen extends Screen {
             case "thud" -> "TargetHUD";
             case "hv" -> "Hand View";
             case "ci" -> "CustomItems";
+            case "jc" -> "JumpCircle";
             case "hat" -> "China Hat";
             case "pred" -> "Predictions";
             case "physic" -> "Item Physic";
@@ -741,6 +755,7 @@ public class MenuScreen extends Screen {
             case "thud" -> Config.targetHud;
             case "hv" -> Config.handView;
             case "ci" -> Config.customItems;
+            case "jc" -> Config.jumpCircle;
             case "hat" -> Config.chinaHat;
             case "pred" -> Config.predictions;
             case "physic" -> Config.itemPhysic;
@@ -778,6 +793,7 @@ public class MenuScreen extends Screen {
             case "thud": Config.targetHud = v; break;
             case "hv": Config.handView = v; break;
             case "ci": Config.customItems = v; break;
+            case "jc": Config.jumpCircle = v; break;
             case "hat": Config.chinaHat = v; break;
             case "pred": Config.predictions = v; break;
             case "physic": Config.itemPhysic = v; break;
@@ -978,6 +994,16 @@ public class MenuScreen extends Screen {
                 Config.targetEspSize = cslider(g, "Размер", 0.5, 2.0, Config.targetEspSize, false);
                 Config.targetEspSpeed = cslider(g, "Скорость", 0.2, 3.0, Config.targetEspSpeed, false);
                 Config.targetEspAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.targetEspAlpha, false);
+            }
+            case "jc" -> {
+                Config.jcStyle = ccycle(g, "Стиль", JumpCircle.STYLES, Config.jcStyle);
+                Config.jcRainbow = cbool(g, "Радуга", Config.jcRainbow);
+                Config.jcHue = cgradL(g, "Цвет", Config.jcHue, pos -> hsv(pos, 0.7, 1.0));
+                Config.jcSize = cslider(g, "Размер", 0.5, 4.0, Config.jcSize, false);
+                Config.jcWidth = cslider(g, "Толщина", 0.1, 1.0, Config.jcWidth, false);
+                Config.jcLife = cslider(g, "Длительность (с)", 0.3, 3.0, Config.jcLife, false);
+                Config.jcAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.jcAlpha, false);
+                Config.jcLand = cbool(g, "При приземлении", Config.jcLand);
             }
             case "ci" -> {
                 Config.ciScale = cslider(g, "Размер", 0.2, 2.0, Config.ciScale, false);
