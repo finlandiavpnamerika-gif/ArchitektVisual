@@ -19,7 +19,7 @@ public final class ModuleDefaults {
             Map.entry("trails", new String[]{"trailsCustom", "trailsHue", "trailsSat", "trailsVal", "trailsColor", "trailsLength", "trailsHeight"}),
             Map.entry("zones", new String[]{"zonesHeld"}),
             Map.entry("tesp", new String[]{"targetEspShape", "targetEspHue", "targetEspHitHue", "targetEspSize", "targetEspSpeed", "targetEspAlpha"}),
-            Map.entry("ci", new String[]{"ciScale", "ciX", "ciY", "ciZ", "ciRX", "ciRY", "ciRZ"}),
+            Map.entry("ci", new String[]{"ciModel", "ciSkin", "ciHue", "ciSat", "ciTarget", "ciScale", "ciX", "ciY", "ciZ", "ciRX", "ciRY", "ciRZ"}),
             Map.entry("hv", new String[]{"leftHanded", "svHand", "sv", "svNoSwing"}),
             Map.entry("thud", new String[]{"thScale", "thX", "thY", "thHue", "thDist"}),
             Map.entry("fog", new String[]{"fogOff", "fogStart", "fogEnd", "fogHue", "fogSat", "fogVal"}),
