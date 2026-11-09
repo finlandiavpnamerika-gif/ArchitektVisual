@@ -36,13 +36,30 @@ public class HeldItemRendererMixin {
         if (CustomItems.renderHeld(stack, context, matrices, queue)) ci.cancel();
     }
 
+    // Мы сдвигаем матрицу ДО того, как ванильный код сам делает push. Если не откатить сдвиг в конце,
+    // он остаётся на общем стеке и переходит на вторую руку (обе руки двигались вместе).
+    // Поэтому свой push в начале и pop на выходе из метода.
+    private boolean visuals$pushed = false;
+
     // смещение / поворот / размер предмета в руке
     @Inject(method = RENDER, at = @At("HEAD"), require = 0)
     private void visuals$handView(AbstractClientPlayerEntity player, float tickProgress, float pitch, Hand hand,
                                   float swingProgress, ItemStack stack, float equipProgress, MatrixStack matrices,
                                   OrderedRenderCommandQueue queue, int light, CallbackInfo ci) {
+        visuals$pushed = false;
         if (!Config.handView) return;
+        matrices.push();
+        visuals$pushed = true;
         HandView.apply(matrices, HandView.side(hand, player));
+    }
+
+    @Inject(method = RENDER, at = @At("RETURN"), require = 0)
+    private void visuals$handViewEnd(AbstractClientPlayerEntity player, float tickProgress, float pitch, Hand hand,
+                                     float swingProgress, ItemStack stack, float equipProgress, MatrixStack matrices,
+                                     OrderedRenderCommandQueue queue, int light, CallbackInfo ci) {
+        if (!visuals$pushed) return;
+        visuals$pushed = false;
+        matrices.pop();
     }
 
     // "Без замаха": прогресс удара = 0 (аргументы float: 0 tickProgress, 1 pitch, 2 swingProgress, 3 equipProgress)
