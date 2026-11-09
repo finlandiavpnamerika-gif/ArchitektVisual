@@ -3,27 +3,25 @@ package com.example.visuals.mixin;
 import com.example.visuals.Freelook;
 import net.minecraft.client.render.Camera;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Camera.class)
-public class FreelookCameraMixin {
+public abstract class FreelookCameraMixin {
 
-    // Первый вызов setRotation в Camera.update() ставит поворот камеры по игроку.
-    // Подменяем yaw и pitch на свои, пока работает Freelook.
-    @ModifyArg(method = "update",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setRotation(FF)V", ordinal = 0),
-            index = 0)
-    private float visuals$freelookYaw(float original) {
-        if (!Freelook.overriding()) return original;
+    @Shadow
+    protected abstract void setRotation(float yaw, float pitch);
+
+    // В Camera.update() setRotation вызывается в нескольких местах (обычный поворот, вид спереди, сон в кровати),
+    // и номер нужного вызова меняется от версии к версии. Поэтому ставим свой поворот после КАЖДОГО вызова:
+    // последний вызов всегда наш, а смещение камеры назад (move) считается уже по нашему повороту.
+    @Inject(method = "update",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setRotation(FF)V", shift = At.Shift.AFTER))
+    private void visuals$freelook(CallbackInfo ci) {
+        if (!Freelook.overriding()) return;
         Freelook.frame();
-        return Freelook.yaw;
-    }
-
-    @ModifyArg(method = "update",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setRotation(FF)V", ordinal = 0),
-            index = 1)
-    private float visuals$freelookPitch(float original) {
-        return Freelook.overriding() ? Freelook.pitch : original;
+        this.setRotation(Freelook.yaw, Freelook.pitch);
     }
 }
