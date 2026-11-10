@@ -40,6 +40,11 @@ public final class ModuleDefaults {
             Map.entry("clock", new String[]{"clockSeconds", "clockDate", "clockGame", "clockColor", "clockScale", "clockAlpha", "clockX", "clockY"}),
             Map.entry("inv", new String[]{"invHotbar", "invColor", "invScale", "invAlpha", "invX", "invY"}),
             Map.entry("totem", new String[]{"totemHideZero", "totemColor", "totemScale", "totemAlpha", "totemX", "totemY"}),
+            Map.entry("crit", new String[]{"critStyle", "critCount"}),
+            Map.entry("kill", new String[]{"killFlash", "killSound", "killParticles", "killColor"}),
+            Map.entry("atk", new String[]{"atkStyle", "atkColor", "atkSize", "atkAlways", "atkOffset"}),
+            Map.entry("stats", new String[]{"statsAcc", "statsKills", "statsStreak", "statsDeaths", "statsKd", "statsPlayersOnly", "statsColor", "statsScale", "statsAlpha", "statsX", "statsY"}),
+            Map.entry("dlog", new String[]{"dlDealt", "dlTaken", "dlLines", "dlLife", "dlColor", "dlScale", "dlAlpha", "dlX", "dlY"}),
             Map.entry("noov", new String[]{"noHurtShake", "noFireOverlay", "noTotemParticles", "noFireworkParticles"}),
             Map.entry("hitsound", new String[]{"hitSoundType", "hitSoundVol", "hitSoundPitch"}),
             Map.entry("combo", new String[]{"comboColor", "comboTimeout", "comboScale", "comboAlpha", "comboX", "comboY"}),
@@ -78,7 +83,8 @@ public final class ModuleDefaults {
         "hud", "arrayList", "armorHud", "potionHud", "keystrokes", "autoswap", "itembind", "customTime", "customWeather",
         "chinaHat", "predictions", "itemPhysic", "shulkerPreview", "highlight", "streamerMode",
         "noOverlay", "hitSound", "comboHud", "watermark",
-        "serverHud", "clockHud", "invHud", "totemHud"
+        "serverHud", "clockHud", "invHud", "totemHud",
+        "critFx", "killFx", "atkInd", "statsHud", "dlHud"
     };
 
     /** Выключает все модули (настройки внутри модулей не трогает). */
