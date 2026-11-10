@@ -27,7 +27,8 @@
     "EntityGlowMixin",
     "CloudRendererMixin",
     "NoVanillaNametagMixin",
-    "NoVanillaNametagLivingMixin"
+    "NoVanillaNametagLivingMixin",
+    "SwingSpeedMixin"
   ],
   "injectors": {
     "defaultRequire": 1
