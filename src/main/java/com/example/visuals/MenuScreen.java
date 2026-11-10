@@ -892,6 +892,89 @@ public class MenuScreen extends Screen {
             cy += 2; resetRow(g, "pcd");
         }
 
+        // ---- панель Cosmetics (третий ряд, вторая колонка) ----
+        int hCos = 34 + mh("wings", 7) + mh("aura", 7) + mh("cape", 6) + mh("nt", 8) + mh("chams", 5) + mh("swing", 3) + mh("clouds", 7) + mh("tip", 4);
+        panel(g, "Cosmetics", x0 + step, y2, colW, hCos);
+
+        Config.wingsOn = module(g, "wings", "Wings", "", Config.wingsOn, 7);
+        if (open.contains("wings")) {
+            Config.wingStyle = ccycle(g, "Стиль", Cosmetics.WING_STYLES, Config.wingStyle);
+            Config.wingColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.wingColor);
+            Config.wingRainbow = cbool(g, "Радуга", Config.wingRainbow);
+            Config.wingSize = cslider(g, "Размер", 0.5, 2.0, Config.wingSize, false);
+            Config.wingSpeed = cslider(g, "Скорость взмаха", 0.3, 3.0, Config.wingSpeed, false);
+            Config.wingFriends = cbool(g, "Для друзей", Config.wingFriends);
+            cy += 2; resetRow(g, "wings");
+        }
+
+        Config.auraOn = module(g, "aura", "Aura", "", Config.auraOn, 7);
+        if (open.contains("aura")) {
+            Config.auraStyle = ccycle(g, "Стиль", Cosmetics.AURA_STYLES, Config.auraStyle);
+            Config.auraColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.auraColor);
+            Config.auraRainbow = cbool(g, "Радуга", Config.auraRainbow);
+            Config.auraSize = cslider(g, "Размер", 0.5, 2.0, Config.auraSize, false);
+            Config.auraSpeed = cslider(g, "Скорость", 0.3, 3.0, Config.auraSpeed, false);
+            Config.auraFriends = cbool(g, "Для друзей", Config.auraFriends);
+            cy += 2; resetRow(g, "aura");
+        }
+
+        Config.capeOn = module(g, "cape", "Animated Cape", "", Config.capeOn, 6);
+        if (open.contains("cape")) {
+            Config.capeColor = ccycle(g, "Цвет сверху", Config.COLOR_NAMES, Config.capeColor);
+            Config.capeColor2 = ccycle(g, "Цвет снизу", Config.COLOR_NAMES, Config.capeColor2);
+            Config.capeRainbow = cbool(g, "Радуга", Config.capeRainbow);
+            Config.capeWave = cslider(g, "Волны", 0.0, 1.5, Config.capeWave, false);
+            Config.capeFriends = cbool(g, "Для друзей", Config.capeFriends);
+            cy += 2; resetRow(g, "cape");
+        }
+
+        Config.ntOn = module(g, "nt", "Nametags+", "", Config.ntOn, 8);
+        if (open.contains("nt")) {
+            Config.ntRange = cslider(g, "Дальность", 16, 128, Config.ntRange, true);
+            Config.ntScale = cslider(g, "Размер", 0.5, 2.0, Config.ntScale, false);
+            Config.ntBg = cbool(g, "Фон", Config.ntBg);
+            Config.ntHealth = cbool(g, "Здоровье", Config.ntHealth);
+            Config.ntDist = cbool(g, "Расстояние", Config.ntDist);
+            Config.ntDistScale = cbool(g, "Масштаб по расстоянию", Config.ntDistScale);
+            Config.ntHide = cbool(g, "Скрыть ванильные", Config.ntHide);
+            cy += 2; resetRow(g, "nt");
+        }
+
+        Config.chamsOn = module(g, "chams", "Chams", "", Config.chamsOn, 5);
+        if (open.contains("chams")) {
+            Config.chPlayers = cbool(g, "Игроки", Config.chPlayers);
+            Config.chMobs = cbool(g, "Мобы", Config.chMobs);
+            Config.chFriends = cbool(g, "Друзья", Config.chFriends);
+            Config.chSelf = cbool(g, "Свой (3-е лицо)", Config.chSelf);
+            cy += 2; resetRow(g, "chams");
+        }
+
+        Config.swingAnim = module(g, "swing", "Swing Animation", "", Config.swingAnim, 3);
+        if (open.contains("swing")) {
+            Config.swingSpeed = cslider(g, "Скорость взмаха", 0.3, 3.0, Config.swingSpeed, false);
+            Config.swingSelfOnly = cbool(g, "Только свой", Config.swingSelfOnly);
+            cy += 2; resetRow(g, "swing");
+        }
+
+        Config.cloudsOn = module(g, "clouds", "Custom Clouds", "", Config.cloudsOn, 7);
+        if (open.contains("clouds")) {
+            Config.cloudHide = cbool(g, "Скрыть облака", Config.cloudHide);
+            Config.cloudTint = cbool(g, "Свой цвет", Config.cloudTint);
+            Config.cloudHue = cslider(g, "Оттенок", 0.0, 1.0, Config.cloudHue, false);
+            Config.cloudSat = cslider(g, "Насыщенность", 0.0, 1.0, Config.cloudSat, false);
+            Config.cloudRainbow = cbool(g, "Радуга", Config.cloudRainbow);
+            Config.cloudHeightOffset = cslider(g, "Высота (смещение)", -40, 120, Config.cloudHeightOffset, true);
+            cy += 2; resetRow(g, "clouds");
+        }
+
+        Config.tipOn = module(g, "tip", "Tooltips Plus", "", Config.tipOn, 4);
+        if (open.contains("tip")) {
+            Config.tipDur = cbool(g, "Прочность", Config.tipDur);
+            Config.tipId = cbool(g, "ID предмета", Config.tipId);
+            Config.tipStack = cbool(g, "Размер стака", Config.tipStack);
+            cy += 2; resetRow(g, "tip");
+        }
+
         drawBottom(g);
     }
 
@@ -936,11 +1019,11 @@ public class MenuScreen extends Screen {
 
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
-            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "pred", "physic", "shulker", "hl", "crit", "kill", "atk"},
-            {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem", "stats", "dlog", "pcd"},
-            {"sprint", "zoom", "respawn", "freelook", "noov", "hitsound", "stream"},
+            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "pred", "physic", "shulker", "hl", "crit", "kill", "atk", "wings", "aura", "cape", "chams"},
+            {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem", "stats", "dlog", "pcd", "nt", "tip"},
+            {"sprint", "zoom", "respawn", "freelook", "noov", "hitsound", "swing", "stream"},
             {"autoswap", "itembind", "friends", "macro", "configs"},
-            {"time", "weather", "hbox", "bout", "chunk", "iesp", "wp", "ptr", "etr"}
+            {"time", "weather", "hbox", "bout", "chunk", "iesp", "wp", "ptr", "etr", "clouds"}
     };
 
     private static String sbLabel(String id) {
@@ -970,6 +1053,14 @@ public class MenuScreen extends Screen {
             case "keys" -> "Keystrokes";
             case "combo" -> "Combo Counter";
             case "server" -> "Server Info";
+            case "wings" -> "Wings";
+            case "aura" -> "Aura";
+            case "cape" -> "Animated Cape";
+            case "nt" -> "Nametags+";
+            case "chams" -> "Chams";
+            case "swing" -> "Swing Animation";
+            case "clouds" -> "Custom Clouds";
+            case "tip" -> "Tooltips Plus";
             case "hbox" -> "Hitboxes";
             case "bout" -> "Block Outline";
             case "chunk" -> "Chunk Borders";
@@ -1036,6 +1127,14 @@ public class MenuScreen extends Screen {
             case "keys" -> Config.keystrokes;
             case "combo" -> Config.comboHud;
             case "server" -> Config.serverHud;
+            case "wings" -> Config.wingsOn;
+            case "aura" -> Config.auraOn;
+            case "cape" -> Config.capeOn;
+            case "nt" -> Config.ntOn;
+            case "chams" -> Config.chamsOn;
+            case "swing" -> Config.swingAnim;
+            case "clouds" -> Config.cloudsOn;
+            case "tip" -> Config.tipOn;
             case "hbox" -> Config.hbox;
             case "bout" -> Config.bout;
             case "chunk" -> Config.chunkB;
@@ -1095,6 +1194,14 @@ public class MenuScreen extends Screen {
             case "keys": Config.keystrokes = v; break;
             case "combo": Config.comboHud = v; break;
             case "server": Config.serverHud = v; break;
+            case "wings": Config.wingsOn = v; break;
+            case "aura": Config.auraOn = v; break;
+            case "cape": Config.capeOn = v; break;
+            case "nt": Config.ntOn = v; break;
+            case "chams": Config.chamsOn = v; break;
+            case "swing": Config.swingAnim = v; break;
+            case "clouds": Config.cloudsOn = v; break;
+            case "tip": Config.tipOn = v; break;
             case "hbox": Config.hbox = v; break;
             case "bout": Config.bout = v; break;
             case "chunk": Config.chunkB = v; break;
@@ -1571,6 +1678,61 @@ public class MenuScreen extends Screen {
                 Config.pcdY = (int) cslider(g, "Y", 0, 250, Config.pcdY, true);
             }
             case "wp" -> wpBlock(g);
+            case "wings" -> {
+                Config.wingStyle = ccycle(g, "Стиль", Cosmetics.WING_STYLES, Config.wingStyle);
+                Config.wingColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.wingColor);
+                Config.wingRainbow = cbool(g, "Радуга", Config.wingRainbow);
+                Config.wingSize = cslider(g, "Размер", 0.5, 2.0, Config.wingSize, false);
+                Config.wingSpeed = cslider(g, "Скорость взмаха", 0.3, 3.0, Config.wingSpeed, false);
+                Config.wingFriends = cbool(g, "Для друзей", Config.wingFriends);
+            }
+            case "aura" -> {
+                Config.auraStyle = ccycle(g, "Стиль", Cosmetics.AURA_STYLES, Config.auraStyle);
+                Config.auraColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.auraColor);
+                Config.auraRainbow = cbool(g, "Радуга", Config.auraRainbow);
+                Config.auraSize = cslider(g, "Размер", 0.5, 2.0, Config.auraSize, false);
+                Config.auraSpeed = cslider(g, "Скорость", 0.3, 3.0, Config.auraSpeed, false);
+                Config.auraFriends = cbool(g, "Для друзей", Config.auraFriends);
+            }
+            case "cape" -> {
+                Config.capeColor = ccycle(g, "Цвет сверху", Config.COLOR_NAMES, Config.capeColor);
+                Config.capeColor2 = ccycle(g, "Цвет снизу", Config.COLOR_NAMES, Config.capeColor2);
+                Config.capeRainbow = cbool(g, "Радуга", Config.capeRainbow);
+                Config.capeWave = cslider(g, "Волны", 0.0, 1.5, Config.capeWave, false);
+                Config.capeFriends = cbool(g, "Для друзей", Config.capeFriends);
+            }
+            case "nt" -> {
+                Config.ntRange = cslider(g, "Дальность", 16, 128, Config.ntRange, true);
+                Config.ntScale = cslider(g, "Размер", 0.5, 2.0, Config.ntScale, false);
+                Config.ntBg = cbool(g, "Фон", Config.ntBg);
+                Config.ntHealth = cbool(g, "Здоровье", Config.ntHealth);
+                Config.ntDist = cbool(g, "Расстояние", Config.ntDist);
+                Config.ntDistScale = cbool(g, "Масштаб по расстоянию", Config.ntDistScale);
+                Config.ntHide = cbool(g, "Скрыть ванильные", Config.ntHide);
+            }
+            case "chams" -> {
+                Config.chPlayers = cbool(g, "Игроки", Config.chPlayers);
+                Config.chMobs = cbool(g, "Мобы", Config.chMobs);
+                Config.chFriends = cbool(g, "Друзья", Config.chFriends);
+                Config.chSelf = cbool(g, "Свой (3-е лицо)", Config.chSelf);
+            }
+            case "swing" -> {
+                Config.swingSpeed = cslider(g, "Скорость взмаха", 0.3, 3.0, Config.swingSpeed, false);
+                Config.swingSelfOnly = cbool(g, "Только свой", Config.swingSelfOnly);
+            }
+            case "clouds" -> {
+                Config.cloudHide = cbool(g, "Скрыть облака", Config.cloudHide);
+                Config.cloudTint = cbool(g, "Свой цвет", Config.cloudTint);
+                Config.cloudHue = cslider(g, "Оттенок", 0.0, 1.0, Config.cloudHue, false);
+                Config.cloudSat = cslider(g, "Насыщенность", 0.0, 1.0, Config.cloudSat, false);
+                Config.cloudRainbow = cbool(g, "Радуга", Config.cloudRainbow);
+                Config.cloudHeightOffset = cslider(g, "Высота (смещение)", -40, 120, Config.cloudHeightOffset, true);
+            }
+            case "tip" -> {
+                Config.tipDur = cbool(g, "Прочность", Config.tipDur);
+                Config.tipId = cbool(g, "ID предмета", Config.tipId);
+                Config.tipStack = cbool(g, "Размер стака", Config.tipStack);
+            }
             case "server" -> {
                 Config.serverIp = cbool(g, "IP сервера", Config.serverIp);
                 Config.serverTps = cbool(g, "TPS", Config.serverTps);
@@ -1588,100 +1750,4 @@ public class MenuScreen extends Screen {
                 Config.clockColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.clockColor);
                 Config.clockScale = cslider(g, "Размер", 0.5, 2.5, Config.clockScale, false);
                 Config.clockAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.clockAlpha, false);
-                Config.clockX = (int) cslider(g, "X", 0, 400, Config.clockX, true);
-                Config.clockY = (int) cslider(g, "Y", 0, 250, Config.clockY, true);
-            }
-            case "inv" -> {
-                Config.invHotbar = cbool(g, "Показывать хотбар", Config.invHotbar);
-                Config.invColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.invColor);
-                Config.invScale = cslider(g, "Размер", 0.5, 2.0, Config.invScale, false);
-                Config.invAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.invAlpha, false);
-                Config.invX = (int) cslider(g, "X", 0, 400, Config.invX, true);
-                Config.invY = (int) cslider(g, "Y", 0, 250, Config.invY, true);
-            }
-            case "totem" -> {
-                Config.totemHideZero = cbool(g, "Скрывать при 0", Config.totemHideZero);
-                Config.totemColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.totemColor);
-                Config.totemScale = cslider(g, "Размер", 0.5, 2.5, Config.totemScale, false);
-                Config.totemAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.totemAlpha, false);
-                Config.totemX = (int) cslider(g, "X", 0, 400, Config.totemX, true);
-                Config.totemY = (int) cslider(g, "Y", 0, 250, Config.totemY, true);
-            }
-            case "combo" -> {
-                Config.comboColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.comboColor);
-                Config.comboTimeout = cslider(g, "Таймаут (сек)", 1.0, 10.0, Config.comboTimeout, false);
-                Config.comboScale = cslider(g, "Размер", 0.5, 2.5, Config.comboScale, false);
-                Config.comboAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.comboAlpha, false);
-                Config.comboX = (int) cslider(g, "X", 0, 400, Config.comboX, true);
-                Config.comboY = (int) cslider(g, "Y", 0, 250, Config.comboY, true);
-            }
-            case "wm" -> {
-                Config.watermarkName = ccycle(g, "Название", WatermarkHud.NAMES, Config.watermarkName);
-                Config.watermarkNick = cbool(g, "Ник", Config.watermarkNick);
-                Config.watermarkFps = cbool(g, "FPS", Config.watermarkFps);
-                Config.watermarkTime = cbool(g, "Время", Config.watermarkTime);
-                Config.watermarkRainbow = cbool(g, "Радуга", Config.watermarkRainbow);
-                Config.watermarkColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.watermarkColor);
-                Config.watermarkScale = cslider(g, "Размер", 0.5, 2.5, Config.watermarkScale, false);
-                Config.watermarkAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.watermarkAlpha, false);
-                Config.watermarkX = (int) cslider(g, "X", 0, 400, Config.watermarkX, true);
-                Config.watermarkY = (int) cslider(g, "Y", 0, 250, Config.watermarkY, true);
-            }
-            case "noov" -> {
-                Config.noHurtShake = cbool(g, "Тряска при уроне", Config.noHurtShake);
-                Config.noFireOverlay = cbool(g, "Огонь на экране", Config.noFireOverlay);
-                Config.noTotemParticles = cbool(g, "Частицы тотема", Config.noTotemParticles);
-                Config.noFireworkParticles = cbool(g, "Частицы фейерверка", Config.noFireworkParticles);
-            }
-            case "hitsound" -> {
-                Config.hitSoundType = ccycle(g, "Звук", Combat.SOUNDS, Config.hitSoundType);
-                Config.hitSoundVol = cslider(g, "Громкость", 0.1, 1.0, Config.hitSoundVol, false);
-                Config.hitSoundPitch = cslider(g, "Высота тона", 0.5, 2.0, Config.hitSoundPitch, false);
-            }
-            case "sprint" -> Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs);
-            case "freelook" -> {
-                Config.freelookToggle = cbool(g, "Переключатель (вместо зажатия)", Config.freelookToggle);
-                Config.freelookThird = cbool(g, "Третье лицо при включении", Config.freelookThird);
-                Config.freelookSmooth = cbool(g, "Плавный возврат", Config.freelookSmooth);
-                Config.freelookSens = cslider(g, "Чувствительность", 0.2, 2.0, Config.freelookSens, false);
-            }
-            case "zoom" -> Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true);
-            case "autoswap" -> {
-                SwapPair toRebind = null, toRemove = null;
-                for (SwapPair sp : Config.swapPairs) {
-                    int r = listRow(g, sp.key, sp.a + " <-> " + sp.b);
-                    if (r == 1) toRebind = sp; else if (r == 2) toRemove = sp;
-                }
-                hint2(g, "Наведи на предмет", "и жми [" + ItemFeatures.swapKeyName() + "]");
-                if (toRemove != null) { Config.swapPairs.remove(toRemove); Config.save(); }
-                else if (toRebind != null) {
-                    final SwapPair sp = toRebind;
-                    client.execute(() -> client.setScreen(new BindScreen(this, "AutoSwap: " + sp.a + " <-> " + sp.b, k -> ItemFeatures.setKey(sp, k))));
-                }
-            }
-            case "itembind" -> {
-                BoundItem toRebind = null, toRemove = null;
-                for (BoundItem b : Config.binds) {
-                    int r = listRow(g, b.key, b.name);
-                    if (r == 1) toRebind = b; else if (r == 2) toRemove = b;
-                }
-                hint2(g, "Наведи на предмет", "и жми [" + ItemFeatures.bindKeyName() + "]");
-                if (toRemove != null) { Config.binds.remove(toRemove); Config.save(); }
-                else if (toRebind != null) {
-                    final BoundItem b = toRebind;
-                    client.execute(() -> client.setScreen(new BindScreen(this, "ItemBind: " + b.name, k -> ItemFeatures.setKey(b, k))));
-                }
-            }
-            case "friends" -> screenButton(g, "-> Открыть Friends", () -> new FriendsScreen(this));
-            case "macro" -> screenButton(g, "-> Настроить макросы", () -> new MacrosScreen(this));
-            case "configs" -> screenButton(g, "-> Открыть конфиги", () -> new ConfigsScreen(this));
-            case "time" -> Config.timeValue = (int) cslider(g, "Время", 0, 24000, Config.timeValue, true);
-            case "weather" -> Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
-            default -> noOptions(g);
-        }
-        if (ModuleDefaults.has(id)) resetRow(g, id);
-    }
-
-    @Override
-    public void removed() { Config.save(); }
-}
+                Config.clockX = (int) cslider(g, "X", 0, 400, Config.clockX, true
