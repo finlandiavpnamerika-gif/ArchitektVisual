@@ -110,6 +110,24 @@ public final class HudManager {
             public double alpha() { return Config.totemAlpha; }
             public int[] draw(DrawContext g, MinecraftClient mc, float a) { return TotemHud.draw(g, mc, a); }
         });
+        ELEMENTS.add(new HudElement("Stats") {
+            public boolean enabled() { return Config.statsHud; }
+            public int x() { return Config.statsX; }
+            public int y() { return Config.statsY; }
+            public void setPos(int x, int y) { Config.statsX = x; Config.statsY = y; }
+            public double scale() { return Config.statsScale; }
+            public double alpha() { return Config.statsAlpha; }
+            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return StatsHud.draw(g, mc, a); }
+        });
+        ELEMENTS.add(new HudElement("DmgLog") {
+            public boolean enabled() { return Config.dlHud; }
+            public int x() { return Config.dlX; }
+            public int y() { return Config.dlY; }
+            public void setPos(int x, int y) { Config.dlX = x; Config.dlY = y; }
+            public double scale() { return Config.dlScale; }
+            public double alpha() { return Config.dlAlpha; }
+            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return DamageLogHud.draw(g, mc, a); }
+        });
         ELEMENTS.add(new HudElement("Info") {
             public boolean enabled() { return Config.hud; }
             public int x() { return Config.hudX; }
