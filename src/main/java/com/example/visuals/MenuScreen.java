@@ -662,7 +662,7 @@ public class MenuScreen extends Screen {
         }
 
         // 6. Extra Visuals 1
-        int hEx1 = 34 + mh("hat", Config.hatCustom ? 6 : 4) + mh("pred", 0);
+        int hEx1 = 34 + mh("hat", Config.hatCustom ? 6 : 4) + mh("pred", 0) + mh("crit", 3) + mh("kill", 5) + mh("atk", 6);
         panel(g, "Extra Visuals 1", x0 + step, y1, colW, hEx1);
         Config.chinaHat = module(g, "hat", "China Hat", "", Config.chinaHat, Config.hatCustom ? 6 : 4);
         if (open.contains("hat")) {
@@ -679,6 +679,32 @@ public class MenuScreen extends Screen {
             resetRow(g, "hat");
         }
         Config.predictions = module(g, "pred", "Predictions", "", Config.predictions, 0);
+
+        Config.critFx = module(g, "crit", "Crit Effects", "", Config.critFx, 3);
+        if (open.contains("crit")) {
+            Config.critStyle = ccycle(g, "Стиль", CombatFx.CRIT_STYLES, Config.critStyle);
+            Config.critCount = cslider(g, "Количество", 5, 60, Config.critCount, true);
+            cy += 2; resetRow(g, "crit");
+        }
+
+        Config.killFx = module(g, "kill", "Kill Effect", "", Config.killFx, 5);
+        if (open.contains("kill")) {
+            Config.killFlash = cbool(g, "Вспышка", Config.killFlash);
+            Config.killSound = cbool(g, "Звук", Config.killSound);
+            Config.killParticles = ccycle(g, "Частицы", CombatFx.KILL_PARTICLES, Config.killParticles);
+            Config.killColor = ccycle(g, "Цвет вспышки", Config.COLOR_NAMES, Config.killColor);
+            cy += 2; resetRow(g, "kill");
+        }
+
+        Config.atkInd = module(g, "atk", "Attack Indicator", "", Config.atkInd, 6);
+        if (open.contains("atk")) {
+            Config.atkStyle = ccycle(g, "Стиль", CombatFx.ATK_STYLES, Config.atkStyle);
+            Config.atkColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.atkColor);
+            Config.atkSize = cslider(g, "Размер", 1, 12, Config.atkSize, true);
+            Config.atkAlways = cbool(g, "Всегда показывать", Config.atkAlways);
+            Config.atkOffset = (int) cslider(g, "Смещение вниз", 0, 40, Config.atkOffset, true);
+            cy += 2; resetRow(g, "atk");
+        }
 
         // 7. Extra Visuals 2
         int hEx2 = 34 + mh("physic", 2) + mh("shulker", 0) + mh("hl", 3 * Config.highlights.size() + 1) + mh("inv", 7) + mh("totem", 7);
@@ -724,7 +750,7 @@ public class MenuScreen extends Screen {
         }
 
         // 8. Misc (+24: кнопка под Macros)
-        int hMisc = 34 + mh("macro", 0) + mh("stream", 0) + 24 + mh("configs", 0) + 24 + mh("server", 9);
+        int hMisc = 34 + mh("macro", 0) + mh("stream", 0) + 24 + mh("configs", 0) + 24 + mh("server", 9) + mh("stats", 13) + mh("dlog", 9);
         panel(g, "Misc", x0 + step * 3, y1, colW, hMisc);
         module(g, "macro", "Macros", "", true, 0);
         screenButton(g, "-> Настроить макросы", () -> new MacrosScreen(this));
@@ -744,6 +770,37 @@ public class MenuScreen extends Screen {
             Config.serverY = (int) cslider(g, "Y", 0, 250, Config.serverY, true);
             cy += 2;
             resetRow(g, "server");
+        }
+
+        Config.statsHud = module(g, "stats", "Combat Stats", "", Config.statsHud, 13);
+        if (open.contains("stats")) {
+            Config.statsAcc = cbool(g, "Точность", Config.statsAcc);
+            Config.statsKills = cbool(g, "Киллы", Config.statsKills);
+            Config.statsStreak = cbool(g, "Серия", Config.statsStreak);
+            Config.statsDeaths = cbool(g, "Смерти", Config.statsDeaths);
+            Config.statsKd = cbool(g, "K/D", Config.statsKd);
+            Config.statsPlayersOnly = cbool(g, "Киллы только игроков", Config.statsPlayersOnly);
+            Config.statsColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.statsColor);
+            Config.statsScale = cslider(g, "Размер", 0.5, 2.5, Config.statsScale, false);
+            Config.statsAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.statsAlpha, false);
+            Config.statsX = (int) cslider(g, "X", 0, 400, Config.statsX, true);
+            Config.statsY = (int) cslider(g, "Y", 0, 250, Config.statsY, true);
+            if (actionRow(g, "Сбросить статистику")) Combat.resetStats();
+            cy += 2; resetRow(g, "stats");
+        }
+
+        Config.dlHud = module(g, "dlog", "Damage Log", "", Config.dlHud, 9);
+        if (open.contains("dlog")) {
+            Config.dlDealt = cbool(g, "Нанесённый урон", Config.dlDealt);
+            Config.dlTaken = cbool(g, "Полученный урон", Config.dlTaken);
+            Config.dlLines = (int) cslider(g, "Строк", 3, 10, Config.dlLines, true);
+            Config.dlLife = cslider(g, "Время (сек)", 2, 20, Config.dlLife, false);
+            Config.dlColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.dlColor);
+            Config.dlScale = cslider(g, "Размер", 0.5, 2.5, Config.dlScale, false);
+            Config.dlAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.dlAlpha, false);
+            Config.dlX = (int) cslider(g, "X", 0, 400, Config.dlX, true);
+            Config.dlY = (int) cslider(g, "Y", 0, 250, Config.dlY, true);
+            cy += 2; resetRow(g, "dlog");
         }
 
         drawBottom(g);
@@ -790,8 +847,8 @@ public class MenuScreen extends Screen {
 
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
-            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "pred", "physic", "shulker", "hl"},
-            {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem"},
+            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "pred", "physic", "shulker", "hl", "crit", "kill", "atk"},
+            {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem", "stats", "dlog"},
             {"sprint", "zoom", "respawn", "freelook", "noov", "hitsound", "stream"},
             {"autoswap", "itembind", "friends", "macro", "configs"},
             {"time", "weather"}
@@ -824,6 +881,11 @@ public class MenuScreen extends Screen {
             case "keys" -> "Keystrokes";
             case "combo" -> "Combo Counter";
             case "server" -> "Server Info";
+            case "crit" -> "Crit Effects";
+            case "kill" -> "Kill Effect";
+            case "atk" -> "Attack Indicator";
+            case "stats" -> "Combat Stats";
+            case "dlog" -> "Damage Log";
             case "clock" -> "Time & Date";
             case "inv" -> "Inventory HUD";
             case "totem" -> "Totem Counter";
@@ -877,6 +939,11 @@ public class MenuScreen extends Screen {
             case "keys" -> Config.keystrokes;
             case "combo" -> Config.comboHud;
             case "server" -> Config.serverHud;
+            case "crit" -> Config.critFx;
+            case "kill" -> Config.killFx;
+            case "atk" -> Config.atkInd;
+            case "stats" -> Config.statsHud;
+            case "dlog" -> Config.dlHud;
             case "clock" -> Config.clockHud;
             case "inv" -> Config.invHud;
             case "totem" -> Config.totemHud;
@@ -923,6 +990,11 @@ public class MenuScreen extends Screen {
             case "keys": Config.keystrokes = v; break;
             case "combo": Config.comboHud = v; break;
             case "server": Config.serverHud = v; break;
+            case "crit": Config.critFx = v; break;
+            case "kill": Config.killFx = v; break;
+            case "atk": Config.atkInd = v; break;
+            case "stats": Config.statsHud = v; break;
+            case "dlog": Config.dlHud = v; break;
             case "clock": Config.clockHud = v; break;
             case "inv": Config.invHud = v; break;
             case "totem": Config.totemHud = v; break;
@@ -1071,6 +1143,15 @@ public class MenuScreen extends Screen {
         if (mouseX < sbSplitX) sbScrollMid = Math.max(0, Math.min(sbMaxMid, sbScrollMid - (float) verticalAmount * 22f));
         else sbScrollRight = Math.max(0, Math.min(sbMaxRight, sbScrollRight - (float) verticalAmount * 22f));
         return true;
+    }
+
+    private boolean actionRow(DrawContext g, String label) {
+        boolean hov = hit(cx, cy, cw, 18);
+        rbox(g, cx, cy, cw, 18, mix(0x20000000, Theme.ROW_HOVER, anim("ar:" + curId + label, hov) * 0.6f));
+        text(g, label, cx + 8, cy + 5, Theme.TEXT);
+        boolean c = clicked && hov;
+        cy += 20;
+        return c;
     }
 
     private void resetRow(DrawContext g, String id) {
@@ -1257,6 +1338,48 @@ public class MenuScreen extends Screen {
                 Config.keystrokesColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.keystrokesColor);
                 Config.keystrokesX = (int) cslider(g, "X", 0, 400, Config.keystrokesX, true);
                 Config.keystrokesY = (int) cslider(g, "Y", 0, 400, Config.keystrokesY, true);
+            }
+            case "crit" -> {
+                Config.critStyle = ccycle(g, "Стиль", CombatFx.CRIT_STYLES, Config.critStyle);
+                Config.critCount = cslider(g, "Количество", 5, 60, Config.critCount, true);
+            }
+            case "kill" -> {
+                Config.killFlash = cbool(g, "Вспышка", Config.killFlash);
+                Config.killSound = cbool(g, "Звук", Config.killSound);
+                Config.killParticles = ccycle(g, "Частицы", CombatFx.KILL_PARTICLES, Config.killParticles);
+                Config.killColor = ccycle(g, "Цвет вспышки", Config.COLOR_NAMES, Config.killColor);
+            }
+            case "atk" -> {
+                Config.atkStyle = ccycle(g, "Стиль", CombatFx.ATK_STYLES, Config.atkStyle);
+                Config.atkColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.atkColor);
+                Config.atkSize = cslider(g, "Размер", 1, 12, Config.atkSize, true);
+                Config.atkAlways = cbool(g, "Всегда показывать", Config.atkAlways);
+                Config.atkOffset = (int) cslider(g, "Смещение вниз", 0, 40, Config.atkOffset, true);
+            }
+            case "stats" -> {
+                Config.statsAcc = cbool(g, "Точность", Config.statsAcc);
+                Config.statsKills = cbool(g, "Киллы", Config.statsKills);
+                Config.statsStreak = cbool(g, "Серия", Config.statsStreak);
+                Config.statsDeaths = cbool(g, "Смерти", Config.statsDeaths);
+                Config.statsKd = cbool(g, "K/D", Config.statsKd);
+                Config.statsPlayersOnly = cbool(g, "Киллы только игроков", Config.statsPlayersOnly);
+                Config.statsColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.statsColor);
+                Config.statsScale = cslider(g, "Размер", 0.5, 2.5, Config.statsScale, false);
+                Config.statsAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.statsAlpha, false);
+                Config.statsX = (int) cslider(g, "X", 0, 400, Config.statsX, true);
+                Config.statsY = (int) cslider(g, "Y", 0, 250, Config.statsY, true);
+                if (actionRow(g, "Сбросить статистику")) Combat.resetStats();
+            }
+            case "dlog" -> {
+                Config.dlDealt = cbool(g, "Нанесённый урон", Config.dlDealt);
+                Config.dlTaken = cbool(g, "Полученный урон", Config.dlTaken);
+                Config.dlLines = (int) cslider(g, "Строк", 3, 10, Config.dlLines, true);
+                Config.dlLife = cslider(g, "Время (сек)", 2, 20, Config.dlLife, false);
+                Config.dlColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.dlColor);
+                Config.dlScale = cslider(g, "Размер", 0.5, 2.5, Config.dlScale, false);
+                Config.dlAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.dlAlpha, false);
+                Config.dlX = (int) cslider(g, "X", 0, 400, Config.dlX, true);
+                Config.dlY = (int) cslider(g, "Y", 0, 250, Config.dlY, true);
             }
             case "server" -> {
                 Config.serverIp = cbool(g, "IP сервера", Config.serverIp);
