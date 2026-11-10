@@ -37,6 +37,7 @@ public class VisualsClient implements ClientModInitializer {
         TargetEsp.register();
         Particles.register();
         DamageFever.register();
+        Combat.register();
         TargetHud.register();
         Theme.THEME_ID = Config.menuTheme;
         Theme.apply();
@@ -92,6 +93,7 @@ public class VisualsClient implements ClientModInitializer {
             }
             Features.tick(client);
             DamageFever.tick(client);
+            Combat.tick(client);
             JumpCircle.tick(client);
             TargetHud.tick(client);
             HandView.tick(client);
