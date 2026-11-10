@@ -1751,3 +1751,4 @@ public class MenuScreen extends Screen {
                 Config.clockScale = cslider(g, "Размер", 0.5, 2.5, Config.clockScale, false);
                 Config.clockAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.clockAlpha, false);
                 Config.clockX = (int) cslider(g, "X", 0, 400, Config.clockX, true
+                                              }
