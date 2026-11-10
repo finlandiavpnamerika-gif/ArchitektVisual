@@ -39,6 +39,8 @@ public class VisualsClient implements ClientModInitializer {
         DamageFever.register();
         Combat.register();
         Waypoints.load();
+        net.fabricmc.fabric.api.item.v1.ItemTooltipCallback.EVENT.register((stack, context, type, lines) ->
+                TooltipsPlus.add(stack, type != null && type.isAdvanced(), lines));
         TargetHud.register();
         Theme.THEME_ID = Config.menuTheme;
         Theme.apply();
@@ -113,6 +115,7 @@ public class VisualsClient implements ClientModInitializer {
             DamageFever.hud(drawContext);
             CombatFx.hud(drawContext);
             Waypoints.hud(drawContext);
+            Nametags.hud(drawContext);
             TargetHud.hud(drawContext);
             Macros.poll();   // и каждый кадр: тапы не теряются
         });
