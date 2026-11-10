@@ -45,6 +45,14 @@ public final class ModuleDefaults {
             Map.entry("atk", new String[]{"atkStyle", "atkColor", "atkSize", "atkAlways", "atkOffset"}),
             Map.entry("stats", new String[]{"statsAcc", "statsKills", "statsStreak", "statsDeaths", "statsKd", "statsPlayersOnly", "statsColor", "statsScale", "statsAlpha", "statsX", "statsY"}),
             Map.entry("dlog", new String[]{"dlDealt", "dlTaken", "dlLines", "dlLife", "dlColor", "dlScale", "dlAlpha", "dlX", "dlY"}),
+            Map.entry("hbox", new String[]{"hbPlayers", "hbMobs", "hbOthers", "hbSelf", "hbFill", "hbColorP", "hbColorM", "hbColorO", "hbWidth", "hbRange", "hbAlpha"}),
+            Map.entry("bout", new String[]{"boColor", "boRainbow", "boWidth", "boFill", "boFillAlpha", "boHideVanilla"}),
+            Map.entry("chunk", new String[]{"cbRadius", "cbHeight", "cbColor", "cbWidth", "cbLevels", "cbAlpha"}),
+            Map.entry("iesp", new String[]{"ieRange", "ieValuable", "ieFill", "ieTracers", "ieColor", "ieColorHi", "ieWidth"}),
+            Map.entry("ptr", new String[]{"ptColor", "ptRainbow", "ptLength", "ptWidth"}),
+            Map.entry("etr", new String[]{"etColor", "etRainbow", "etLength", "etWidth", "etAll"}),
+            Map.entry("pcd", new String[]{"pcdHideIdle", "pcdColor", "pcdScale", "pcdAlpha", "pcdX", "pcdY"}),
+            Map.entry("wp", new String[]{"wpBeam", "wpLabels", "wpDist", "wpMax", "wpColor", "wpScale", "wpDeath"}),
             Map.entry("noov", new String[]{"noHurtShake", "noFireOverlay", "noTotemParticles", "noFireworkParticles"}),
             Map.entry("hitsound", new String[]{"hitSoundType", "hitSoundVol", "hitSoundPitch"}),
             Map.entry("combo", new String[]{"comboColor", "comboTimeout", "comboScale", "comboAlpha", "comboX", "comboY"}),
@@ -84,7 +92,8 @@ public final class ModuleDefaults {
         "chinaHat", "predictions", "itemPhysic", "shulkerPreview", "highlight", "streamerMode",
         "noOverlay", "hitSound", "comboHud", "watermark",
         "serverHud", "clockHud", "invHud", "totemHud",
-        "critFx", "killFx", "atkInd", "statsHud", "dlHud"
+        "critFx", "killFx", "atkInd", "statsHud", "dlHud",
+        "hbox", "bout", "chunkB", "itemEsp", "wp", "ptrail", "etrail", "pcdHud"
     };
 
     /** Выключает все модули (настройки внутри модулей не трогает). */
