@@ -21,7 +21,8 @@
     "HeldItemRendererMixin",
     "NoOverlayHurtMixin",
     "NoOverlayFireMixin",
-    "NoOverlayParticleMixin"
+    "NoOverlayParticleMixin",
+    "TpsMixin"
   ],
   "injectors": {
     "defaultRequire": 1
