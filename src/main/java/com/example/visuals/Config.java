@@ -297,6 +297,69 @@ public final class Config {
     public static int pcdColor = 1;
     public static boolean pcdHideIdle = true;
 
+    // Wings
+    public static boolean wingsOn = false;
+    public static int wingStyle = 0;
+    public static int wingColor = 1;
+    public static boolean wingRainbow = false;
+    public static double wingSize = 1.0;
+    public static double wingSpeed = 1.0;
+    public static boolean wingFriends = false;
+
+    // Aura
+    public static boolean auraOn = false;
+    public static int auraStyle = 0;
+    public static int auraColor = 0;
+    public static boolean auraRainbow = false;
+    public static double auraSize = 1.0;
+    public static double auraSpeed = 1.0;
+    public static boolean auraFriends = false;
+
+    // Animated Cape
+    public static boolean capeOn = false;
+    public static int capeColor = 0;
+    public static int capeColor2 = 1;
+    public static boolean capeRainbow = false;
+    public static double capeWave = 0.6;
+    public static boolean capeFriends = false;
+
+    // Nametags+
+    public static boolean ntOn = false;
+    public static double ntRange = 64;
+    public static double ntScale = 1.0;
+    public static boolean ntBg = true;
+    public static boolean ntHealth = true;
+    public static boolean ntDist = true;
+    public static boolean ntDistScale = false;
+    public static boolean ntHide = true;
+
+    // Chams
+    public static boolean chamsOn = false;
+    public static boolean chPlayers = true;
+    public static boolean chMobs = false;
+    public static boolean chFriends = true;
+    public static boolean chSelf = false;
+
+    // Swing Animation
+    public static boolean swingAnim = false;
+    public static double swingSpeed = 1.0;
+    public static boolean swingSelfOnly = true;
+
+    // Custom Clouds
+    public static boolean cloudsOn = false;
+    public static boolean cloudHide = false;
+    public static boolean cloudTint = true;
+    public static double cloudHue = 0.6;
+    public static double cloudSat = 0.5;
+    public static boolean cloudRainbow = false;
+    public static double cloudHeightOffset = 0;
+
+    // Tooltips Plus
+    public static boolean tipOn = false;
+    public static boolean tipDur = true;
+    public static boolean tipId = true;
+    public static boolean tipStack = false;
+
     // Potion HUD
     public static boolean potionHud = true;
     public static int potionX = 130;
@@ -742,6 +805,53 @@ public final class Config {
             o.addProperty("pcdAlpha", pcdAlpha);
             o.addProperty("pcdColor", pcdColor);
             o.addProperty("pcdHideIdle", pcdHideIdle);
+            o.addProperty("wingsOn", wingsOn);
+            o.addProperty("wingStyle", wingStyle);
+            o.addProperty("wingColor", wingColor);
+            o.addProperty("wingRainbow", wingRainbow);
+            o.addProperty("wingSize", wingSize);
+            o.addProperty("wingSpeed", wingSpeed);
+            o.addProperty("wingFriends", wingFriends);
+            o.addProperty("auraOn", auraOn);
+            o.addProperty("auraStyle", auraStyle);
+            o.addProperty("auraColor", auraColor);
+            o.addProperty("auraRainbow", auraRainbow);
+            o.addProperty("auraSize", auraSize);
+            o.addProperty("auraSpeed", auraSpeed);
+            o.addProperty("auraFriends", auraFriends);
+            o.addProperty("capeOn", capeOn);
+            o.addProperty("capeColor", capeColor);
+            o.addProperty("capeColor2", capeColor2);
+            o.addProperty("capeRainbow", capeRainbow);
+            o.addProperty("capeWave", capeWave);
+            o.addProperty("capeFriends", capeFriends);
+            o.addProperty("ntOn", ntOn);
+            o.addProperty("ntRange", ntRange);
+            o.addProperty("ntScale", ntScale);
+            o.addProperty("ntBg", ntBg);
+            o.addProperty("ntHealth", ntHealth);
+            o.addProperty("ntDist", ntDist);
+            o.addProperty("ntDistScale", ntDistScale);
+            o.addProperty("ntHide", ntHide);
+            o.addProperty("chamsOn", chamsOn);
+            o.addProperty("chPlayers", chPlayers);
+            o.addProperty("chMobs", chMobs);
+            o.addProperty("chFriends", chFriends);
+            o.addProperty("chSelf", chSelf);
+            o.addProperty("swingAnim", swingAnim);
+            o.addProperty("swingSpeed", swingSpeed);
+            o.addProperty("swingSelfOnly", swingSelfOnly);
+            o.addProperty("cloudsOn", cloudsOn);
+            o.addProperty("cloudHide", cloudHide);
+            o.addProperty("cloudTint", cloudTint);
+            o.addProperty("cloudHue", cloudHue);
+            o.addProperty("cloudSat", cloudSat);
+            o.addProperty("cloudRainbow", cloudRainbow);
+            o.addProperty("cloudHeightOffset", cloudHeightOffset);
+            o.addProperty("tipOn", tipOn);
+            o.addProperty("tipDur", tipDur);
+            o.addProperty("tipId", tipId);
+            o.addProperty("tipStack", tipStack);
             o.addProperty("potionHud", potionHud);
             o.addProperty("potionX", potionX);
             o.addProperty("potionY", potionY);
@@ -1115,6 +1225,53 @@ public final class Config {
                 pcdAlpha = d(o, "pcdAlpha", pcdAlpha);
                 pcdColor = (int) d(o, "pcdColor", pcdColor);
                 pcdHideIdle = b(o, "pcdHideIdle", pcdHideIdle);
+                wingsOn = b(o, "wingsOn", wingsOn);
+                wingStyle = (int) d(o, "wingStyle", wingStyle);
+                wingColor = (int) d(o, "wingColor", wingColor);
+                wingRainbow = b(o, "wingRainbow", wingRainbow);
+                wingSize = d(o, "wingSize", wingSize);
+                wingSpeed = d(o, "wingSpeed", wingSpeed);
+                wingFriends = b(o, "wingFriends", wingFriends);
+                auraOn = b(o, "auraOn", auraOn);
+                auraStyle = (int) d(o, "auraStyle", auraStyle);
+                auraColor = (int) d(o, "auraColor", auraColor);
+                auraRainbow = b(o, "auraRainbow", auraRainbow);
+                auraSize = d(o, "auraSize", auraSize);
+                auraSpeed = d(o, "auraSpeed", auraSpeed);
+                auraFriends = b(o, "auraFriends", auraFriends);
+                capeOn = b(o, "capeOn", capeOn);
+                capeColor = (int) d(o, "capeColor", capeColor);
+                capeColor2 = (int) d(o, "capeColor2", capeColor2);
+                capeRainbow = b(o, "capeRainbow", capeRainbow);
+                capeWave = d(o, "capeWave", capeWave);
+                capeFriends = b(o, "capeFriends", capeFriends);
+                ntOn = b(o, "ntOn", ntOn);
+                ntRange = d(o, "ntRange", ntRange);
+                ntScale = d(o, "ntScale", ntScale);
+                ntBg = b(o, "ntBg", ntBg);
+                ntHealth = b(o, "ntHealth", ntHealth);
+                ntDist = b(o, "ntDist", ntDist);
+                ntDistScale = b(o, "ntDistScale", ntDistScale);
+                ntHide = b(o, "ntHide", ntHide);
+                chamsOn = b(o, "chamsOn", chamsOn);
+                chPlayers = b(o, "chPlayers", chPlayers);
+                chMobs = b(o, "chMobs", chMobs);
+                chFriends = b(o, "chFriends", chFriends);
+                chSelf = b(o, "chSelf", chSelf);
+                swingAnim = b(o, "swingAnim", swingAnim);
+                swingSpeed = d(o, "swingSpeed", swingSpeed);
+                swingSelfOnly = b(o, "swingSelfOnly", swingSelfOnly);
+                cloudsOn = b(o, "cloudsOn", cloudsOn);
+                cloudHide = b(o, "cloudHide", cloudHide);
+                cloudTint = b(o, "cloudTint", cloudTint);
+                cloudHue = d(o, "cloudHue", cloudHue);
+                cloudSat = d(o, "cloudSat", cloudSat);
+                cloudRainbow = b(o, "cloudRainbow", cloudRainbow);
+                cloudHeightOffset = d(o, "cloudHeightOffset", cloudHeightOffset);
+                tipOn = b(o, "tipOn", tipOn);
+                tipDur = b(o, "tipDur", tipDur);
+                tipId = b(o, "tipId", tipId);
+                tipStack = b(o, "tipStack", tipStack);
                 potionHud = b(o, "potionHud", potionHud);
                 potionX = (int) d(o, "potionX", potionX);
                 potionY = (int) d(o, "potionY", potionY);
