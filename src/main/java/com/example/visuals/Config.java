@@ -175,6 +175,52 @@ public final class Config {
     public static int totemColor = 4;
     public static boolean totemHideZero = false;
 
+    // Crit Effects
+    public static boolean critFx = false;
+    public static int critStyle = 0;
+    public static double critCount = 20;
+
+    // Kill Effect
+    public static boolean killFx = false;
+    public static boolean killFlash = true;
+    public static boolean killSound = true;
+    public static int killParticles = 1;
+    public static int killColor = 0;
+
+    // Attack Indicator
+    public static boolean atkInd = false;
+    public static int atkStyle = 0;
+    public static int atkColor = 2;
+    public static double atkSize = 4;
+    public static boolean atkAlways = false;
+    public static int atkOffset = 14;
+
+    // Combat Stats
+    public static boolean statsHud = false;
+    public static int statsX = 4;
+    public static int statsY = 210;
+    public static double statsScale = 1.0;
+    public static double statsAlpha = 1.0;
+    public static int statsColor = 0;
+    public static boolean statsAcc = true;
+    public static boolean statsKills = true;
+    public static boolean statsStreak = true;
+    public static boolean statsDeaths = true;
+    public static boolean statsKd = true;
+    public static boolean statsPlayersOnly = true;
+
+    // Damage Log
+    public static boolean dlHud = false;
+    public static int dlX = 300;
+    public static int dlY = 70;
+    public static double dlScale = 1.0;
+    public static double dlAlpha = 1.0;
+    public static int dlColor = 4;
+    public static boolean dlDealt = true;
+    public static boolean dlTaken = true;
+    public static int dlLines = 5;
+    public static double dlLife = 8.0;
+
     // Potion HUD
     public static boolean potionHud = true;
     public static int potionX = 130;
@@ -524,6 +570,42 @@ public final class Config {
             o.addProperty("totemAlpha", totemAlpha);
             o.addProperty("totemColor", totemColor);
             o.addProperty("totemHideZero", totemHideZero);
+            o.addProperty("critFx", critFx);
+            o.addProperty("critStyle", critStyle);
+            o.addProperty("critCount", critCount);
+            o.addProperty("killFx", killFx);
+            o.addProperty("killFlash", killFlash);
+            o.addProperty("killSound", killSound);
+            o.addProperty("killParticles", killParticles);
+            o.addProperty("killColor", killColor);
+            o.addProperty("atkInd", atkInd);
+            o.addProperty("atkStyle", atkStyle);
+            o.addProperty("atkColor", atkColor);
+            o.addProperty("atkSize", atkSize);
+            o.addProperty("atkAlways", atkAlways);
+            o.addProperty("atkOffset", atkOffset);
+            o.addProperty("statsHud", statsHud);
+            o.addProperty("statsX", statsX);
+            o.addProperty("statsY", statsY);
+            o.addProperty("statsScale", statsScale);
+            o.addProperty("statsAlpha", statsAlpha);
+            o.addProperty("statsColor", statsColor);
+            o.addProperty("statsAcc", statsAcc);
+            o.addProperty("statsKills", statsKills);
+            o.addProperty("statsStreak", statsStreak);
+            o.addProperty("statsDeaths", statsDeaths);
+            o.addProperty("statsKd", statsKd);
+            o.addProperty("statsPlayersOnly", statsPlayersOnly);
+            o.addProperty("dlHud", dlHud);
+            o.addProperty("dlX", dlX);
+            o.addProperty("dlY", dlY);
+            o.addProperty("dlScale", dlScale);
+            o.addProperty("dlAlpha", dlAlpha);
+            o.addProperty("dlColor", dlColor);
+            o.addProperty("dlDealt", dlDealt);
+            o.addProperty("dlTaken", dlTaken);
+            o.addProperty("dlLines", dlLines);
+            o.addProperty("dlLife", dlLife);
             o.addProperty("potionHud", potionHud);
             o.addProperty("potionX", potionX);
             o.addProperty("potionY", potionY);
@@ -801,6 +883,42 @@ public final class Config {
                 totemAlpha = d(o, "totemAlpha", totemAlpha);
                 totemColor = (int) d(o, "totemColor", totemColor);
                 totemHideZero = b(o, "totemHideZero", totemHideZero);
+                critFx = b(o, "critFx", critFx);
+                critStyle = (int) d(o, "critStyle", critStyle);
+                critCount = d(o, "critCount", critCount);
+                killFx = b(o, "killFx", killFx);
+                killFlash = b(o, "killFlash", killFlash);
+                killSound = b(o, "killSound", killSound);
+                killParticles = (int) d(o, "killParticles", killParticles);
+                killColor = (int) d(o, "killColor", killColor);
+                atkInd = b(o, "atkInd", atkInd);
+                atkStyle = (int) d(o, "atkStyle", atkStyle);
+                atkColor = (int) d(o, "atkColor", atkColor);
+                atkSize = d(o, "atkSize", atkSize);
+                atkAlways = b(o, "atkAlways", atkAlways);
+                atkOffset = (int) d(o, "atkOffset", atkOffset);
+                statsHud = b(o, "statsHud", statsHud);
+                statsX = (int) d(o, "statsX", statsX);
+                statsY = (int) d(o, "statsY", statsY);
+                statsScale = d(o, "statsScale", statsScale);
+                statsAlpha = d(o, "statsAlpha", statsAlpha);
+                statsColor = (int) d(o, "statsColor", statsColor);
+                statsAcc = b(o, "statsAcc", statsAcc);
+                statsKills = b(o, "statsKills", statsKills);
+                statsStreak = b(o, "statsStreak", statsStreak);
+                statsDeaths = b(o, "statsDeaths", statsDeaths);
+                statsKd = b(o, "statsKd", statsKd);
+                statsPlayersOnly = b(o, "statsPlayersOnly", statsPlayersOnly);
+                dlHud = b(o, "dlHud", dlHud);
+                dlX = (int) d(o, "dlX", dlX);
+                dlY = (int) d(o, "dlY", dlY);
+                dlScale = d(o, "dlScale", dlScale);
+                dlAlpha = d(o, "dlAlpha", dlAlpha);
+                dlColor = (int) d(o, "dlColor", dlColor);
+                dlDealt = b(o, "dlDealt", dlDealt);
+                dlTaken = b(o, "dlTaken", dlTaken);
+                dlLines = (int) d(o, "dlLines", dlLines);
+                dlLife = d(o, "dlLife", dlLife);
                 potionHud = b(o, "potionHud", potionHud);
                 potionX = (int) d(o, "potionX", potionX);
                 potionY = (int) d(o, "potionY", potionY);
