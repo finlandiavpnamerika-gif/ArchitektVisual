@@ -633,7 +633,7 @@ public class MenuScreen extends Screen {
         int y1 = y0 + maxH1 + 10;
 
         // 5. Time & Weather
-        int hTw = 34 + mh("time", 3) + mh("weather", 2);
+        int hTw = 34 + mh("time", 3) + mh("weather", 2) + mh("clock", 9);
         panel(g, "Time & Weather", x0, y1, colW, hTw);
         Config.customTime = module(g, "time", "Время", "", Config.customTime, 2);
         if (open.contains("time")) {
@@ -645,6 +645,20 @@ public class MenuScreen extends Screen {
         if (open.contains("weather")) {
             Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
             resetRow(g, "weather");
+        }
+
+        Config.clockHud = module(g, "clock", "Time & Date", "", Config.clockHud, 9);
+        if (open.contains("clock")) {
+            Config.clockSeconds = cbool(g, "Секунды", Config.clockSeconds);
+            Config.clockDate = cbool(g, "Дата", Config.clockDate);
+            Config.clockGame = cbool(g, "Время в мире", Config.clockGame);
+            Config.clockColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.clockColor);
+            Config.clockScale = cslider(g, "Размер", 0.5, 2.5, Config.clockScale, false);
+            Config.clockAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.clockAlpha, false);
+            Config.clockX = (int) cslider(g, "X", 0, 400, Config.clockX, true);
+            Config.clockY = (int) cslider(g, "Y", 0, 250, Config.clockY, true);
+            cy += 2;
+            resetRow(g, "clock");
         }
 
         // 6. Extra Visuals 1
@@ -667,7 +681,7 @@ public class MenuScreen extends Screen {
         Config.predictions = module(g, "pred", "Predictions", "", Config.predictions, 0);
 
         // 7. Extra Visuals 2
-        int hEx2 = 34 + mh("physic", 2) + mh("shulker", 0) + mh("hl", 3 * Config.highlights.size() + 1);
+        int hEx2 = 34 + mh("physic", 2) + mh("shulker", 0) + mh("hl", 3 * Config.highlights.size() + 1) + mh("inv", 7) + mh("totem", 7);
         panel(g, "Extra Visuals 2", x0 + step * 2, y1, colW, hEx2);
         Config.itemPhysic = module(g, "physic", "Item Physic", "", Config.itemPhysic, 1);
         if (open.contains("physic")) { Config.physicLift = cslider(g, "Высота (см)", -15, 15, Config.physicLift, true); cy += 2;  resetRow(g, "physic");}
@@ -685,14 +699,52 @@ public class MenuScreen extends Screen {
             if (toRemove != null) { Config.highlights.remove(toRemove); Config.save(); }
         }
 
+        Config.invHud = module(g, "inv", "Inventory HUD", "", Config.invHud, 7);
+        if (open.contains("inv")) {
+            Config.invHotbar = cbool(g, "Показывать хотбар", Config.invHotbar);
+            Config.invColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.invColor);
+            Config.invScale = cslider(g, "Размер", 0.5, 2.0, Config.invScale, false);
+            Config.invAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.invAlpha, false);
+            Config.invX = (int) cslider(g, "X", 0, 400, Config.invX, true);
+            Config.invY = (int) cslider(g, "Y", 0, 250, Config.invY, true);
+            cy += 2;
+            resetRow(g, "inv");
+        }
+
+        Config.totemHud = module(g, "totem", "Totem Counter", "", Config.totemHud, 7);
+        if (open.contains("totem")) {
+            Config.totemHideZero = cbool(g, "Скрывать при 0", Config.totemHideZero);
+            Config.totemColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.totemColor);
+            Config.totemScale = cslider(g, "Размер", 0.5, 2.5, Config.totemScale, false);
+            Config.totemAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.totemAlpha, false);
+            Config.totemX = (int) cslider(g, "X", 0, 400, Config.totemX, true);
+            Config.totemY = (int) cslider(g, "Y", 0, 250, Config.totemY, true);
+            cy += 2;
+            resetRow(g, "totem");
+        }
+
         // 8. Misc (+24: кнопка под Macros)
-        int hMisc = 34 + mh("macro", 0) + mh("stream", 0) + 24 + mh("configs", 0) + 24;
+        int hMisc = 34 + mh("macro", 0) + mh("stream", 0) + 24 + mh("configs", 0) + 24 + mh("server", 9);
         panel(g, "Misc", x0 + step * 3, y1, colW, hMisc);
         module(g, "macro", "Macros", "", true, 0);
         screenButton(g, "-> Настроить макросы", () -> new MacrosScreen(this));
         module(g, "configs", "Configs", "", true, 0);
         screenButton(g, "-> Конфиги (сохранить/загрузить)", () -> new ConfigsScreen(this));
         Config.streamerMode = module(g, "stream", "StreamerMode", "", Config.streamerMode, 0);
+
+        Config.serverHud = module(g, "server", "Server Info", "", Config.serverHud, 9);
+        if (open.contains("server")) {
+            Config.serverIp = cbool(g, "IP сервера", Config.serverIp);
+            Config.serverTps = cbool(g, "TPS", Config.serverTps);
+            Config.serverPing = cbool(g, "Ping", Config.serverPing);
+            Config.serverColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.serverColor);
+            Config.serverScale = cslider(g, "Размер", 0.5, 2.5, Config.serverScale, false);
+            Config.serverAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.serverAlpha, false);
+            Config.serverX = (int) cslider(g, "X", 0, 400, Config.serverX, true);
+            Config.serverY = (int) cslider(g, "Y", 0, 250, Config.serverY, true);
+            cy += 2;
+            resetRow(g, "server");
+        }
 
         drawBottom(g);
     }
@@ -739,7 +791,7 @@ public class MenuScreen extends Screen {
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
             {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "pred", "physic", "shulker", "hl"},
-            {"hud", "array", "armor", "potion", "keys", "combo", "wm"},
+            {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem"},
             {"sprint", "zoom", "respawn", "freelook", "noov", "hitsound", "stream"},
             {"autoswap", "itembind", "friends", "macro", "configs"},
             {"time", "weather"}
@@ -771,6 +823,10 @@ public class MenuScreen extends Screen {
             case "potion" -> "Potion HUD";
             case "keys" -> "Keystrokes";
             case "combo" -> "Combo Counter";
+            case "server" -> "Server Info";
+            case "clock" -> "Time & Date";
+            case "inv" -> "Inventory HUD";
+            case "totem" -> "Totem Counter";
             case "wm" -> "Watermark";
             case "noov" -> "NoOverlay";
             case "hitsound" -> "Hit Sound";
@@ -820,6 +876,10 @@ public class MenuScreen extends Screen {
             case "potion" -> Config.potionHud;
             case "keys" -> Config.keystrokes;
             case "combo" -> Config.comboHud;
+            case "server" -> Config.serverHud;
+            case "clock" -> Config.clockHud;
+            case "inv" -> Config.invHud;
+            case "totem" -> Config.totemHud;
             case "wm" -> Config.watermark;
             case "noov" -> Config.noOverlay;
             case "hitsound" -> Config.hitSound;
@@ -862,6 +922,10 @@ public class MenuScreen extends Screen {
             case "potion": Config.potionHud = v; break;
             case "keys": Config.keystrokes = v; break;
             case "combo": Config.comboHud = v; break;
+            case "server": Config.serverHud = v; break;
+            case "clock": Config.clockHud = v; break;
+            case "inv": Config.invHud = v; break;
+            case "totem": Config.totemHud = v; break;
             case "wm": Config.watermark = v; break;
             case "noov": Config.noOverlay = v; break;
             case "hitsound": Config.hitSound = v; break;
@@ -1193,6 +1257,42 @@ public class MenuScreen extends Screen {
                 Config.keystrokesColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.keystrokesColor);
                 Config.keystrokesX = (int) cslider(g, "X", 0, 400, Config.keystrokesX, true);
                 Config.keystrokesY = (int) cslider(g, "Y", 0, 400, Config.keystrokesY, true);
+            }
+            case "server" -> {
+                Config.serverIp = cbool(g, "IP сервера", Config.serverIp);
+                Config.serverTps = cbool(g, "TPS", Config.serverTps);
+                Config.serverPing = cbool(g, "Ping", Config.serverPing);
+                Config.serverColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.serverColor);
+                Config.serverScale = cslider(g, "Размер", 0.5, 2.5, Config.serverScale, false);
+                Config.serverAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.serverAlpha, false);
+                Config.serverX = (int) cslider(g, "X", 0, 400, Config.serverX, true);
+                Config.serverY = (int) cslider(g, "Y", 0, 250, Config.serverY, true);
+            }
+            case "clock" -> {
+                Config.clockSeconds = cbool(g, "Секунды", Config.clockSeconds);
+                Config.clockDate = cbool(g, "Дата", Config.clockDate);
+                Config.clockGame = cbool(g, "Время в мире", Config.clockGame);
+                Config.clockColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.clockColor);
+                Config.clockScale = cslider(g, "Размер", 0.5, 2.5, Config.clockScale, false);
+                Config.clockAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.clockAlpha, false);
+                Config.clockX = (int) cslider(g, "X", 0, 400, Config.clockX, true);
+                Config.clockY = (int) cslider(g, "Y", 0, 250, Config.clockY, true);
+            }
+            case "inv" -> {
+                Config.invHotbar = cbool(g, "Показывать хотбар", Config.invHotbar);
+                Config.invColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.invColor);
+                Config.invScale = cslider(g, "Размер", 0.5, 2.0, Config.invScale, false);
+                Config.invAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.invAlpha, false);
+                Config.invX = (int) cslider(g, "X", 0, 400, Config.invX, true);
+                Config.invY = (int) cslider(g, "Y", 0, 250, Config.invY, true);
+            }
+            case "totem" -> {
+                Config.totemHideZero = cbool(g, "Скрывать при 0", Config.totemHideZero);
+                Config.totemColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.totemColor);
+                Config.totemScale = cslider(g, "Размер", 0.5, 2.5, Config.totemScale, false);
+                Config.totemAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.totemAlpha, false);
+                Config.totemX = (int) cslider(g, "X", 0, 400, Config.totemX, true);
+                Config.totemY = (int) cslider(g, "Y", 0, 250, Config.totemY, true);
             }
             case "combo" -> {
                 Config.comboColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.comboColor);
