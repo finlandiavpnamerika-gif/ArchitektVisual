@@ -35,7 +35,11 @@ public final class ModuleDefaults {
             Map.entry("time", new String[]{"timeValue"}),
             Map.entry("weather", new String[]{"weatherType"}),
             Map.entry("hat", new String[]{"hatCustom", "hatHue", "hatSat", "hatVal", "chinaHatMode", "hatSize", "hatHeight"}),
-            Map.entry("physic", new String[]{"physicLift"})
+            Map.entry("physic", new String[]{"physicLift"}),
+            Map.entry("noov", new String[]{"noHurtShake", "noFireOverlay", "noTotemParticles", "noFireworkParticles"}),
+            Map.entry("hitsound", new String[]{"hitSoundType", "hitSoundVol", "hitSoundPitch"}),
+            Map.entry("combo", new String[]{"comboColor", "comboTimeout", "comboScale", "comboAlpha", "comboX", "comboY"}),
+            Map.entry("wm", new String[]{"watermarkName", "watermarkNick", "watermarkFps", "watermarkTime", "watermarkRainbow", "watermarkColor", "watermarkScale", "watermarkAlpha", "watermarkX", "watermarkY"})
     );
 
     private static final Map<String, Object> DEFAULTS = new HashMap<>();
@@ -68,7 +72,8 @@ public final class ModuleDefaults {
         "sprint", "zoom", "autoRespawn", "thirdPerson", "fullbright", "customCrosshair", "trails", "zones", "targetEsp",
         "jumpCircle", "customItems", "handView", "targetHud", "customFog", "damageFever", "particles", "skyShader",
         "hud", "arrayList", "armorHud", "potionHud", "keystrokes", "autoswap", "itembind", "customTime", "customWeather",
-        "chinaHat", "predictions", "itemPhysic", "shulkerPreview", "highlight", "streamerMode"
+        "chinaHat", "predictions", "itemPhysic", "shulkerPreview", "highlight", "streamerMode",
+        "noOverlay", "hitSound", "comboHud", "watermark"
     };
 
     /** Выключает все модули (настройки внутри модулей не трогает). */
