@@ -56,6 +56,24 @@ public final class HudManager {
             public double alpha() { return Config.potionAlpha; }
             public int[] draw(DrawContext g, MinecraftClient mc, float a) { return PotionHud.draw(g, mc, a); }
         });
+        ELEMENTS.add(new HudElement("Watermark") {
+            public boolean enabled() { return Config.watermark; }
+            public int x() { return Config.watermarkX; }
+            public int y() { return Config.watermarkY; }
+            public void setPos(int x, int y) { Config.watermarkX = x; Config.watermarkY = y; }
+            public double scale() { return Config.watermarkScale; }
+            public double alpha() { return Config.watermarkAlpha; }
+            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return WatermarkHud.draw(g, mc, a); }
+        });
+        ELEMENTS.add(new HudElement("Combo") {
+            public boolean enabled() { return Config.comboHud; }
+            public int x() { return Config.comboX; }
+            public int y() { return Config.comboY; }
+            public void setPos(int x, int y) { Config.comboX = x; Config.comboY = y; }
+            public double scale() { return Config.comboScale; }
+            public double alpha() { return Config.comboAlpha; }
+            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return ComboHud.draw(g, mc, a); }
+        });
         ELEMENTS.add(new HudElement("Info") {
             public boolean enabled() { return Config.hud; }
             public int x() { return Config.hudX; }
