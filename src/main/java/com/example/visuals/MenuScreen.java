@@ -1750,10 +1750,8 @@ public class MenuScreen extends Screen {
                 Config.clockColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.clockColor);
                 Config.clockScale = cslider(g, "Размер", 0.5, 2.5, Config.clockScale, false);
                 Config.clockAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.clockAlpha, false);
-                                Config.clockX = (int) cslider(g, "X", 0, 400, Config.clockX, true);
+                Config.clockX = (int) cslider(g, "X", 0, 400, Config.clockX, true);
                 Config.clockY = (int) cslider(g, "Y", 0, 250, Config.clockY, true);
-                cy += 2;
-                resetRow(g, "clock");
             }
             case "inv" -> {
                 Config.invHotbar = cbool(g, "Показывать хотбар", Config.invHotbar);
@@ -1762,8 +1760,6 @@ public class MenuScreen extends Screen {
                 Config.invAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.invAlpha, false);
                 Config.invX = (int) cslider(g, "X", 0, 400, Config.invX, true);
                 Config.invY = (int) cslider(g, "Y", 0, 250, Config.invY, true);
-                cy += 2;
-                resetRow(g, "inv");
             }
             case "totem" -> {
                 Config.totemHideZero = cbool(g, "Скрывать при 0", Config.totemHideZero);
@@ -1772,8 +1768,14 @@ public class MenuScreen extends Screen {
                 Config.totemAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.totemAlpha, false);
                 Config.totemX = (int) cslider(g, "X", 0, 400, Config.totemX, true);
                 Config.totemY = (int) cslider(g, "Y", 0, 250, Config.totemY, true);
-                cy += 2;
-                resetRow(g, "totem");
+            }
+            case "combo" -> {
+                Config.comboColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.comboColor);
+                Config.comboTimeout = cslider(g, "Таймаут (сек)", 1.0, 10.0, Config.comboTimeout, false);
+                Config.comboScale = cslider(g, "Размер", 0.5, 2.5, Config.comboScale, false);
+                Config.comboAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.comboAlpha, false);
+                Config.comboX = (int) cslider(g, "X", 0, 400, Config.comboX, true);
+                Config.comboY = (int) cslider(g, "Y", 0, 250, Config.comboY, true);
             }
             case "wm" -> {
                 Config.watermarkName = ccycle(g, "Название", WatermarkHud.NAMES, Config.watermarkName);
@@ -1786,67 +1788,62 @@ public class MenuScreen extends Screen {
                 Config.watermarkAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.watermarkAlpha, false);
                 Config.watermarkX = (int) cslider(g, "X", 0, 400, Config.watermarkX, true);
                 Config.watermarkY = (int) cslider(g, "Y", 0, 250, Config.watermarkY, true);
-                cy += 2;
-                resetRow(g, "wm");
             }
             case "noov" -> {
                 Config.noHurtShake = cbool(g, "Тряска при уроне", Config.noHurtShake);
                 Config.noFireOverlay = cbool(g, "Огонь на экране", Config.noFireOverlay);
                 Config.noTotemParticles = cbool(g, "Частицы тотема", Config.noTotemParticles);
                 Config.noFireworkParticles = cbool(g, "Частицы фейерверка", Config.noFireworkParticles);
-                cy += 2; resetRow(g, "noov");
             }
             case "hitsound" -> {
                 Config.hitSoundType = ccycle(g, "Звук", Combat.SOUNDS, Config.hitSoundType);
                 Config.hitSoundVol = cslider(g, "Громкость", 0.1, 1.0, Config.hitSoundVol, false);
                 Config.hitSoundPitch = cslider(g, "Высота тона", 0.5, 2.0, Config.hitSoundPitch, false);
-                cy += 2; resetRow(g, "hitsound");
             }
-            case "sprint" -> {
-                Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs);
-                cy += 2; resetRow(g, "sprint");
-            }
-            case "zoom" -> {
-                Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true);
-                cy += 2; resetRow(g, "zoom");
-            }
+            case "sprint" -> Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs);
             case "freelook" -> {
                 Config.freelookToggle = cbool(g, "Переключатель (вместо зажатия)", Config.freelookToggle);
                 Config.freelookThird = cbool(g, "Третье лицо при включении", Config.freelookThird);
                 Config.freelookSmooth = cbool(g, "Плавный возврат", Config.freelookSmooth);
                 Config.freelookSens = cslider(g, "Чувствительность", 0.2, 2.0, Config.freelookSens, false);
-                cy += 2; resetRow(g, "freelook");
             }
-            case "time" -> {
-                Config.timeValue = (int) cslider(g, "Время", 0, 24000, Config.timeValue, true);
-                cy += 20;
-                resetRow(g, "time");
-            }
-            case "weather" -> {
-                Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
-                resetRow(g, "weather");
-            }
-            case "stream" -> {
-                noOptions(g);
-            }
+            case "zoom" -> Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true);
             case "autoswap" -> {
-                hint2(g, "Настройка через", "горячую клавишу");
+                SwapPair toRebind = null, toRemove = null;
+                for (SwapPair sp : Config.swapPairs) {
+                    int r = listRow(g, sp.key, sp.a + " <-> " + sp.b);
+                    if (r == 1) toRebind = sp; else if (r == 2) toRemove = sp;
+                }
+                hint2(g, "Наведи на предмет", "и жми [" + ItemFeatures.swapKeyName() + "]");
+                if (toRemove != null) { Config.swapPairs.remove(toRemove); Config.save(); }
+                else if (toRebind != null) {
+                    final SwapPair sp = toRebind;
+                    client.execute(() -> client.setScreen(new BindScreen(this, "AutoSwap: " + sp.a + " <-> " + sp.b, k -> ItemFeatures.setKey(sp, k))));
+                }
             }
             case "itembind" -> {
-                hint2(g, "Настройка через", "горячую клавишу");
+                BoundItem toRebind = null, toRemove = null;
+                for (BoundItem b : Config.binds) {
+                    int r = listRow(g, b.key, b.name);
+                    if (r == 1) toRebind = b; else if (r == 2) toRemove = b;
+                }
+                hint2(g, "Наведи на предмет", "и жми [" + ItemFeatures.bindKeyName() + "]");
+                if (toRemove != null) { Config.binds.remove(toRemove); Config.save(); }
+                else if (toRebind != null) {
+                    final BoundItem b = toRebind;
+                    client.execute(() -> client.setScreen(new BindScreen(this, "ItemBind: " + b.name, k -> ItemFeatures.setKey(b, k))));
+                }
             }
-            case "pred" -> {
-                noOptions(g);
-            }
-            case "shulker" -> {
-                noOptions(g);
-            }
+            case "friends" -> screenButton(g, "-> Открыть Friends", () -> new FriendsScreen(this));
+            case "macro" -> screenButton(g, "-> Настроить макросы", () -> new MacrosScreen(this));
+            case "configs" -> screenButton(g, "-> Открыть конфиги", () -> new ConfigsScreen(this));
+            case "time" -> Config.timeValue = (int) cslider(g, "Время", 0, 24000, Config.timeValue, true);
+            case "weather" -> Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
             default -> noOptions(g);
         }
+        if (ModuleDefaults.has(id)) resetRow(g, id);
     }
 
-    private void noOptions(DrawContext g) {
-        text(g, "Нет настроек", cx + 2, cy + 2, Theme.TEXT_DIM);
-        cy += 20;
-    }
+    @Override
+    public void removed() { Config.save(); }
 }
