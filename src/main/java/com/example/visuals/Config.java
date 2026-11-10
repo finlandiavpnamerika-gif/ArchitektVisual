@@ -135,6 +135,46 @@ public final class Config {
     public static boolean watermarkFps = true;
     public static boolean watermarkTime = false;
 
+    // Server Info
+    public static boolean serverHud = false;
+    public static int serverX = 4;
+    public static int serverY = 70;
+    public static double serverScale = 1.0;
+    public static double serverAlpha = 1.0;
+    public static int serverColor = 1;
+    public static boolean serverIp = true;
+    public static boolean serverTps = true;
+    public static boolean serverPing = true;
+
+    // Time & Date
+    public static boolean clockHud = false;
+    public static int clockX = 4;
+    public static int clockY = 120;
+    public static double clockScale = 1.0;
+    public static double clockAlpha = 1.0;
+    public static int clockColor = 0;
+    public static boolean clockSeconds = true;
+    public static boolean clockDate = true;
+    public static boolean clockGame = false;
+
+    // Inventory HUD
+    public static boolean invHud = false;
+    public static int invX = 4;
+    public static int invY = 170;
+    public static double invScale = 1.0;
+    public static double invAlpha = 1.0;
+    public static int invColor = 0;
+    public static boolean invHotbar = false;
+
+    // Totem Counter
+    public static boolean totemHud = false;
+    public static int totemX = 190;
+    public static int totemY = 170;
+    public static double totemScale = 1.0;
+    public static double totemAlpha = 1.0;
+    public static int totemColor = 4;
+    public static boolean totemHideZero = false;
+
     // Potion HUD
     public static boolean potionHud = true;
     public static int potionX = 130;
@@ -452,6 +492,38 @@ public final class Config {
             o.addProperty("watermarkNick", watermarkNick);
             o.addProperty("watermarkFps", watermarkFps);
             o.addProperty("watermarkTime", watermarkTime);
+            o.addProperty("serverHud", serverHud);
+            o.addProperty("serverX", serverX);
+            o.addProperty("serverY", serverY);
+            o.addProperty("serverScale", serverScale);
+            o.addProperty("serverAlpha", serverAlpha);
+            o.addProperty("serverColor", serverColor);
+            o.addProperty("serverIp", serverIp);
+            o.addProperty("serverTps", serverTps);
+            o.addProperty("serverPing", serverPing);
+            o.addProperty("clockHud", clockHud);
+            o.addProperty("clockX", clockX);
+            o.addProperty("clockY", clockY);
+            o.addProperty("clockScale", clockScale);
+            o.addProperty("clockAlpha", clockAlpha);
+            o.addProperty("clockColor", clockColor);
+            o.addProperty("clockSeconds", clockSeconds);
+            o.addProperty("clockDate", clockDate);
+            o.addProperty("clockGame", clockGame);
+            o.addProperty("invHud", invHud);
+            o.addProperty("invX", invX);
+            o.addProperty("invY", invY);
+            o.addProperty("invScale", invScale);
+            o.addProperty("invAlpha", invAlpha);
+            o.addProperty("invColor", invColor);
+            o.addProperty("invHotbar", invHotbar);
+            o.addProperty("totemHud", totemHud);
+            o.addProperty("totemX", totemX);
+            o.addProperty("totemY", totemY);
+            o.addProperty("totemScale", totemScale);
+            o.addProperty("totemAlpha", totemAlpha);
+            o.addProperty("totemColor", totemColor);
+            o.addProperty("totemHideZero", totemHideZero);
             o.addProperty("potionHud", potionHud);
             o.addProperty("potionX", potionX);
             o.addProperty("potionY", potionY);
@@ -697,6 +769,38 @@ public final class Config {
                 watermarkNick = b(o, "watermarkNick", watermarkNick);
                 watermarkFps = b(o, "watermarkFps", watermarkFps);
                 watermarkTime = b(o, "watermarkTime", watermarkTime);
+                serverHud = b(o, "serverHud", serverHud);
+                serverX = (int) d(o, "serverX", serverX);
+                serverY = (int) d(o, "serverY", serverY);
+                serverScale = d(o, "serverScale", serverScale);
+                serverAlpha = d(o, "serverAlpha", serverAlpha);
+                serverColor = (int) d(o, "serverColor", serverColor);
+                serverIp = b(o, "serverIp", serverIp);
+                serverTps = b(o, "serverTps", serverTps);
+                serverPing = b(o, "serverPing", serverPing);
+                clockHud = b(o, "clockHud", clockHud);
+                clockX = (int) d(o, "clockX", clockX);
+                clockY = (int) d(o, "clockY", clockY);
+                clockScale = d(o, "clockScale", clockScale);
+                clockAlpha = d(o, "clockAlpha", clockAlpha);
+                clockColor = (int) d(o, "clockColor", clockColor);
+                clockSeconds = b(o, "clockSeconds", clockSeconds);
+                clockDate = b(o, "clockDate", clockDate);
+                clockGame = b(o, "clockGame", clockGame);
+                invHud = b(o, "invHud", invHud);
+                invX = (int) d(o, "invX", invX);
+                invY = (int) d(o, "invY", invY);
+                invScale = d(o, "invScale", invScale);
+                invAlpha = d(o, "invAlpha", invAlpha);
+                invColor = (int) d(o, "invColor", invColor);
+                invHotbar = b(o, "invHotbar", invHotbar);
+                totemHud = b(o, "totemHud", totemHud);
+                totemX = (int) d(o, "totemX", totemX);
+                totemY = (int) d(o, "totemY", totemY);
+                totemScale = d(o, "totemScale", totemScale);
+                totemAlpha = d(o, "totemAlpha", totemAlpha);
+                totemColor = (int) d(o, "totemColor", totemColor);
+                totemHideZero = b(o, "totemHideZero", totemHideZero);
                 potionHud = b(o, "potionHud", potionHud);
                 potionX = (int) d(o, "potionX", potionX);
                 potionY = (int) d(o, "potionY", potionY);
