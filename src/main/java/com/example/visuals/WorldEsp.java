@@ -49,7 +49,7 @@ public final class WorldEsp {
 
     public static boolean any() {
         return Config.hbox || Config.bout || Config.chunkB || Config.itemEsp
-                || (Config.wp && Config.wpBeam) || Config.ptrail || Config.etrail;
+                || (Config.wp && Config.wpBeam) || Config.ptrail || Config.etrail || Cosmetics.any();
     }
 
     // ------------------------------------------------------------------ следы
@@ -135,6 +135,7 @@ public final class WorldEsp {
             if (Config.hbox || Config.itemEsp) entities(q, m, cam, camera, mc, tp);
             if (Config.bout) blockOutline(q, m, cam, mc);
             if (Config.wp && Config.wpBeam) Waypoints.renderBeams(q, m, cam, mc);
+            if (Cosmetics.any()) Cosmetics.render(q, m, cam, mc, tp);
             if (Config.ptrail) pearlTrails(q, m, cam, mc, tp);
             if (Config.etrail) elytraTrails(q, m, cam, mc, tp);
             consumers.draw(RenderLayers.debugQuads());
