@@ -53,6 +53,14 @@ public final class ModuleDefaults {
             Map.entry("etr", new String[]{"etColor", "etRainbow", "etLength", "etWidth", "etAll"}),
             Map.entry("pcd", new String[]{"pcdHideIdle", "pcdColor", "pcdScale", "pcdAlpha", "pcdX", "pcdY"}),
             Map.entry("wp", new String[]{"wpBeam", "wpLabels", "wpDist", "wpMax", "wpColor", "wpScale", "wpDeath"}),
+            Map.entry("wings", new String[]{"wingStyle", "wingColor", "wingRainbow", "wingSize", "wingSpeed", "wingFriends"}),
+            Map.entry("aura", new String[]{"auraStyle", "auraColor", "auraRainbow", "auraSize", "auraSpeed", "auraFriends"}),
+            Map.entry("cape", new String[]{"capeColor", "capeColor2", "capeRainbow", "capeWave", "capeFriends"}),
+            Map.entry("nt", new String[]{"ntRange", "ntScale", "ntBg", "ntHealth", "ntDist", "ntDistScale", "ntHide"}),
+            Map.entry("chams", new String[]{"chPlayers", "chMobs", "chFriends", "chSelf"}),
+            Map.entry("swing", new String[]{"swingSpeed", "swingSelfOnly"}),
+            Map.entry("clouds", new String[]{"cloudHide", "cloudTint", "cloudHue", "cloudSat", "cloudRainbow", "cloudHeightOffset"}),
+            Map.entry("tip", new String[]{"tipDur", "tipId", "tipStack"}),
             Map.entry("noov", new String[]{"noHurtShake", "noFireOverlay", "noTotemParticles", "noFireworkParticles"}),
             Map.entry("hitsound", new String[]{"hitSoundType", "hitSoundVol", "hitSoundPitch"}),
             Map.entry("combo", new String[]{"comboColor", "comboTimeout", "comboScale", "comboAlpha", "comboX", "comboY"}),
@@ -93,7 +101,8 @@ public final class ModuleDefaults {
         "noOverlay", "hitSound", "comboHud", "watermark",
         "serverHud", "clockHud", "invHud", "totemHud",
         "critFx", "killFx", "atkInd", "statsHud", "dlHud",
-        "hbox", "bout", "chunkB", "itemEsp", "wp", "ptrail", "etrail", "pcdHud"
+        "hbox", "bout", "chunkB", "itemEsp", "wp", "ptrail", "etrail", "pcdHud",
+        "wingsOn", "auraOn", "capeOn", "ntOn", "chamsOn", "swingAnim", "cloudsOn", "tipOn"
     };
 
     /** Выключает все модули (настройки внутри модулей не трогает). */
