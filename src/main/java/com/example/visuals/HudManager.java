@@ -74,6 +74,42 @@ public final class HudManager {
             public double alpha() { return Config.comboAlpha; }
             public int[] draw(DrawContext g, MinecraftClient mc, float a) { return ComboHud.draw(g, mc, a); }
         });
+        ELEMENTS.add(new HudElement("Server") {
+            public boolean enabled() { return Config.serverHud; }
+            public int x() { return Config.serverX; }
+            public int y() { return Config.serverY; }
+            public void setPos(int x, int y) { Config.serverX = x; Config.serverY = y; }
+            public double scale() { return Config.serverScale; }
+            public double alpha() { return Config.serverAlpha; }
+            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return ServerInfoHud.draw(g, mc, a); }
+        });
+        ELEMENTS.add(new HudElement("Clock") {
+            public boolean enabled() { return Config.clockHud; }
+            public int x() { return Config.clockX; }
+            public int y() { return Config.clockY; }
+            public void setPos(int x, int y) { Config.clockX = x; Config.clockY = y; }
+            public double scale() { return Config.clockScale; }
+            public double alpha() { return Config.clockAlpha; }
+            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return ClockHud.draw(g, mc, a); }
+        });
+        ELEMENTS.add(new HudElement("Inventory") {
+            public boolean enabled() { return Config.invHud; }
+            public int x() { return Config.invX; }
+            public int y() { return Config.invY; }
+            public void setPos(int x, int y) { Config.invX = x; Config.invY = y; }
+            public double scale() { return Config.invScale; }
+            public double alpha() { return Config.invAlpha; }
+            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return InventoryHud.draw(g, mc, a); }
+        });
+        ELEMENTS.add(new HudElement("Totems") {
+            public boolean enabled() { return Config.totemHud; }
+            public int x() { return Config.totemX; }
+            public int y() { return Config.totemY; }
+            public void setPos(int x, int y) { Config.totemX = x; Config.totemY = y; }
+            public double scale() { return Config.totemScale; }
+            public double alpha() { return Config.totemAlpha; }
+            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return TotemHud.draw(g, mc, a); }
+        });
         ELEMENTS.add(new HudElement("Info") {
             public boolean enabled() { return Config.hud; }
             public int x() { return Config.hudX; }
