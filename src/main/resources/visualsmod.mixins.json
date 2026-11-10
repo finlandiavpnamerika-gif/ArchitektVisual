@@ -22,7 +22,8 @@
     "NoOverlayHurtMixin",
     "NoOverlayFireMixin",
     "NoOverlayParticleMixin",
-    "TpsMixin"
+    "TpsMixin",
+    "NoVanillaOutlineMixin"
   ],
   "injectors": {
     "defaultRequire": 1
