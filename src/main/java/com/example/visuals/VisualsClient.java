@@ -38,6 +38,7 @@ public class VisualsClient implements ClientModInitializer {
         Particles.register();
         DamageFever.register();
         Combat.register();
+        Waypoints.load();
         TargetHud.register();
         Theme.THEME_ID = Config.menuTheme;
         Theme.apply();
@@ -94,6 +95,8 @@ public class VisualsClient implements ClientModInitializer {
             Features.tick(client);
             DamageFever.tick(client);
             Combat.tick(client);
+            WorldEsp.tick(client);
+            Waypoints.tick(client);
             JumpCircle.tick(client);
             TargetHud.tick(client);
             HandView.tick(client);
@@ -109,6 +112,7 @@ public class VisualsClient implements ClientModInitializer {
             FuntimeHelper.hud(drawContext);
             DamageFever.hud(drawContext);
             CombatFx.hud(drawContext);
+            Waypoints.hud(drawContext);
             TargetHud.hud(drawContext);
             Macros.poll();   // и каждый кадр: тапы не теряются
         });
@@ -127,6 +131,41 @@ public class VisualsClient implements ClientModInitializer {
                         mc.execute(() -> mc.setScreen(new MenuScreen()));
                         return 1;
                     })
+            );
+            dispatcher.register(ClientCommandManager.literal("waypoint")
+                    .then(ClientCommandManager.literal("add")
+                            .executes(ctx -> {
+                                Waypoints.addHere(ctx.getSource().getClient(), null);
+                                ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("Waypoint added"));
+                                return 1;
+                            })
+                            .then(ClientCommandManager.argument("name", com.mojang.brigadier.arguments.StringArgumentType.greedyString())
+                                    .executes(ctx -> {
+                                        Waypoints.addHere(ctx.getSource().getClient(),
+                                                com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "name"));
+                                        ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("Waypoint added"));
+                                        return 1;
+                                    })))
+                    .then(ClientCommandManager.literal("remove")
+                            .then(ClientCommandManager.argument("name", com.mojang.brigadier.arguments.StringArgumentType.greedyString())
+                                    .executes(ctx -> {
+                                        boolean ok = Waypoints.remove(com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "name"));
+                                        ctx.getSource().sendFeedback(net.minecraft.text.Text.literal(ok ? "Waypoint removed" : "Waypoint not found"));
+                                        return 1;
+                                    })))
+                    .then(ClientCommandManager.literal("clear")
+                            .executes(ctx -> {
+                                Waypoints.clear();
+                                ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("Waypoints cleared"));
+                                return 1;
+                            }))
+                    .then(ClientCommandManager.literal("list")
+                            .executes(ctx -> {
+                                if (Waypoints.LIST.isEmpty()) ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("No waypoints"));
+                                for (Waypoints.Wp w : Waypoints.LIST)
+                                    ctx.getSource().sendFeedback(net.minecraft.text.Text.literal(w.name + ": " + w.x + " " + w.y + " " + w.z));
+                                return 1;
+                            }))
             );
             dispatcher.register(ClientCommandManager.literal("freelook")
                     .executes(ctx -> {
