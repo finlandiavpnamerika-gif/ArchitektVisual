@@ -23,7 +23,12 @@
     "NoOverlayFireMixin",
     "NoOverlayParticleMixin",
     "TpsMixin",
-    "NoVanillaOutlineMixin"
+    "NoVanillaOutlineMixin",
+    "SwingSpeedMixin",
+    "EntityGlowMixin",
+    "CloudRendererMixin",
+    "NoVanillaNametagMixin",
+    "NoVanillaNametagLivingMixin"
   ],
   "injectors": {
     "defaultRequire": 1
