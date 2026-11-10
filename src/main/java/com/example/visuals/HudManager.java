@@ -128,6 +128,15 @@ public final class HudManager {
             public double alpha() { return Config.dlAlpha; }
             public int[] draw(DrawContext g, MinecraftClient mc, float a) { return DamageLogHud.draw(g, mc, a); }
         });
+        ELEMENTS.add(new HudElement("Pearl") {
+            public boolean enabled() { return Config.pcdHud; }
+            public int x() { return Config.pcdX; }
+            public int y() { return Config.pcdY; }
+            public void setPos(int x, int y) { Config.pcdX = x; Config.pcdY = y; }
+            public double scale() { return Config.pcdScale; }
+            public double alpha() { return Config.pcdAlpha; }
+            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return PearlHud.draw(g, mc, a); }
+        });
         ELEMENTS.add(new HudElement("Info") {
             public boolean enabled() { return Config.hud; }
             public int x() { return Config.hudX; }
