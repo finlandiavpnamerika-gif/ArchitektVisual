@@ -204,7 +204,7 @@ public final class Combat {
     public static void playSound(MinecraftClient mc, String id, float pitch, float vol) {
         try {
             SoundEvent ev = SoundEvent.of(Identifier.of(id));
-            mc.getSoundManager().play(PositionedSoundInstance.ui(ev, pitch, vol));
+            mc.getSoundManager().play(PositionedSoundInstance.master(ev, pitch, vol));
         } catch (Exception ignored) {}
     }
 }
