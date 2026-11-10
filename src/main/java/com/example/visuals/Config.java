@@ -221,6 +221,82 @@ public final class Config {
     public static int dlLines = 5;
     public static double dlLife = 8.0;
 
+    // Hitboxes
+    public static boolean hbox = false;
+    public static boolean hbPlayers = true;
+    public static boolean hbMobs = true;
+    public static boolean hbOthers = false;
+    public static boolean hbSelf = false;
+    public static boolean hbFill = false;
+    public static double hbWidth = 0.02;
+    public static double hbRange = 48;
+    public static double hbAlpha = 0.9;
+    public static int hbColorP = 0;
+    public static int hbColorM = 4;
+    public static int hbColorO = 3;
+
+    // Block Outline
+    public static boolean bout = false;
+    public static int boColor = 1;
+    public static boolean boRainbow = false;
+    public static double boWidth = 0.02;
+    public static boolean boFill = false;
+    public static double boFillAlpha = 0.25;
+    public static boolean boHideVanilla = true;
+
+    // Chunk Borders
+    public static boolean chunkB = false;
+    public static int cbRadius = 1;
+    public static double cbHeight = 32;
+    public static int cbColor = 3;
+    public static double cbWidth = 0.03;
+    public static boolean cbLevels = true;
+    public static double cbAlpha = 0.9;
+
+    // Item ESP
+    public static boolean itemEsp = false;
+    public static double ieRange = 48;
+    public static boolean ieValuable = false;
+    public static boolean ieFill = true;
+    public static boolean ieTracers = false;
+    public static int ieColor = 1;
+    public static int ieColorHi = 3;
+    public static double ieWidth = 0.02;
+
+    // Waypoints
+    public static boolean wp = false;
+    public static boolean wpBeam = true;
+    public static boolean wpLabels = true;
+    public static boolean wpDist = true;
+    public static double wpMax = 2000;
+    public static int wpColor = 0;
+    public static double wpScale = 1.0;
+    public static boolean wpDeath = true;
+
+    // Pearl Trail
+    public static boolean ptrail = false;
+    public static int ptColor = 0;
+    public static boolean ptRainbow = false;
+    public static int ptLength = 40;
+    public static double ptWidth = 0.06;
+
+    // Elytra Trail
+    public static boolean etrail = false;
+    public static int etColor = 1;
+    public static boolean etRainbow = false;
+    public static int etLength = 40;
+    public static double etWidth = 0.12;
+    public static boolean etAll = false;
+
+    // Pearl Cooldown
+    public static boolean pcdHud = false;
+    public static int pcdX = 190;
+    public static int pcdY = 200;
+    public static double pcdScale = 1.0;
+    public static double pcdAlpha = 1.0;
+    public static int pcdColor = 1;
+    public static boolean pcdHideIdle = true;
+
     // Potion HUD
     public static boolean potionHud = true;
     public static int potionX = 130;
@@ -606,6 +682,66 @@ public final class Config {
             o.addProperty("dlTaken", dlTaken);
             o.addProperty("dlLines", dlLines);
             o.addProperty("dlLife", dlLife);
+            o.addProperty("hbox", hbox);
+            o.addProperty("hbPlayers", hbPlayers);
+            o.addProperty("hbMobs", hbMobs);
+            o.addProperty("hbOthers", hbOthers);
+            o.addProperty("hbSelf", hbSelf);
+            o.addProperty("hbFill", hbFill);
+            o.addProperty("hbWidth", hbWidth);
+            o.addProperty("hbRange", hbRange);
+            o.addProperty("hbAlpha", hbAlpha);
+            o.addProperty("hbColorP", hbColorP);
+            o.addProperty("hbColorM", hbColorM);
+            o.addProperty("hbColorO", hbColorO);
+            o.addProperty("bout", bout);
+            o.addProperty("boColor", boColor);
+            o.addProperty("boRainbow", boRainbow);
+            o.addProperty("boWidth", boWidth);
+            o.addProperty("boFill", boFill);
+            o.addProperty("boFillAlpha", boFillAlpha);
+            o.addProperty("boHideVanilla", boHideVanilla);
+            o.addProperty("chunkB", chunkB);
+            o.addProperty("cbRadius", cbRadius);
+            o.addProperty("cbHeight", cbHeight);
+            o.addProperty("cbColor", cbColor);
+            o.addProperty("cbWidth", cbWidth);
+            o.addProperty("cbLevels", cbLevels);
+            o.addProperty("cbAlpha", cbAlpha);
+            o.addProperty("itemEsp", itemEsp);
+            o.addProperty("ieRange", ieRange);
+            o.addProperty("ieValuable", ieValuable);
+            o.addProperty("ieFill", ieFill);
+            o.addProperty("ieTracers", ieTracers);
+            o.addProperty("ieColor", ieColor);
+            o.addProperty("ieColorHi", ieColorHi);
+            o.addProperty("ieWidth", ieWidth);
+            o.addProperty("wp", wp);
+            o.addProperty("wpBeam", wpBeam);
+            o.addProperty("wpLabels", wpLabels);
+            o.addProperty("wpDist", wpDist);
+            o.addProperty("wpMax", wpMax);
+            o.addProperty("wpColor", wpColor);
+            o.addProperty("wpScale", wpScale);
+            o.addProperty("wpDeath", wpDeath);
+            o.addProperty("ptrail", ptrail);
+            o.addProperty("ptColor", ptColor);
+            o.addProperty("ptRainbow", ptRainbow);
+            o.addProperty("ptLength", ptLength);
+            o.addProperty("ptWidth", ptWidth);
+            o.addProperty("etrail", etrail);
+            o.addProperty("etColor", etColor);
+            o.addProperty("etRainbow", etRainbow);
+            o.addProperty("etLength", etLength);
+            o.addProperty("etWidth", etWidth);
+            o.addProperty("etAll", etAll);
+            o.addProperty("pcdHud", pcdHud);
+            o.addProperty("pcdX", pcdX);
+            o.addProperty("pcdY", pcdY);
+            o.addProperty("pcdScale", pcdScale);
+            o.addProperty("pcdAlpha", pcdAlpha);
+            o.addProperty("pcdColor", pcdColor);
+            o.addProperty("pcdHideIdle", pcdHideIdle);
             o.addProperty("potionHud", potionHud);
             o.addProperty("potionX", potionX);
             o.addProperty("potionY", potionY);
@@ -919,6 +1055,66 @@ public final class Config {
                 dlTaken = b(o, "dlTaken", dlTaken);
                 dlLines = (int) d(o, "dlLines", dlLines);
                 dlLife = d(o, "dlLife", dlLife);
+                hbox = b(o, "hbox", hbox);
+                hbPlayers = b(o, "hbPlayers", hbPlayers);
+                hbMobs = b(o, "hbMobs", hbMobs);
+                hbOthers = b(o, "hbOthers", hbOthers);
+                hbSelf = b(o, "hbSelf", hbSelf);
+                hbFill = b(o, "hbFill", hbFill);
+                hbWidth = d(o, "hbWidth", hbWidth);
+                hbRange = d(o, "hbRange", hbRange);
+                hbAlpha = d(o, "hbAlpha", hbAlpha);
+                hbColorP = (int) d(o, "hbColorP", hbColorP);
+                hbColorM = (int) d(o, "hbColorM", hbColorM);
+                hbColorO = (int) d(o, "hbColorO", hbColorO);
+                bout = b(o, "bout", bout);
+                boColor = (int) d(o, "boColor", boColor);
+                boRainbow = b(o, "boRainbow", boRainbow);
+                boWidth = d(o, "boWidth", boWidth);
+                boFill = b(o, "boFill", boFill);
+                boFillAlpha = d(o, "boFillAlpha", boFillAlpha);
+                boHideVanilla = b(o, "boHideVanilla", boHideVanilla);
+                chunkB = b(o, "chunkB", chunkB);
+                cbRadius = (int) d(o, "cbRadius", cbRadius);
+                cbHeight = d(o, "cbHeight", cbHeight);
+                cbColor = (int) d(o, "cbColor", cbColor);
+                cbWidth = d(o, "cbWidth", cbWidth);
+                cbLevels = b(o, "cbLevels", cbLevels);
+                cbAlpha = d(o, "cbAlpha", cbAlpha);
+                itemEsp = b(o, "itemEsp", itemEsp);
+                ieRange = d(o, "ieRange", ieRange);
+                ieValuable = b(o, "ieValuable", ieValuable);
+                ieFill = b(o, "ieFill", ieFill);
+                ieTracers = b(o, "ieTracers", ieTracers);
+                ieColor = (int) d(o, "ieColor", ieColor);
+                ieColorHi = (int) d(o, "ieColorHi", ieColorHi);
+                ieWidth = d(o, "ieWidth", ieWidth);
+                wp = b(o, "wp", wp);
+                wpBeam = b(o, "wpBeam", wpBeam);
+                wpLabels = b(o, "wpLabels", wpLabels);
+                wpDist = b(o, "wpDist", wpDist);
+                wpMax = d(o, "wpMax", wpMax);
+                wpColor = (int) d(o, "wpColor", wpColor);
+                wpScale = d(o, "wpScale", wpScale);
+                wpDeath = b(o, "wpDeath", wpDeath);
+                ptrail = b(o, "ptrail", ptrail);
+                ptColor = (int) d(o, "ptColor", ptColor);
+                ptRainbow = b(o, "ptRainbow", ptRainbow);
+                ptLength = (int) d(o, "ptLength", ptLength);
+                ptWidth = d(o, "ptWidth", ptWidth);
+                etrail = b(o, "etrail", etrail);
+                etColor = (int) d(o, "etColor", etColor);
+                etRainbow = b(o, "etRainbow", etRainbow);
+                etLength = (int) d(o, "etLength", etLength);
+                etWidth = d(o, "etWidth", etWidth);
+                etAll = b(o, "etAll", etAll);
+                pcdHud = b(o, "pcdHud", pcdHud);
+                pcdX = (int) d(o, "pcdX", pcdX);
+                pcdY = (int) d(o, "pcdY", pcdY);
+                pcdScale = d(o, "pcdScale", pcdScale);
+                pcdAlpha = d(o, "pcdAlpha", pcdAlpha);
+                pcdColor = (int) d(o, "pcdColor", pcdColor);
+                pcdHideIdle = b(o, "pcdHideIdle", pcdHideIdle);
                 potionHud = b(o, "potionHud", potionHud);
                 potionX = (int) d(o, "potionX", potionX);
                 potionY = (int) d(o, "potionY", potionY);
