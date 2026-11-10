@@ -36,6 +36,10 @@ public final class ModuleDefaults {
             Map.entry("weather", new String[]{"weatherType"}),
             Map.entry("hat", new String[]{"hatCustom", "hatHue", "hatSat", "hatVal", "chinaHatMode", "hatSize", "hatHeight"}),
             Map.entry("physic", new String[]{"physicLift"}),
+            Map.entry("server", new String[]{"serverIp", "serverTps", "serverPing", "serverColor", "serverScale", "serverAlpha", "serverX", "serverY"}),
+            Map.entry("clock", new String[]{"clockSeconds", "clockDate", "clockGame", "clockColor", "clockScale", "clockAlpha", "clockX", "clockY"}),
+            Map.entry("inv", new String[]{"invHotbar", "invColor", "invScale", "invAlpha", "invX", "invY"}),
+            Map.entry("totem", new String[]{"totemHideZero", "totemColor", "totemScale", "totemAlpha", "totemX", "totemY"}),
             Map.entry("noov", new String[]{"noHurtShake", "noFireOverlay", "noTotemParticles", "noFireworkParticles"}),
             Map.entry("hitsound", new String[]{"hitSoundType", "hitSoundVol", "hitSoundPitch"}),
             Map.entry("combo", new String[]{"comboColor", "comboTimeout", "comboScale", "comboAlpha", "comboX", "comboY"}),
@@ -73,7 +77,8 @@ public final class ModuleDefaults {
         "jumpCircle", "customItems", "handView", "targetHud", "customFog", "damageFever", "particles", "skyShader",
         "hud", "arrayList", "armorHud", "potionHud", "keystrokes", "autoswap", "itembind", "customTime", "customWeather",
         "chinaHat", "predictions", "itemPhysic", "shulkerPreview", "highlight", "streamerMode",
-        "noOverlay", "hitSound", "comboHud", "watermark"
+        "noOverlay", "hitSound", "comboHud", "watermark",
+        "serverHud", "clockHud", "invHud", "totemHud"
     };
 
     /** Выключает все модули (настройки внутри модулей не трогает). */
