@@ -1750,5 +1750,103 @@ public class MenuScreen extends Screen {
                 Config.clockColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.clockColor);
                 Config.clockScale = cslider(g, "Размер", 0.5, 2.5, Config.clockScale, false);
                 Config.clockAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.clockAlpha, false);
-                Config.clockX = (int) cslider(g, "X", 0, 400, Config.clockX, true
-                                              }
+                                Config.clockX = (int) cslider(g, "X", 0, 400, Config.clockX, true);
+                Config.clockY = (int) cslider(g, "Y", 0, 250, Config.clockY, true);
+                cy += 2;
+                resetRow(g, "clock");
+            }
+            case "inv" -> {
+                Config.invHotbar = cbool(g, "Показывать хотбар", Config.invHotbar);
+                Config.invColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.invColor);
+                Config.invScale = cslider(g, "Размер", 0.5, 2.0, Config.invScale, false);
+                Config.invAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.invAlpha, false);
+                Config.invX = (int) cslider(g, "X", 0, 400, Config.invX, true);
+                Config.invY = (int) cslider(g, "Y", 0, 250, Config.invY, true);
+                cy += 2;
+                resetRow(g, "inv");
+            }
+            case "totem" -> {
+                Config.totemHideZero = cbool(g, "Скрывать при 0", Config.totemHideZero);
+                Config.totemColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.totemColor);
+                Config.totemScale = cslider(g, "Размер", 0.5, 2.5, Config.totemScale, false);
+                Config.totemAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.totemAlpha, false);
+                Config.totemX = (int) cslider(g, "X", 0, 400, Config.totemX, true);
+                Config.totemY = (int) cslider(g, "Y", 0, 250, Config.totemY, true);
+                cy += 2;
+                resetRow(g, "totem");
+            }
+            case "wm" -> {
+                Config.watermarkName = ccycle(g, "Название", WatermarkHud.NAMES, Config.watermarkName);
+                Config.watermarkNick = cbool(g, "Ник", Config.watermarkNick);
+                Config.watermarkFps = cbool(g, "FPS", Config.watermarkFps);
+                Config.watermarkTime = cbool(g, "Время", Config.watermarkTime);
+                Config.watermarkRainbow = cbool(g, "Радуга", Config.watermarkRainbow);
+                Config.watermarkColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.watermarkColor);
+                Config.watermarkScale = cslider(g, "Размер", 0.5, 2.5, Config.watermarkScale, false);
+                Config.watermarkAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.watermarkAlpha, false);
+                Config.watermarkX = (int) cslider(g, "X", 0, 400, Config.watermarkX, true);
+                Config.watermarkY = (int) cslider(g, "Y", 0, 250, Config.watermarkY, true);
+                cy += 2;
+                resetRow(g, "wm");
+            }
+            case "noov" -> {
+                Config.noHurtShake = cbool(g, "Тряска при уроне", Config.noHurtShake);
+                Config.noFireOverlay = cbool(g, "Огонь на экране", Config.noFireOverlay);
+                Config.noTotemParticles = cbool(g, "Частицы тотема", Config.noTotemParticles);
+                Config.noFireworkParticles = cbool(g, "Частицы фейерверка", Config.noFireworkParticles);
+                cy += 2; resetRow(g, "noov");
+            }
+            case "hitsound" -> {
+                Config.hitSoundType = ccycle(g, "Звук", Combat.SOUNDS, Config.hitSoundType);
+                Config.hitSoundVol = cslider(g, "Громкость", 0.1, 1.0, Config.hitSoundVol, false);
+                Config.hitSoundPitch = cslider(g, "Высота тона", 0.5, 2.0, Config.hitSoundPitch, false);
+                cy += 2; resetRow(g, "hitsound");
+            }
+            case "sprint" -> {
+                Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs);
+                cy += 2; resetRow(g, "sprint");
+            }
+            case "zoom" -> {
+                Config.zoomFov = cslider(g, "FOV", 10, 60, Config.zoomFov, true);
+                cy += 2; resetRow(g, "zoom");
+            }
+            case "freelook" -> {
+                Config.freelookToggle = cbool(g, "Переключатель (вместо зажатия)", Config.freelookToggle);
+                Config.freelookThird = cbool(g, "Третье лицо при включении", Config.freelookThird);
+                Config.freelookSmooth = cbool(g, "Плавный возврат", Config.freelookSmooth);
+                Config.freelookSens = cslider(g, "Чувствительность", 0.2, 2.0, Config.freelookSens, false);
+                cy += 2; resetRow(g, "freelook");
+            }
+            case "time" -> {
+                Config.timeValue = (int) cslider(g, "Время", 0, 24000, Config.timeValue, true);
+                cy += 20;
+                resetRow(g, "time");
+            }
+            case "weather" -> {
+                Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
+                resetRow(g, "weather");
+            }
+            case "stream" -> {
+                noOptions(g);
+            }
+            case "autoswap" -> {
+                hint2(g, "Настройка через", "горячую клавишу");
+            }
+            case "itembind" -> {
+                hint2(g, "Настройка через", "горячую клавишу");
+            }
+            case "pred" -> {
+                noOptions(g);
+            }
+            case "shulker" -> {
+                noOptions(g);
+            }
+            default -> noOptions(g);
+        }
+    }
+
+    private void noOptions(DrawContext g) {
+        text(g, "Нет настроек", cx + 2, cy + 2, Theme.TEXT_DIM);
+        cy += 20;
+    }
+}
