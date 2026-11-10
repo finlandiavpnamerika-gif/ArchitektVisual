@@ -803,6 +803,95 @@ public class MenuScreen extends Screen {
             cy += 2; resetRow(g, "dlog");
         }
 
+        // ========== ТРЕТИЙ РЯД: World ==========
+        int maxH2 = Math.max(Math.max(hTw, hEx1), Math.max(hEx2, hMisc));
+        int y2 = y1 + maxH2 + 10;
+        int hWorld = 34 + mh("hbox", 12) + mh("bout", 7) + mh("chunk", 7) + mh("iesp", 8) + mh("wp", 10 + Waypoints.LIST.size()) + mh("ptr", 5) + mh("etr", 6) + mh("pcd", 7);
+        panel(g, "World", x0, y2, colW, hWorld);
+
+        Config.hbox = module(g, "hbox", "Hitboxes", "", Config.hbox, 12);
+        if (open.contains("hbox")) {
+            Config.hbPlayers = cbool(g, "Игроки", Config.hbPlayers);
+            Config.hbMobs = cbool(g, "Мобы", Config.hbMobs);
+            Config.hbOthers = cbool(g, "Прочие сущности", Config.hbOthers);
+            Config.hbSelf = cbool(g, "Свой (в 3-м лице)", Config.hbSelf);
+            Config.hbFill = cbool(g, "Заливка", Config.hbFill);
+            Config.hbColorP = ccycle(g, "Цвет игроков", Config.COLOR_NAMES, Config.hbColorP);
+            Config.hbColorM = ccycle(g, "Цвет мобов", Config.COLOR_NAMES, Config.hbColorM);
+            Config.hbColorO = ccycle(g, "Цвет прочих", Config.COLOR_NAMES, Config.hbColorO);
+            Config.hbWidth = cslider(g, "Толщина", 0.005, 0.06, Config.hbWidth, false);
+            Config.hbRange = cslider(g, "Дальность", 8, 128, Config.hbRange, true);
+            Config.hbAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.hbAlpha, false);
+            cy += 2; resetRow(g, "hbox");
+        }
+
+        Config.bout = module(g, "bout", "Block Outline", "", Config.bout, 7);
+        if (open.contains("bout")) {
+            Config.boColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.boColor);
+            Config.boRainbow = cbool(g, "Радуга", Config.boRainbow);
+            Config.boWidth = cslider(g, "Толщина", 0.005, 0.06, Config.boWidth, false);
+            Config.boFill = cbool(g, "Заливка", Config.boFill);
+            Config.boFillAlpha = cslider(g, "Прозрачность заливки", 0.05, 0.8, Config.boFillAlpha, false);
+            Config.boHideVanilla = cbool(g, "Скрыть ванильную рамку", Config.boHideVanilla);
+            cy += 2; resetRow(g, "bout");
+        }
+
+        Config.chunkB = module(g, "chunk", "Chunk Borders", "", Config.chunkB, 7);
+        if (open.contains("chunk")) {
+            Config.cbRadius = (int) cslider(g, "Радиус (чанков)", 1, 4, Config.cbRadius, true);
+            Config.cbHeight = cslider(g, "Высота показа", 16, 128, Config.cbHeight, true);
+            Config.cbColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.cbColor);
+            Config.cbWidth = cslider(g, "Толщина", 0.01, 0.08, Config.cbWidth, false);
+            Config.cbLevels = cbool(g, "Уровни каждые 16", Config.cbLevels);
+            Config.cbAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.cbAlpha, false);
+            cy += 2; resetRow(g, "chunk");
+        }
+
+        Config.itemEsp = module(g, "iesp", "Item ESP", "", Config.itemEsp, 8);
+        if (open.contains("iesp")) {
+            Config.ieRange = cslider(g, "Дальность", 8, 128, Config.ieRange, true);
+            Config.ieValuable = cbool(g, "Только ценные", Config.ieValuable);
+            Config.ieFill = cbool(g, "Заливка", Config.ieFill);
+            Config.ieTracers = cbool(g, "Трейсеры", Config.ieTracers);
+            Config.ieColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.ieColor);
+            Config.ieColorHi = ccycle(g, "Цвет ценных", Config.COLOR_NAMES, Config.ieColorHi);
+            Config.ieWidth = cslider(g, "Толщина", 0.005, 0.06, Config.ieWidth, false);
+            cy += 2; resetRow(g, "iesp");
+        }
+
+        Config.wp = module(g, "wp", "Waypoints", "/waypoint add", Config.wp, 10 + Waypoints.LIST.size());
+        if (open.contains("wp")) { wpBlock(g); cy += 2; resetRow(g, "wp"); }
+
+        Config.ptrail = module(g, "ptr", "Pearl Trail", "", Config.ptrail, 5);
+        if (open.contains("ptr")) {
+            Config.ptColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.ptColor);
+            Config.ptRainbow = cbool(g, "Радуга", Config.ptRainbow);
+            Config.ptLength = (int) cslider(g, "Длина (тики)", 10, 200, Config.ptLength, true);
+            Config.ptWidth = cslider(g, "Толщина", 0.02, 0.2, Config.ptWidth, false);
+            cy += 2; resetRow(g, "ptr");
+        }
+
+        Config.etrail = module(g, "etr", "Elytra Trail", "", Config.etrail, 6);
+        if (open.contains("etr")) {
+            Config.etColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.etColor);
+            Config.etRainbow = cbool(g, "Радуга", Config.etRainbow);
+            Config.etLength = (int) cslider(g, "Длина (тики)", 10, 200, Config.etLength, true);
+            Config.etWidth = cslider(g, "Толщина", 0.04, 0.4, Config.etWidth, false);
+            Config.etAll = cbool(g, "Все игроки", Config.etAll);
+            cy += 2; resetRow(g, "etr");
+        }
+
+        Config.pcdHud = module(g, "pcd", "Pearl Cooldown", "", Config.pcdHud, 7);
+        if (open.contains("pcd")) {
+            Config.pcdHideIdle = cbool(g, "Скрывать, когда готов", Config.pcdHideIdle);
+            Config.pcdColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.pcdColor);
+            Config.pcdScale = cslider(g, "Размер", 0.5, 2.5, Config.pcdScale, false);
+            Config.pcdAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.pcdAlpha, false);
+            Config.pcdX = (int) cslider(g, "X", 0, 400, Config.pcdX, true);
+            Config.pcdY = (int) cslider(g, "Y", 0, 250, Config.pcdY, true);
+            cy += 2; resetRow(g, "pcd");
+        }
+
         drawBottom(g);
     }
 
@@ -848,10 +937,10 @@ public class MenuScreen extends Screen {
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
             {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "pred", "physic", "shulker", "hl", "crit", "kill", "atk"},
-            {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem", "stats", "dlog"},
+            {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem", "stats", "dlog", "pcd"},
             {"sprint", "zoom", "respawn", "freelook", "noov", "hitsound", "stream"},
             {"autoswap", "itembind", "friends", "macro", "configs"},
-            {"time", "weather"}
+            {"time", "weather", "hbox", "bout", "chunk", "iesp", "wp", "ptr", "etr"}
     };
 
     private static String sbLabel(String id) {
@@ -881,6 +970,14 @@ public class MenuScreen extends Screen {
             case "keys" -> "Keystrokes";
             case "combo" -> "Combo Counter";
             case "server" -> "Server Info";
+            case "hbox" -> "Hitboxes";
+            case "bout" -> "Block Outline";
+            case "chunk" -> "Chunk Borders";
+            case "iesp" -> "Item ESP";
+            case "ptr" -> "Pearl Trail";
+            case "etr" -> "Elytra Trail";
+            case "pcd" -> "Pearl Cooldown";
+            case "wp" -> "Waypoints";
             case "crit" -> "Crit Effects";
             case "kill" -> "Kill Effect";
             case "atk" -> "Attack Indicator";
@@ -939,6 +1036,14 @@ public class MenuScreen extends Screen {
             case "keys" -> Config.keystrokes;
             case "combo" -> Config.comboHud;
             case "server" -> Config.serverHud;
+            case "hbox" -> Config.hbox;
+            case "bout" -> Config.bout;
+            case "chunk" -> Config.chunkB;
+            case "iesp" -> Config.itemEsp;
+            case "ptr" -> Config.ptrail;
+            case "etr" -> Config.etrail;
+            case "pcd" -> Config.pcdHud;
+            case "wp" -> Config.wp;
             case "crit" -> Config.critFx;
             case "kill" -> Config.killFx;
             case "atk" -> Config.atkInd;
@@ -990,6 +1095,14 @@ public class MenuScreen extends Screen {
             case "keys": Config.keystrokes = v; break;
             case "combo": Config.comboHud = v; break;
             case "server": Config.serverHud = v; break;
+            case "hbox": Config.hbox = v; break;
+            case "bout": Config.bout = v; break;
+            case "chunk": Config.chunkB = v; break;
+            case "iesp": Config.itemEsp = v; break;
+            case "ptr": Config.ptrail = v; break;
+            case "etr": Config.etrail = v; break;
+            case "pcd": Config.pcdHud = v; break;
+            case "wp": Config.wp = v; break;
             case "crit": Config.critFx = v; break;
             case "kill": Config.killFx = v; break;
             case "atk": Config.atkInd = v; break;
@@ -1143,6 +1256,23 @@ public class MenuScreen extends Screen {
         if (mouseX < sbSplitX) sbScrollMid = Math.max(0, Math.min(sbMaxMid, sbScrollMid - (float) verticalAmount * 22f));
         else sbScrollRight = Math.max(0, Math.min(sbMaxRight, sbScrollRight - (float) verticalAmount * 22f));
         return true;
+    }
+
+    private void wpBlock(DrawContext g) {
+        Config.wpBeam = cbool(g, "Луч в мире", Config.wpBeam);
+        Config.wpLabels = cbool(g, "Метки на экране", Config.wpLabels);
+        Config.wpDist = cbool(g, "Расстояние", Config.wpDist);
+        Config.wpDeath = cbool(g, "Точка смерти", Config.wpDeath);
+        Config.wpMax = cslider(g, "Макс. дальность", 50, 5000, Config.wpMax, true);
+        Config.wpColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.wpColor);
+        Config.wpScale = cslider(g, "Размер меток", 0.5, 2.0, Config.wpScale, false);
+        if (actionRow(g, "+ Добавить здесь")) Waypoints.addHere(client, null);
+        if (actionRow(g, "Удалить все точки")) Waypoints.clear();
+        Waypoints.Wp del = null;
+        for (Waypoints.Wp w : Waypoints.LIST) {
+            if (nameRow(g, w.name + " " + w.x + "," + w.y + "," + w.z) == 2) del = w;
+        }
+        if (del != null) { Waypoints.LIST.remove(del); Waypoints.save(); }
     }
 
     private boolean actionRow(DrawContext g, String label) {
@@ -1381,6 +1511,66 @@ public class MenuScreen extends Screen {
                 Config.dlX = (int) cslider(g, "X", 0, 400, Config.dlX, true);
                 Config.dlY = (int) cslider(g, "Y", 0, 250, Config.dlY, true);
             }
+            case "hbox" -> {
+                Config.hbPlayers = cbool(g, "Игроки", Config.hbPlayers);
+                Config.hbMobs = cbool(g, "Мобы", Config.hbMobs);
+                Config.hbOthers = cbool(g, "Прочие сущности", Config.hbOthers);
+                Config.hbSelf = cbool(g, "Свой (в 3-м лице)", Config.hbSelf);
+                Config.hbFill = cbool(g, "Заливка", Config.hbFill);
+                Config.hbColorP = ccycle(g, "Цвет игроков", Config.COLOR_NAMES, Config.hbColorP);
+                Config.hbColorM = ccycle(g, "Цвет мобов", Config.COLOR_NAMES, Config.hbColorM);
+                Config.hbColorO = ccycle(g, "Цвет прочих", Config.COLOR_NAMES, Config.hbColorO);
+                Config.hbWidth = cslider(g, "Толщина", 0.005, 0.06, Config.hbWidth, false);
+                Config.hbRange = cslider(g, "Дальность", 8, 128, Config.hbRange, true);
+                Config.hbAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.hbAlpha, false);
+            }
+            case "bout" -> {
+                Config.boColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.boColor);
+                Config.boRainbow = cbool(g, "Радуга", Config.boRainbow);
+                Config.boWidth = cslider(g, "Толщина", 0.005, 0.06, Config.boWidth, false);
+                Config.boFill = cbool(g, "Заливка", Config.boFill);
+                Config.boFillAlpha = cslider(g, "Прозрачность заливки", 0.05, 0.8, Config.boFillAlpha, false);
+                Config.boHideVanilla = cbool(g, "Скрыть ванильную рамку", Config.boHideVanilla);
+            }
+            case "chunk" -> {
+                Config.cbRadius = (int) cslider(g, "Радиус (чанков)", 1, 4, Config.cbRadius, true);
+                Config.cbHeight = cslider(g, "Высота показа", 16, 128, Config.cbHeight, true);
+                Config.cbColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.cbColor);
+                Config.cbWidth = cslider(g, "Толщина", 0.01, 0.08, Config.cbWidth, false);
+                Config.cbLevels = cbool(g, "Уровни каждые 16", Config.cbLevels);
+                Config.cbAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.cbAlpha, false);
+            }
+            case "iesp" -> {
+                Config.ieRange = cslider(g, "Дальность", 8, 128, Config.ieRange, true);
+                Config.ieValuable = cbool(g, "Только ценные", Config.ieValuable);
+                Config.ieFill = cbool(g, "Заливка", Config.ieFill);
+                Config.ieTracers = cbool(g, "Трейсеры", Config.ieTracers);
+                Config.ieColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.ieColor);
+                Config.ieColorHi = ccycle(g, "Цвет ценных", Config.COLOR_NAMES, Config.ieColorHi);
+                Config.ieWidth = cslider(g, "Толщина", 0.005, 0.06, Config.ieWidth, false);
+            }
+            case "ptr" -> {
+                Config.ptColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.ptColor);
+                Config.ptRainbow = cbool(g, "Радуга", Config.ptRainbow);
+                Config.ptLength = (int) cslider(g, "Длина (тики)", 10, 200, Config.ptLength, true);
+                Config.ptWidth = cslider(g, "Толщина", 0.02, 0.2, Config.ptWidth, false);
+            }
+            case "etr" -> {
+                Config.etColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.etColor);
+                Config.etRainbow = cbool(g, "Радуга", Config.etRainbow);
+                Config.etLength = (int) cslider(g, "Длина (тики)", 10, 200, Config.etLength, true);
+                Config.etWidth = cslider(g, "Толщина", 0.04, 0.4, Config.etWidth, false);
+                Config.etAll = cbool(g, "Все игроки", Config.etAll);
+            }
+            case "pcd" -> {
+                Config.pcdHideIdle = cbool(g, "Скрывать, когда готов", Config.pcdHideIdle);
+                Config.pcdColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.pcdColor);
+                Config.pcdScale = cslider(g, "Размер", 0.5, 2.5, Config.pcdScale, false);
+                Config.pcdAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.pcdAlpha, false);
+                Config.pcdX = (int) cslider(g, "X", 0, 400, Config.pcdX, true);
+                Config.pcdY = (int) cslider(g, "Y", 0, 250, Config.pcdY, true);
+            }
+            case "wp" -> wpBlock(g);
             case "server" -> {
                 Config.serverIp = cbool(g, "IP сервера", Config.serverIp);
                 Config.serverTps = cbool(g, "TPS", Config.serverTps);
