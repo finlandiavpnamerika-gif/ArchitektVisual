@@ -33,8 +33,8 @@ public class NoOverlayParticleMixin {
             at = @At("HEAD"), cancellable = true, require = 0)
     private void visuals$noFireworkObj(Particle particle, CallbackInfo ci) {
         if (Config.noOverlay && Config.noFireworkParticles
-                && (particle instanceof FireworksSparkParticle.FireworkParticle
-                || particle instanceof FireworksSparkParticle.Explosion
-                || particle instanceof FireworksSparkParticle.Flash)) ci.cancel();
+                && particle.getClass().getEnclosingClass() == FireworksSparkParticle.class) {
+            ci.cancel();
+        }
     }
 }
