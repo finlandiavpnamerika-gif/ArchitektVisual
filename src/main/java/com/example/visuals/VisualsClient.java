@@ -108,6 +108,7 @@ public class VisualsClient implements ClientModInitializer {
             Features.hud(drawContext, tickCounter);
             FuntimeHelper.hud(drawContext);
             DamageFever.hud(drawContext);
+            CombatFx.hud(drawContext);
             TargetHud.hud(drawContext);
             Macros.poll();   // и каждый кадр: тапы не теряются
         });
