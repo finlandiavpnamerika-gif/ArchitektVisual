@@ -8,6 +8,7 @@ import com.example.visuals.Particles;
 import com.example.visuals.SkyRenderer;
 import com.example.visuals.TargetEsp;
 import com.example.visuals.TrailRenderer;
+import com.example.visuals.WorldEsp;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -25,7 +26,7 @@ public class WorldRendererMixin {
     // Вызывается в конце WorldRenderer.render(): рисует China Hat и Trails.
     @Inject(method = "render", at = @At("RETURN"))
     private void visuals$renderChinaHat(CallbackInfo ci) {
-        if (!Config.chinaHat && !Config.trails && !Config.zones && !Config.targetEsp && !Config.skyShader && !Config.particles) return;
+        if (!Config.chinaHat && !Config.trails && !Config.zones && !Config.targetEsp && !Config.skyShader && !Config.particles && !WorldEsp.any()) return;
 
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.world == null || mc.player == null) return;
@@ -45,6 +46,7 @@ public class WorldRendererMixin {
         if (Config.zones) FuntimeHelper.render(camera, positionMatrix, consumers, tickProgress);
         if (Config.targetEsp) TargetEsp.render(camera, positionMatrix, consumers, tickProgress);
         if (Config.jumpCircle) JumpCircle.render(camera, positionMatrix, consumers, tickProgress);
+        WorldEsp.render(camera, positionMatrix, consumers, tickProgress);
         Particles.render(camera, positionMatrix, consumers, tickProgress);
     }
 }
