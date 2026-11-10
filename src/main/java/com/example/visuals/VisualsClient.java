@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -39,7 +40,7 @@ public class VisualsClient implements ClientModInitializer {
         DamageFever.register();
         Combat.register();
         Waypoints.load();
-        net.fabricmc.fabric.api.item.v1.ItemTooltipCallback.EVENT.register((stack, context, type, lines) ->
+        ItemTooltipCallback.EVENT.register((stack, context, type, lines) ->
                 TooltipsPlus.add(stack, type != null && type.isAdvanced(), lines));
         TargetHud.register();
         Theme.THEME_ID = Config.menuTheme;
