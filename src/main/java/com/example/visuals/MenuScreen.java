@@ -319,7 +319,7 @@ public class MenuScreen extends Screen {
         // ========== ПЕРВЫЙ РЯД ==========
 
         // 1. Utilities
-        int hUtil = 34 + mh("sprint", 2) + mh("zoom", 2) + mh("respawn", 0) + mh("freelook", 5);
+        int hUtil = 34 + mh("sprint", 2) + mh("zoom", 2) + mh("respawn", 0) + mh("freelook", 5) + mh("noov", 5) + mh("hitsound", 4);
         panel(g, "Utilities", x0, y0, colW, hUtil);
         Config.sprint = module(g, "sprint", "AutoSprint", "", Config.sprint, 1);
         if (open.contains("sprint")) { Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs); cy += 2;  resetRow(g, "sprint");}
@@ -333,6 +333,23 @@ public class MenuScreen extends Screen {
             Config.freelookSmooth = cbool(g, "Плавный возврат", Config.freelookSmooth);
             Config.freelookSens = cslider(g, "Чувствительность", 0.2, 2.0, Config.freelookSens, false);
             cy += 2; resetRow(g, "freelook");
+        }
+
+        Config.noOverlay = module(g, "noov", "NoOverlay", "", Config.noOverlay, 4);
+        if (open.contains("noov")) {
+            Config.noHurtShake = cbool(g, "Тряска при уроне", Config.noHurtShake);
+            Config.noFireOverlay = cbool(g, "Огонь на экране", Config.noFireOverlay);
+            Config.noTotemParticles = cbool(g, "Частицы тотема", Config.noTotemParticles);
+            Config.noFireworkParticles = cbool(g, "Частицы фейерверка", Config.noFireworkParticles);
+            cy += 2; resetRow(g, "noov");
+        }
+
+        Config.hitSound = module(g, "hitsound", "Hit Sound", "", Config.hitSound, 3);
+        if (open.contains("hitsound")) {
+            Config.hitSoundType = ccycle(g, "Звук", Combat.SOUNDS, Config.hitSoundType);
+            Config.hitSoundVol = cslider(g, "Громкость", 0.1, 1.0, Config.hitSoundVol, false);
+            Config.hitSoundPitch = cslider(g, "Высота тона", 0.5, 2.0, Config.hitSoundPitch, false);
+            cy += 2; resetRow(g, "hitsound");
         }
 
         // 2. Visuals
@@ -473,7 +490,7 @@ public class MenuScreen extends Screen {
         }
 
         // 3. HUD
-        int hHud = 34 + mh("hud", 11) + mh("array", 8) + mh("armor", 8) + mh("potion", 11) + mh("keys", 9);
+        int hHud = 34 + mh("hud", 11) + mh("array", 8) + mh("armor", 8) + mh("potion", 11) + mh("keys", 9) + mh("combo", 7) + mh("wm", 10);
         panel(g, "HUD", x0 + step * 2, y0, colW, hHud);
 
         Config.hud = module(g, "hud", "Info HUD", "", Config.hud, 9);
@@ -544,6 +561,34 @@ public class MenuScreen extends Screen {
             Config.keystrokesY = (int) cslider(g, "Y", 0, 400, Config.keystrokesY, true);
             cy += 2;
             resetRow(g, "keys");
+        }
+
+        Config.comboHud = module(g, "combo", "Combo Counter", "", Config.comboHud, 7);
+        if (open.contains("combo")) {
+            Config.comboColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.comboColor);
+            Config.comboTimeout = cslider(g, "Таймаут (сек)", 1.0, 10.0, Config.comboTimeout, false);
+            Config.comboScale = cslider(g, "Размер", 0.5, 2.5, Config.comboScale, false);
+            Config.comboAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.comboAlpha, false);
+            Config.comboX = (int) cslider(g, "X", 0, 400, Config.comboX, true);
+            Config.comboY = (int) cslider(g, "Y", 0, 250, Config.comboY, true);
+            cy += 2;
+            resetRow(g, "combo");
+        }
+
+        Config.watermark = module(g, "wm", "Watermark", "", Config.watermark, 10);
+        if (open.contains("wm")) {
+            Config.watermarkName = ccycle(g, "Название", WatermarkHud.NAMES, Config.watermarkName);
+            Config.watermarkNick = cbool(g, "Ник", Config.watermarkNick);
+            Config.watermarkFps = cbool(g, "FPS", Config.watermarkFps);
+            Config.watermarkTime = cbool(g, "Время", Config.watermarkTime);
+            Config.watermarkRainbow = cbool(g, "Радуга", Config.watermarkRainbow);
+            Config.watermarkColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.watermarkColor);
+            Config.watermarkScale = cslider(g, "Размер", 0.5, 2.5, Config.watermarkScale, false);
+            Config.watermarkAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.watermarkAlpha, false);
+            Config.watermarkX = (int) cslider(g, "X", 0, 400, Config.watermarkX, true);
+            Config.watermarkY = (int) cslider(g, "Y", 0, 250, Config.watermarkY, true);
+            cy += 2;
+            resetRow(g, "wm");
         }
 
         // 4. Client (+48: строка Friends и кнопка под ней)
@@ -694,8 +739,8 @@ public class MenuScreen extends Screen {
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
             {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "pred", "physic", "shulker", "hl"},
-            {"hud", "array", "armor", "potion", "keys"},
-            {"sprint", "zoom", "respawn", "freelook", "stream"},
+            {"hud", "array", "armor", "potion", "keys", "combo", "wm"},
+            {"sprint", "zoom", "respawn", "freelook", "noov", "hitsound", "stream"},
             {"autoswap", "itembind", "friends", "macro", "configs"},
             {"time", "weather"}
     };
@@ -725,6 +770,10 @@ public class MenuScreen extends Screen {
             case "armor" -> "Armor";
             case "potion" -> "Potion HUD";
             case "keys" -> "Keystrokes";
+            case "combo" -> "Combo Counter";
+            case "wm" -> "Watermark";
+            case "noov" -> "NoOverlay";
+            case "hitsound" -> "Hit Sound";
             case "sprint" -> "AutoSprint";
             case "zoom" -> "Zoom";
             case "respawn" -> "AutoRespawn";
@@ -770,6 +819,10 @@ public class MenuScreen extends Screen {
             case "armor" -> Config.armorHud;
             case "potion" -> Config.potionHud;
             case "keys" -> Config.keystrokes;
+            case "combo" -> Config.comboHud;
+            case "wm" -> Config.watermark;
+            case "noov" -> Config.noOverlay;
+            case "hitsound" -> Config.hitSound;
             case "sprint" -> Config.sprint;
             case "zoom" -> Config.zoom;
             case "respawn" -> Config.autoRespawn;
@@ -808,6 +861,10 @@ public class MenuScreen extends Screen {
             case "armor": Config.armorHud = v; break;
             case "potion": Config.potionHud = v; break;
             case "keys": Config.keystrokes = v; break;
+            case "combo": Config.comboHud = v; break;
+            case "wm": Config.watermark = v; break;
+            case "noov": Config.noOverlay = v; break;
+            case "hitsound": Config.hitSound = v; break;
             case "sprint": Config.sprint = v; break;
             case "zoom": Config.zoom = v; break;
             case "respawn": Config.autoRespawn = v; break;
@@ -1136,6 +1193,37 @@ public class MenuScreen extends Screen {
                 Config.keystrokesColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.keystrokesColor);
                 Config.keystrokesX = (int) cslider(g, "X", 0, 400, Config.keystrokesX, true);
                 Config.keystrokesY = (int) cslider(g, "Y", 0, 400, Config.keystrokesY, true);
+            }
+            case "combo" -> {
+                Config.comboColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.comboColor);
+                Config.comboTimeout = cslider(g, "Таймаут (сек)", 1.0, 10.0, Config.comboTimeout, false);
+                Config.comboScale = cslider(g, "Размер", 0.5, 2.5, Config.comboScale, false);
+                Config.comboAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.comboAlpha, false);
+                Config.comboX = (int) cslider(g, "X", 0, 400, Config.comboX, true);
+                Config.comboY = (int) cslider(g, "Y", 0, 250, Config.comboY, true);
+            }
+            case "wm" -> {
+                Config.watermarkName = ccycle(g, "Название", WatermarkHud.NAMES, Config.watermarkName);
+                Config.watermarkNick = cbool(g, "Ник", Config.watermarkNick);
+                Config.watermarkFps = cbool(g, "FPS", Config.watermarkFps);
+                Config.watermarkTime = cbool(g, "Время", Config.watermarkTime);
+                Config.watermarkRainbow = cbool(g, "Радуга", Config.watermarkRainbow);
+                Config.watermarkColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.watermarkColor);
+                Config.watermarkScale = cslider(g, "Размер", 0.5, 2.5, Config.watermarkScale, false);
+                Config.watermarkAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.watermarkAlpha, false);
+                Config.watermarkX = (int) cslider(g, "X", 0, 400, Config.watermarkX, true);
+                Config.watermarkY = (int) cslider(g, "Y", 0, 250, Config.watermarkY, true);
+            }
+            case "noov" -> {
+                Config.noHurtShake = cbool(g, "Тряска при уроне", Config.noHurtShake);
+                Config.noFireOverlay = cbool(g, "Огонь на экране", Config.noFireOverlay);
+                Config.noTotemParticles = cbool(g, "Частицы тотема", Config.noTotemParticles);
+                Config.noFireworkParticles = cbool(g, "Частицы фейерверка", Config.noFireworkParticles);
+            }
+            case "hitsound" -> {
+                Config.hitSoundType = ccycle(g, "Звук", Combat.SOUNDS, Config.hitSoundType);
+                Config.hitSoundVol = cslider(g, "Громкость", 0.1, 1.0, Config.hitSoundVol, false);
+                Config.hitSoundPitch = cslider(g, "Высота тона", 0.5, 2.0, Config.hitSoundPitch, false);
             }
             case "sprint" -> Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs);
             case "freelook" -> {
