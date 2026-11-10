@@ -18,7 +18,10 @@
     "ItemEntityMixin",
     "ItemEntityRendererMixin",
     "FogRendererMixin",
-    "HeldItemRendererMixin"
+    "HeldItemRendererMixin",
+    "NoOverlayHurtMixin",
+    "NoOverlayFireMixin",
+    "NoOverlayParticleMixin"
   ],
   "injectors": {
     "defaultRequire": 1
