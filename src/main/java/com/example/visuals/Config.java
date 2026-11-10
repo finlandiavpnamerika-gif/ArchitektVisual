@@ -100,6 +100,41 @@ public final class Config {
     public static boolean armorHudShowTool = true;
     public static boolean armorHudShowDurability = true;
 
+    // NoOverlay
+    public static boolean noOverlay = false;
+    public static boolean noHurtShake = true;
+    public static boolean noFireOverlay = true;
+    public static boolean noTotemParticles = true;
+    public static boolean noFireworkParticles = true;
+
+    // Hit Sound
+    public static boolean hitSound = false;
+    public static int hitSoundType = 0;
+    public static double hitSoundVol = 1.0;
+    public static double hitSoundPitch = 1.0;
+
+    // Combo Counter
+    public static boolean comboHud = false;
+    public static int comboX = 190;
+    public static int comboY = 140;
+    public static double comboScale = 1.0;
+    public static double comboAlpha = 1.0;
+    public static int comboColor = 0;
+    public static double comboTimeout = 3.0;
+
+    // Watermark
+    public static boolean watermark = false;
+    public static int watermarkX = 4;
+    public static int watermarkY = 30;
+    public static double watermarkScale = 1.0;
+    public static double watermarkAlpha = 1.0;
+    public static int watermarkColor = 0;
+    public static int watermarkName = 0;
+    public static boolean watermarkRainbow = false;
+    public static boolean watermarkNick = false;
+    public static boolean watermarkFps = true;
+    public static boolean watermarkTime = false;
+
     // Potion HUD
     public static boolean potionHud = true;
     public static int potionX = 130;
@@ -390,6 +425,33 @@ public final class Config {
             o.addProperty("armorHudAlpha", armorHudAlpha);
             o.addProperty("armorHudShowTool", armorHudShowTool);
             o.addProperty("armorHudShowDurability", armorHudShowDurability);
+            o.addProperty("noOverlay", noOverlay);
+            o.addProperty("noHurtShake", noHurtShake);
+            o.addProperty("noFireOverlay", noFireOverlay);
+            o.addProperty("noTotemParticles", noTotemParticles);
+            o.addProperty("noFireworkParticles", noFireworkParticles);
+            o.addProperty("hitSound", hitSound);
+            o.addProperty("hitSoundType", hitSoundType);
+            o.addProperty("hitSoundVol", hitSoundVol);
+            o.addProperty("hitSoundPitch", hitSoundPitch);
+            o.addProperty("comboHud", comboHud);
+            o.addProperty("comboX", comboX);
+            o.addProperty("comboY", comboY);
+            o.addProperty("comboScale", comboScale);
+            o.addProperty("comboAlpha", comboAlpha);
+            o.addProperty("comboColor", comboColor);
+            o.addProperty("comboTimeout", comboTimeout);
+            o.addProperty("watermark", watermark);
+            o.addProperty("watermarkX", watermarkX);
+            o.addProperty("watermarkY", watermarkY);
+            o.addProperty("watermarkScale", watermarkScale);
+            o.addProperty("watermarkAlpha", watermarkAlpha);
+            o.addProperty("watermarkColor", watermarkColor);
+            o.addProperty("watermarkName", watermarkName);
+            o.addProperty("watermarkRainbow", watermarkRainbow);
+            o.addProperty("watermarkNick", watermarkNick);
+            o.addProperty("watermarkFps", watermarkFps);
+            o.addProperty("watermarkTime", watermarkTime);
             o.addProperty("potionHud", potionHud);
             o.addProperty("potionX", potionX);
             o.addProperty("potionY", potionY);
@@ -608,6 +670,33 @@ public final class Config {
                 armorHudAlpha = d(o, "armorHudAlpha", armorHudAlpha);
                 armorHudShowTool = b(o, "armorHudShowTool", armorHudShowTool);
                 armorHudShowDurability = b(o, "armorHudShowDurability", armorHudShowDurability);
+                noOverlay = b(o, "noOverlay", noOverlay);
+                noHurtShake = b(o, "noHurtShake", noHurtShake);
+                noFireOverlay = b(o, "noFireOverlay", noFireOverlay);
+                noTotemParticles = b(o, "noTotemParticles", noTotemParticles);
+                noFireworkParticles = b(o, "noFireworkParticles", noFireworkParticles);
+                hitSound = b(o, "hitSound", hitSound);
+                hitSoundType = (int) d(o, "hitSoundType", hitSoundType);
+                hitSoundVol = d(o, "hitSoundVol", hitSoundVol);
+                hitSoundPitch = d(o, "hitSoundPitch", hitSoundPitch);
+                comboHud = b(o, "comboHud", comboHud);
+                comboX = (int) d(o, "comboX", comboX);
+                comboY = (int) d(o, "comboY", comboY);
+                comboScale = d(o, "comboScale", comboScale);
+                comboAlpha = d(o, "comboAlpha", comboAlpha);
+                comboColor = (int) d(o, "comboColor", comboColor);
+                comboTimeout = d(o, "comboTimeout", comboTimeout);
+                watermark = b(o, "watermark", watermark);
+                watermarkX = (int) d(o, "watermarkX", watermarkX);
+                watermarkY = (int) d(o, "watermarkY", watermarkY);
+                watermarkScale = d(o, "watermarkScale", watermarkScale);
+                watermarkAlpha = d(o, "watermarkAlpha", watermarkAlpha);
+                watermarkColor = (int) d(o, "watermarkColor", watermarkColor);
+                watermarkName = (int) d(o, "watermarkName", watermarkName);
+                watermarkRainbow = b(o, "watermarkRainbow", watermarkRainbow);
+                watermarkNick = b(o, "watermarkNick", watermarkNick);
+                watermarkFps = b(o, "watermarkFps", watermarkFps);
+                watermarkTime = b(o, "watermarkTime", watermarkTime);
                 potionHud = b(o, "potionHud", potionHud);
                 potionX = (int) d(o, "potionX", potionX);
                 potionY = (int) d(o, "potionY", potionY);
