@@ -28,7 +28,9 @@
     "CloudRendererMixin",
     "NoVanillaNametagMixin",
     "NoVanillaNametagLivingMixin",
-    "SwingSpeedMixin"
+    "SwingSpeedMixin",
+    "ArmorFeatureTintMixin",
+    "EquipmentRendererTintMixin"
   ],
   "injectors": {
     "defaultRequire": 1
