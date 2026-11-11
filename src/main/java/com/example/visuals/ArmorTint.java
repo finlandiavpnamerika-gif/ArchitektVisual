@@ -1,6 +1,6 @@
 package com.example.visuals;
 
-import net.minecraft.class_1799;
+import net.minecraft.item.ItemStack;
 
 /** Цвет-множитель для брони на моделях игроков по прочности предмета. */
 public final class ArmorTint {
@@ -9,11 +9,11 @@ public final class ArmorTint {
     /** ARGB; -1 = не красить. */
     public static int current = -1;
 
-    public static void begin(class_1799 st) {
+    public static void begin(ItemStack st) {
         current = -1;
-        if (!Config.armorTint || st.method_7960() || !st.method_7963()) return;
-        int max = Math.max(1, st.method_7936());
-        float r = (float) (max - st.method_7919()) / max;
+        if (!Config.armorTint || st.isEmpty() || !st.isDamageable()) return;
+        int max = Math.max(1, st.getMaxDamage());
+        float r = (float) (max - st.getDamage()) / max;
         int c = HudStyle.durabilityColor(r);
         float k = 0.30f; // подмешиваем белый, чтобы тёмная броня не становилась чёрной
         int rr = (int) (255 * k + (1 - k) * ((c >> 16) & 255));
