@@ -175,6 +175,14 @@ public final class Config {
     public static int totemColor = 4;
     public static boolean totemHideZero = false;
 
+    // Cooldown HUD
+    public static boolean cdHud = true;
+    public static int cdX = 8;
+    public static int cdY = 120;
+    public static double cdAlpha = 1.0;
+    public static int cdColor = 0;          // 0 = авто (по прогрессу), 1..5 = COLORS
+    public static boolean cdTime = true;
+
     // Crit Effects
     public static boolean critFx = false;
     public static int critStyle = 0;
@@ -709,6 +717,12 @@ public final class Config {
             o.addProperty("totemAlpha", totemAlpha);
             o.addProperty("totemColor", totemColor);
             o.addProperty("totemHideZero", totemHideZero);
+            o.addProperty("cdHud", cdHud);
+            o.addProperty("cdX", cdX);
+            o.addProperty("cdY", cdY);
+            o.addProperty("cdAlpha", cdAlpha);
+            o.addProperty("cdColor", cdColor);
+            o.addProperty("cdTime", cdTime);
             o.addProperty("critFx", critFx);
             o.addProperty("critStyle", critStyle);
             o.addProperty("critCount", critCount);
@@ -1129,6 +1143,12 @@ public final class Config {
                 totemAlpha = d(o, "totemAlpha", totemAlpha);
                 totemColor = (int) d(o, "totemColor", totemColor);
                 totemHideZero = b(o, "totemHideZero", totemHideZero);
+                cdHud = b(o, "cdHud", cdHud);
+                cdX = (int) d(o, "cdX", cdX);
+                cdY = (int) d(o, "cdY", cdY);
+                cdAlpha = d(o, "cdAlpha", cdAlpha);
+                cdColor = (int) d(o, "cdColor", cdColor);
+                cdTime = b(o, "cdTime", cdTime);
                 critFx = b(o, "critFx", critFx);
                 critStyle = (int) d(o, "critStyle", critStyle);
                 critCount = d(o, "critCount", critCount);
