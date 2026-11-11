@@ -119,6 +119,7 @@ public class VisualsClient implements ClientModInitializer {
             Waypoints.hud(drawContext);
             Nametags.hud(drawContext);
             TargetHud.hud(drawContext);
+            CooldownHud.hud(drawContext);
             Macros.poll();   // и каждый кадр: тапы не теряются
         });
 
