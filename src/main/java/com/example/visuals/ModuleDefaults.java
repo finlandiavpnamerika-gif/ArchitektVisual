@@ -28,7 +28,7 @@ public final class ModuleDefaults {
             Map.entry("sky", new String[]{"skyPreset", "skyAlpha", "skySpeed", "skyNightOnly", "skyStars"}),
             Map.entry("hud", new String[]{"hudHoriz", "hudFps", "hudPing", "hudCoords", "hudFacing", "hudScale", "hudAlpha", "hudColor", "hudX", "hudY"}),
             Map.entry("array", new String[]{"arrayListHoriz", "arrayListColor", "arrayListShadow", "arrayListScale", "arrayListAlpha", "arrayListX", "arrayListY"}),
-            Map.entry("armor", new String[]{"armorHudHoriz", "armorHudShowTool", "armorHudShowDurability", "armorHudScale", "armorHudAlpha", "armorHudX", "armorHudY"}),
+            Map.entry("armor", new String[]{"armorHudHoriz", "armorHudShowTool", "armorHudShowDurability", "armorHudColorIcons", "armorTint", "armorHudScale", "armorHudAlpha", "armorHudX", "armorHudY"}),
             Map.entry("potion", new String[]{"potionHoriz", "potionIcons", "potionBars", "potionLevel", "potionScale", "potionAlpha", "potionColor", "potionX", "potionY"}),
             Map.entry("jc", new String[]{"jcStyle", "jcHue", "jcRainbow", "jcSize", "jcWidth", "jcLife", "jcAlpha", "jcLand"}),
             Map.entry("keys", new String[]{"keystrokesHoriz", "keystrokesShowMouse", "keystrokesShowSpace", "keystrokesScale", "keystrokesAlpha", "keystrokesColor", "keystrokesX", "keystrokesY"}),
