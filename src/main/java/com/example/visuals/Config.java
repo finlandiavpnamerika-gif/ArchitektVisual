@@ -99,6 +99,8 @@ public final class Config {
     public static double armorHudAlpha = 1.0;
     public static boolean armorHudShowTool = true;
     public static boolean armorHudShowDurability = true;
+    public static boolean armorHudColorIcons = true;
+    public static boolean armorTint = true;
 
     // NoOverlay
     public static boolean noOverlay = false;
@@ -658,6 +660,8 @@ public final class Config {
             o.addProperty("armorHudAlpha", armorHudAlpha);
             o.addProperty("armorHudShowTool", armorHudShowTool);
             o.addProperty("armorHudShowDurability", armorHudShowDurability);
+            o.addProperty("armorHudColorIcons", armorHudColorIcons);
+            o.addProperty("armorTint", armorTint);
             o.addProperty("noOverlay", noOverlay);
             o.addProperty("noHurtShake", noHurtShake);
             o.addProperty("noFireOverlay", noFireOverlay);
@@ -1084,6 +1088,8 @@ public final class Config {
                 armorHudAlpha = d(o, "armorHudAlpha", armorHudAlpha);
                 armorHudShowTool = b(o, "armorHudShowTool", armorHudShowTool);
                 armorHudShowDurability = b(o, "armorHudShowDurability", armorHudShowDurability);
+                armorHudColorIcons = b(o, "armorHudColorIcons", armorHudColorIcons);
+                armorTint = b(o, "armorTint", armorTint);
                 noOverlay = b(o, "noOverlay", noOverlay);
                 noHurtShake = b(o, "noHurtShake", noHurtShake);
                 noFireOverlay = b(o, "noFireOverlay", noFireOverlay);
