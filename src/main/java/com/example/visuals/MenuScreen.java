@@ -707,7 +707,7 @@ public class MenuScreen extends Screen {
         }
 
         // 7. Extra Visuals 2
-        int hEx2 = 34 + mh("physic", 2) + mh("shulker", 0) + mh("hl", 3 * Config.highlights.size() + 1) + mh("inv", 7) + mh("totem", 7);
+        int hEx2 = 34 + mh("physic", 2) + mh("shulker", 0) + mh("hl", 3 * Config.highlights.size() + 1) + mh("inv", 7) + mh("totem", 7) + mh("cdh", 5);
         panel(g, "Extra Visuals 2", x0 + step * 2, y1, colW, hEx2);
         Config.itemPhysic = module(g, "physic", "Item Physic", "", Config.itemPhysic, 1);
         if (open.contains("physic")) { Config.physicLift = cslider(g, "Высота (см)", -15, 15, Config.physicLift, true); cy += 2;  resetRow(g, "physic");}
@@ -747,6 +747,16 @@ public class MenuScreen extends Screen {
             Config.totemY = (int) cslider(g, "Y", 0, 250, Config.totemY, true);
             cy += 2;
             resetRow(g, "totem");
+        }
+
+        Config.cdHud = module(g, "cdh", "Cooldown HUD", "", Config.cdHud, 5);
+        if (open.contains("cdh")) {
+            Config.cdTime = cbool(g, "Показывать время", Config.cdTime);
+            Config.cdColor = ccycle(g, "Цвет", CooldownHud.COLOR_NAMES, Config.cdColor);
+            Config.cdAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.cdAlpha, false);
+            Config.cdX = (int) cslider(g, "X", 0, 400, Config.cdX, true);
+            Config.cdY = (int) cslider(g, "Y", 0, 250, Config.cdY, true);
+            cy += 2;
         }
 
         // 8. Misc (+24: кнопка под Macros)
@@ -1020,7 +1030,7 @@ public class MenuScreen extends Screen {
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
             {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "pred", "physic", "shulker", "hl", "crit", "kill", "atk", "wings", "aura", "cape", "chams"},
-            {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem", "stats", "dlog", "pcd", "nt", "tip"},
+            {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem", "stats", "dlog", "pcd", "cdh", "nt", "tip"},
             {"sprint", "zoom", "respawn", "freelook", "noov", "hitsound", "swing", "stream"},
             {"autoswap", "itembind", "friends", "macro", "configs"},
             {"time", "weather", "hbox", "bout", "chunk", "iesp", "wp", "ptr", "etr", "clouds"}
@@ -1077,6 +1087,7 @@ public class MenuScreen extends Screen {
             case "clock" -> "Time & Date";
             case "inv" -> "Inventory HUD";
             case "totem" -> "Totem Counter";
+            case "cdh" -> "Cooldown HUD";
             case "wm" -> "Watermark";
             case "noov" -> "NoOverlay";
             case "hitsound" -> "Hit Sound";
@@ -1151,6 +1162,7 @@ public class MenuScreen extends Screen {
             case "clock" -> Config.clockHud;
             case "inv" -> Config.invHud;
             case "totem" -> Config.totemHud;
+            case "cdh" -> Config.cdHud;
             case "wm" -> Config.watermark;
             case "noov" -> Config.noOverlay;
             case "hitsound" -> Config.hitSound;
@@ -1218,6 +1230,7 @@ public class MenuScreen extends Screen {
             case "clock": Config.clockHud = v; break;
             case "inv": Config.invHud = v; break;
             case "totem": Config.totemHud = v; break;
+            case "cdh": Config.cdHud = v; break;
             case "wm": Config.watermark = v; break;
             case "noov": Config.noOverlay = v; break;
             case "hitsound": Config.hitSound = v; break;
@@ -1769,6 +1782,13 @@ public class MenuScreen extends Screen {
                 Config.totemX = (int) cslider(g, "X", 0, 400, Config.totemX, true);
                 Config.totemY = (int) cslider(g, "Y", 0, 250, Config.totemY, true);
             }
+            case "cdh" -> {
+                Config.cdTime = cbool(g, "Показывать время", Config.cdTime);
+                Config.cdColor = ccycle(g, "Цвет", CooldownHud.COLOR_NAMES, Config.cdColor);
+                Config.cdAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.cdAlpha, false);
+                Config.cdX = (int) cslider(g, "X", 0, 400, Config.cdX, true);
+                Config.cdY = (int) cslider(g, "Y", 0, 250, Config.cdY, true);
+            }
             case "combo" -> {
                 Config.comboColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.comboColor);
                 Config.comboTimeout = cslider(g, "Таймаут (сек)", 1.0, 10.0, Config.comboTimeout, false);
@@ -1846,4 +1866,3 @@ public class MenuScreen extends Screen {
 
     @Override
     public void removed() { Config.save(); }
-}
