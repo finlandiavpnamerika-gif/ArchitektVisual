@@ -11,7 +11,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemCooldownManager;
+import net.minecraft.entity.player.ItemCooldownManager;
 import net.minecraft.item.ItemStack;
 
 /** HUD с кулдаунами предметов (жемчуг, хорус, щит, серверные кулдауны и т.д.). */
