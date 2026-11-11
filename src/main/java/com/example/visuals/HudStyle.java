@@ -41,6 +41,13 @@ public final class HudStyle {
 
     // ---------- примитивы ----------
 
+        /** Цвета по порогам: 100-75 салатовый, 75-50 зелёный, 50-25 жёлтый, 25-0 красный. */
+    public static int durabilityColor(float ratio) {
+        if (ratio > 0.75f) return 0xFF9DFF3A; // салатовое
+        if (ratio > 0.50f) return 0xFF2EC83C; // зелёное
+        if (ratio > 0.25f) return 0xFFFFD81F; // жёлтое
+        return 0xFFFF3B30;                    // красное
+    }
     /** Сколько пикселей срезать слева/справа в строке i (от края) у угла радиуса r. */
     private static int inset(int r, int i) {
         double dy = r - i - 0.25;
