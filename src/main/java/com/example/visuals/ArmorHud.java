@@ -106,4 +106,4 @@ public final class ArmorHud {
         }
         return new int[] {w, h};
     }
-                                                       }
+}
