@@ -18,8 +18,7 @@ import net.minecraft.item.ItemStack;
 public final class CooldownHud {
     private CooldownHud() {}
 
-    public static boolean enabled = true;
-    public static int x = 8;
+    public static final String[] COLOR_NAMES = {"Авто", "Фиолетовый", "Голубой", "Зелёный", "Жёлтый", "Красный"};
 
     private static final int ROW_H = 22;
     private static final int BAR_W = 56;
@@ -37,8 +36,12 @@ public final class CooldownHud {
 
     private static final Map<Item, St> STATE = new HashMap<>();
 
+    private static int col(int rgb, int a) {
+        return (Math.max(0, Math.min(255, a)) << 24) | (rgb & 0xFFFFFF);
+    }
+
     public static void hud(DrawContext ctx) {
-        if (!enabled) return;
+        if (!Config.cdHud) return;
         MinecraftClient mc = MinecraftClient.getInstance();
         PlayerEntity player = mc.player;
         if (player == null || mc.options.hudHidden) {
@@ -88,26 +91,35 @@ public final class CooldownHud {
 
         if (rows.isEmpty()) return;
 
-        int total = rows.size() * ROW_H;
-        int y = mc.getWindow().getScaledHeight() / 2 - total / 2;
+        int a = (int) (255 * Config.cdAlpha);
+        int x = Config.cdX;
+        int y = Config.cdY;
 
         for (Row r : rows) {
-            int w = 20 + 4 + BAR_W + 4 + 30;
-            ctx.fill(x - 3, y - 2, x + w, y + ROW_H - 4, 0x90000000);
+            int w = 20 + 4 + BAR_W + 4 + (Config.cdTime ? 30 : 0);
+            ctx.fill(x - 3, y - 2, x + w, y + ROW_H - 4, col(0x000000, (int) (0x90 * Config.cdAlpha)));
 
             ctx.drawItem(r.stack, x, y);
 
             int bx = x + 24;
             int by = y + 6;
-            ctx.fill(bx, by, bx + BAR_W, by + 5, 0xFF2A2A2A);
+            ctx.fill(bx, by, bx + BAR_W, by + 5, col(0x2A2A2A, a));
             int filled = Math.round(BAR_W * r.progress);
-            int color = r.progress > 0.5f ? 0xFFE74C3C : (r.progress > 0.2f ? 0xFFF1C40F : 0xFF2ECC71);
-            ctx.fill(bx, by, bx + filled, by + 5, color);
 
-            String t = r.seconds >= 0
-                    ? String.format(Locale.ROOT, "%.1fс", r.seconds)
-                    : String.format(Locale.ROOT, "%d%%", Math.round(r.progress * 100));
-            ctx.drawText(mc.textRenderer, t, bx + BAR_W + 4, y + 4, 0xFFFFFFFF, true);
+            int rgb;
+            if (Config.cdColor == 0) {
+                rgb = r.progress > 0.5f ? 0xE74C3C : (r.progress > 0.2f ? 0xF1C40F : 0x2ECC71);
+            } else {
+                rgb = Config.COLORS[Math.min(Config.cdColor - 1, Config.COLORS.length - 1)];
+            }
+            ctx.fill(bx, by, bx + filled, by + 5, col(rgb, a));
+
+            if (Config.cdTime) {
+                String t = r.seconds >= 0
+                        ? String.format(Locale.ROOT, "%.1fс", r.seconds)
+                        : String.format(Locale.ROOT, "%d%%", Math.round(r.progress * 100));
+                ctx.drawText(mc.textRenderer, t, bx + BAR_W + 4, y + 4, col(0xFFFFFF, a), true);
+            }
 
             y += ROW_H;
         }
