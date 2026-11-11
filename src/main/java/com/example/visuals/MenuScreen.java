@@ -1866,3 +1866,4 @@ public class MenuScreen extends Screen {
 
     @Override
     public void removed() { Config.save(); }
+}
