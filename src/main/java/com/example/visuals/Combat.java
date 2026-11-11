@@ -58,7 +58,7 @@ public final class Combat {
 
     private static int trackId = -1;
     private static float trackHp = -1;
-    private static double tx, ty, tz;
+    private static double tx, ty, tz, trackH = 1.8;
     private static boolean trackPlayer = false;
     private static String trackName = "";
     private static long trackAttackAt = 0;
@@ -94,6 +94,7 @@ public final class Combat {
                     trackPlayer = le instanceof PlayerEntity;
                     trackName = le.getName().getString();
                     trackAttackAt = now;
+                    trackH = le.getHeight();
                     tx = le.getX(); ty = le.getY(); tz = le.getZ();
                 }
             }
@@ -138,10 +139,10 @@ public final class Combat {
         // таймаут комбо
         if (combo > 0 && now - lastHitMs > (long) (Config.comboTimeout * 1000)) combo = 0;
 
-        // подтверждение попадания
+        // подтверждение попадания (убийственный удар не даёт hurtTime, поэтому считаем и смерть цели)
         if (pendingId != -1) {
             Entity e = mc.world.getEntityById(pendingId);
-            if (e instanceof LivingEntity le && le.hurtTime > pendingHurt) {
+            if (e instanceof LivingEntity le && (le.hurtTime > pendingHurt || le.getHealth() <= 0)) {
                 pendingId = -1;
                 onHit(mc, le, now);
             } else if (now - pendingAt > 600) {
@@ -158,16 +159,18 @@ public final class Combat {
         if (e instanceof LivingEntity le && !le.isDead() && le.getHealth() > 0) {
             float hp = le.getHealth() + le.getAbsorptionAmount();
             tx = le.getX(); ty = le.getY(); tz = le.getZ();
+            trackH = le.getHeight();
             if (trackHp >= 0 && hp < trackHp - 0.01f && now - trackAttackAt < 1500) {
                 addLog(trackName, trackHp - hp, true, now);
             }
             trackHp = hp;
             if (now - trackAttackAt > 8000) trackId = -1;
         } else {
-            // цель умерла или пропала: считаем убийством, если недавно били и она была рядом
-            boolean near = mc.player.squaredDistanceTo(tx, ty, tz) < 16 * 16;
+            // цель умерла (здоровье 0) либо исчезла с малым остатком HP рядом после нашего удара
             boolean dead = e instanceof LivingEntity le2 && (le2.isDead() || le2.getHealth() <= 0);
-            if (trackHitSeen && now - trackAttackAt < 4000 && (dead || near)) onKill(mc, now);
+            boolean near = mc.player.squaredDistanceTo(tx, ty, tz) < 16 * 16;
+            boolean vanished = e == null && near && trackHp >= 0 && trackHp <= 6f && now - trackAttackAt < 1500;
+            if (now - trackAttackAt < 4000 && (dead || vanished)) onKill(mc, now);
             trackId = -1;
         }
     }
@@ -184,11 +187,12 @@ public final class Combat {
     }
 
     private static void onKill(MinecraftClient mc, long now) {
+        // эффект показываем для любой цели, а статистика может считаться только по игрокам
+        if (Config.killFx) GhostFx.spawn(mc, tx, ty, tz, trackH);
         if (Config.statsPlayersOnly && !trackPlayer) return;
         kills++;
         streak++;
         if (streak > bestStreak) bestStreak = streak;
-        if (Config.killFx) CombatFx.kill(mc, tx, ty, tz);
     }
 
     private static void addLog(String name, float amount, boolean dealt, long now) {
