@@ -98,6 +98,7 @@ public class VisualsClient implements ClientModInitializer {
             Features.tick(client);
             DamageFever.tick(client);
             Combat.tick(client);
+            GhostFx.tick(client);
             WorldEsp.tick(client);
             Waypoints.tick(client);
             JumpCircle.tick(client);
