@@ -8,6 +8,7 @@ import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.world.World;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 
@@ -88,7 +89,7 @@ public final class SkyRenderer {
                               VertexConsumerProvider.Immediate consumers, float tickProgress) {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (!Config.skyShader || mc.world == null || mc.player == null) return;
-        if (!mc.world.getDimension().natural()) return;   // только Верхний мир
+        if (mc.world.getRegistryKey() != World.OVERWORLD) return;   // только Верхний мир
 
         // ночь / дождь
         float night = 1f;
