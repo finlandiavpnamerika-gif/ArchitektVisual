@@ -353,4 +353,78 @@ public final class Cosmetics {
                     boolean have = false;
                     for (double y = 0; y <= 1.95; y += 0.08) {
                         double a = y * 6.0 + t * sp * 2.0 + strand * Math.PI;
-                        double rr = r0 * (0.85 +
+                        double rr = r0 * (0.85 + 0.15 * Math.sin(y * 3 + t));
+                        double x = px + Math.cos(a) * rr, yy = py + y, z = pz + Math.sin(a) * rr;
+                        float fade = (float) Math.sin(Math.PI * Math.min(1.0, y / 1.95));
+                        int c = WorldDraw.argb(0.85f * fade,
+                                Config.auraRainbow ? hue((float) (t * 0.2 + y * 0.3)) : base);
+                        if (have) WorldDraw.ribbon(q, m, cam.x, cam.y, cam.z, lx, ly, lz, x, yy, z, 0.022f, c, c);
+                        lx = x; ly = yy; lz = z; have = true;
+                    }
+                }
+            }
+            default -> {  // кольца
+                for (int i = 0; i < 3; i++) {
+                    double ph = (t * sp * 0.5 + i / 3.0) % 1.0;
+                    double y = py + ph * 1.95;
+                    float fade = (float) Math.sin(Math.PI * ph);
+                    int c = WorldDraw.argb(0.8f * fade, Config.auraRainbow ? hue((float) (t * 0.2 + i * 0.2)) : base);
+                    double rr = r0 * (0.9 + 0.2 * Math.sin(ph * Math.PI));
+                    int seg = 28;
+                    for (int k = 0; k < seg; k++) {
+                        double a0 = k * 2 * Math.PI / seg, a1 = (k + 1) * 2 * Math.PI / seg;
+                        WorldDraw.ribbon(q, m, cam.x, cam.y, cam.z,
+                                px + Math.cos(a0) * rr, y, pz + Math.sin(a0) * rr,
+                                px + Math.cos(a1) * rr, y, pz + Math.sin(a1) * rr, 0.02f, c, c);
+                    }
+                }
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ Cape
+    private static void cape(VertexConsumer q, Matrix4f m, Vec3d cam, PlayerEntity p,
+                             double px, double py, double pz, Frame fr, double t) {
+        boolean sneak = p.isSneaking();
+        double top = sneak ? 1.38 : 1.46;
+        double ox = px + fr.bx * (sneak ? 0.27 : 0.14), oy = py + top, oz = pz + fr.bz * (sneak ? 0.27 : 0.14);
+
+        Vec3d v = p.getVelocity();
+        double speed = Math.sqrt(v.x * v.x + v.z * v.z);
+        double ang = MathHelper.clamp(0.14 + speed * 2.4 + (sneak ? 0.18 : 0.0), 0.1, 1.15);
+        double dxv = fr.bx * Math.sin(ang), dyv = -Math.cos(ang), dzv = fr.bz * Math.sin(ang);
+
+        final int rows = 10, cols = 5;
+        double len = 1.2, width = 0.5;
+        double wave = Config.capeWave;
+        int c1 = Config.capeRainbow ? 0 : pal(Config.capeColor), c2 = pal(Config.capeColor2);
+
+        double[][][] pts = new double[rows + 1][cols + 1][];
+        int[][] col = new int[rows + 1][cols + 1];
+        for (int r = 0; r <= rows; r++) {
+            double fr0 = (double) r / rows;
+            for (int c = 0; c <= cols; c++) {
+                double fc = (double) c / cols - 0.5;
+                double lat = fc * width * (1.0 + 0.18 * fr0);
+                double w = wave * Math.sin(t * 3.0 + r * 0.7 + c * 0.35) * 0.06 * fr0 * (0.35 + speed * 4.0);
+                pts[r][c] = new double[] {
+                        ox + dxv * len * fr0 + fr.rx * lat + fr.bx * w,
+                        oy + dyv * len * fr0,
+                        oz + dzv * len * fr0 + fr.rz * lat + fr.bz * w};
+                int base = Config.capeRainbow ? hue((float) (t * 0.15 + fr0 * 0.35)) : mixRgb(c1, c2, (float) fr0);
+                float shade = (float) (0.85 + 0.15 * Math.sin(t * 3.0 + r * 0.7 + c * 0.35));
+                col[r][c] = WorldDraw.argb(0.97f, mixRgb(0x000000, base, shade));
+            }
+        }
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                double[] a = pts[r][c], b = pts[r][c + 1], d = pts[r + 1][c], e = pts[r + 1][c + 1];
+                WorldDraw.quad2(q, m,
+                        (float) (a[0] - cam.x), (float) (a[1] - cam.y), (float) (a[2] - cam.z), col[r][c],
+                        (float) (b[0] - cam.x), (float) (b[1] - cam.y), (float) (b[2] - cam.z), col[r][c + 1],
+                        (float) (e[0] - cam.x), (float) (e[1] - cam.y), (float) (e[2] - cam.z), col[r + 1][c + 1],
+                        (float) (d[0] - cam.x), (float) (d[1] - cam.y), (float) (d[2] - cam.z), col[r + 1][c]);
+            }
+        }
+    }
+}
