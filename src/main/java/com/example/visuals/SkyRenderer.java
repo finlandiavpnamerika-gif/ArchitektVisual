@@ -2,12 +2,12 @@ package com.example.visuals;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.Random;
-import net.minecraft.class_12249;
-import net.minecraft.class_310;
-import net.minecraft.class_4184;
-import net.minecraft.class_4587;
-import net.minecraft.class_4588;
-import net.minecraft.class_4597;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 
@@ -84,36 +84,36 @@ public final class SkyRenderer {
 
     // ================= рендер =================
 
-    public static void render(class_4184 camera, Matrix4f positionMatrix,
-                              class_4597.class_4598 consumers, float tickProgress) {
-        class_310 mc = class_310.method_1551();
-        if (!Config.skyShader || mc.field_1687 == null || mc.field_1724 == null) return;
-        if (!mc.field_1687.method_8597().comp_642()) return;   // только Верхний мир
+    public static void render(Camera camera, Matrix4f positionMatrix,
+                              VertexConsumerProvider.Immediate consumers, float tickProgress) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (!Config.skyShader || mc.world == null || mc.player == null) return;
+        if (!mc.world.getDimension().natural()) return;   // только Верхний мир
 
         // ночь / дождь
         float night = 1f;
         if (Config.skyNightOnly) {
-            float ang = (float) ((mc.field_1687.method_8532() % 24000L) / 24000.0 * Math.PI * 2.0);
+            float ang = (float) ((mc.world.getTimeOfDay() % 24000L) / 24000.0 * Math.PI * 2.0);
             float sun = (float) Math.sin(ang);                 // 1 = полдень, -1 = полночь
             night = clamp01((0.12f - sun) / 0.40f);
         }
-        float rain = mc.field_1687.method_8430(tickProgress);
+        float rain = mc.world.getRainGradient(tickProgress);
         float k = (float) Config.skyAlpha * night * (1f - 0.75f * rain);
         if (k <= 0.01f) return;
 
         int preset = Math.max(0, Math.min(Config.skyPreset, PRESETS.length - 1));
         if (cachedPreset != preset) { buildColors(preset); cachedPreset = preset; }
 
-        float R = Math.max(64f, mc.field_1690.method_42503().method_41753() * 16f * 2.2f);
+        float R = Math.max(64f, mc.options.getViewDistance().getValue() * 16f * 2.2f);
         float t = (System.currentTimeMillis() % 1000000L) / 1000f * (float) Config.skySpeed;
         Matrix4f rot = new Matrix4f().rotationY(t * 0.02f);    // медленный поворот неба вокруг вертикали
-        Matrix4f id = new class_4587().method_23760().method_23761();
+        Matrix4f id = new MatrixStack().peek().getPositionMatrix();
 
         Matrix4fStack mv = RenderSystem.getModelViewStack();
         mv.pushMatrix();
         mv.mul(positionMatrix);
         try {
-            class_4588 q = consumers.method_73477(class_12249.method_76023());
+            VertexConsumer q = consumers.getBuffer(RenderLayers.debugQuads());
 
             // купол
             for (int j = 0; j < EL; j++) {
@@ -159,7 +159,7 @@ public final class SkyRenderer {
                 default -> {}
             }
 
-            consumers.method_22994(class_12249.method_76023());
+            consumers.draw(RenderLayers.debugQuads());
         } finally {
             mv.popMatrix();
         }
@@ -172,7 +172,7 @@ public final class SkyRenderer {
     private static final float[] TX = new float[AS + 1], TY = new float[AS + 1], TZ = new float[AS + 1];
     private static final int[] AC = new int[AS + 1];
 
-    private static void aurora(class_4588 q, Matrix4f m, float R, float t, float k, int colA, int colB) {
+    private static void aurora(VertexConsumer q, Matrix4f m, float R, float t, float k, int colA, int colB) {
         for (int r = 0; r < 3; r++) {
             float az0 = r * 2.1f + 0.4f;
             float span = 2.6f;
@@ -271,7 +271,7 @@ public final class SkyRenderer {
 
     private static final int DISC_SEG = 40;
 
-    private static void disc(class_4588 q, Matrix4f m, float R,
+    private static void disc(VertexConsumer q, Matrix4f m, float R,
                              float dx, float dy, float dz,
                              float ang, int cTop, int cBot, float k, float glow) {
         float l = (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
@@ -392,6 +392,4 @@ public final class SkyRenderer {
         float c000 = hash(xi, yi, zi),         c100 = hash(xi + 1, yi, zi);
         float c010 = hash(xi, yi + 1, zi),     c110 = hash(xi + 1, yi + 1, zi);
         float c001 = hash(xi, yi, zi + 1),     c101 = hash(xi + 1, yi, zi + 1);
-        float c011 = hash(xi, yi + 1, zi + 1), c111 = hash(xi + 1, yi + 1, zi + 1);
-        float x00 = lerp(c000, c100, u), x10 = lerp(c010, c110, u);
-        float x01 = 
+        float c011 = hash(xi, yi + 1, zi + 1), c111 = hash(xi + 1, yi + 1, zi +
