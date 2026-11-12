@@ -392,4 +392,65 @@ public final class SkyRenderer {
         float c000 = hash(xi, yi, zi),         c100 = hash(xi + 1, yi, zi);
         float c010 = hash(xi, yi + 1, zi),     c110 = hash(xi + 1, yi + 1, zi);
         float c001 = hash(xi, yi, zi + 1),     c101 = hash(xi + 1, yi, zi + 1);
-        float c011 = hash(xi, yi + 1, zi + 1), c111 = hash(xi + 1, yi + 1, zi +
+        float c011 = hash(xi, yi + 1, zi + 1), c111 = hash(xi + 1, yi + 1, zi + 1);
+        float x00 = lerp(c000, c100, u), x10 = lerp(c010, c110, u);
+        float x01 = lerp(c001, c101, u), x11 = lerp(c011, c111, u);
+        return lerp(lerp(x00, x10, v), lerp(x01, x11, v), w);
+    }
+
+    private static float fbm(float x, float y, float z, int oct) {
+        float a = 0.5f, s = 0f;
+        for (int i = 0; i < oct; i++) {
+            s += a * noise(x, y, z);
+            x *= 2.03f; y *= 2.03f; z *= 2.03f; a *= 0.5f;
+        }
+        return s;
+    }
+
+    // ================= утилиты =================
+
+    private static float clamp01(float v) { return v < 0f ? 0f : (v > 1f ? 1f : v); }
+    private static float lerp(float a, float b, float t) { return a + (b - a) * t; }
+
+    private static float smooth(float e0, float e1, float x) {
+        float t = clamp01((x - e0) / (e1 - e0));
+        return t * t * (3f - 2f * t);
+    }
+
+    private static int lerpRgb(int a, int b, float t) {
+        int rr = (int) (((a >> 16) & 255) + (((b >> 16) & 255) - ((a >> 16) & 255)) * t);
+        int gg = (int) (((a >> 8) & 255) + (((b >> 8) & 255) - ((a >> 8) & 255)) * t);
+        int bb = (int) ((a & 255) + ((b & 255) - (a & 255)) * t);
+        return (rr << 16) | (gg << 8) | bb;
+    }
+
+    private static int argb(int a, int rgb) {
+        return (Math.max(0, Math.min(255, a)) << 24) | (rgb & 0xFFFFFF);
+    }
+
+    private static int scaleAlpha(int argb, float k) {
+        int a = (int) ((argb >>> 24) * k);
+        return (Math.max(0, Math.min(255, a)) << 24) | (argb & 0xFFFFFF);
+    }
+
+    /** Четырёхугольник, видимый с обеих сторон. */
+    private static void dquad(VertexConsumer q, Matrix4f m,
+                              float ax, float ay, float az, int ac,
+                              float bx, float by, float bz, int bc,
+                              float cx, float cy, float cz, int cc,
+                              float dx, float dy, float dz, int dc) {
+        quad(q, m, ax, ay, az, ac, bx, by, bz, bc, cx, cy, cz, cc, dx, dy, dz, dc);
+        quad(q, m, dx, dy, dz, dc, cx, cy, cz, cc, bx, by, bz, bc, ax, ay, az, ac);
+    }
+
+    private static void quad(VertexConsumer q, Matrix4f m,
+                             float ax, float ay, float az, int ac,
+                             float bx, float by, float bz, int bc,
+                             float cx, float cy, float cz, int cc,
+                             float dx, float dy, float dz, int dc) {
+        q.vertex(m, ax, ay, az).color(ac);
+        q.vertex(m, bx, by, bz).color(bc);
+        q.vertex(m, cx, cy, cz).color(cc);
+        q.vertex(m, dx, dy, dz).color(dc);
+    }
+}
