@@ -10,20 +10,20 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
+import net.minecraft.class_2960;
+import net.minecraft.class_304;
+import net.minecraft.class_310;
+import net.minecraft.class_3675;
+import net.minecraft.class_465;
 import org.lwjgl.glfw.GLFW;
 
 public class VisualsClient implements ClientModInitializer {
-    public static KeyBinding menuKey;
-    public static KeyBinding zoomKey;
-    public static KeyBinding freelookKey;
-    public static KeyBinding swapSelectKey;
-    public static KeyBinding bindSelectKey;
-    public static KeyBinding highlightKey;
+    public static class_304 menuKey;
+    public static class_304 zoomKey;
+    public static class_304 freelookKey;
+    public static class_304 swapSelectKey;
+    public static class_304 bindSelectKey;
+    public static class_304 highlightKey;
 
     @Override
     public void onInitializeClient() {
@@ -41,59 +41,59 @@ public class VisualsClient implements ClientModInitializer {
         Combat.register();
         Waypoints.load();
         ItemTooltipCallback.EVENT.register((stack, context, type, lines) ->
-                TooltipsPlus.add(stack, type != null && type.isAdvanced(), lines));
+                TooltipsPlus.add(stack, type != null && type.method_8035(), lines));
         TargetHud.register();
         Theme.THEME_ID = Config.menuTheme;
         Theme.apply();
 
         // В 1.21.9+ категория - объект, а не строка
-        KeyBinding.Category category = KeyBinding.Category.create(Identifier.of("visualsmod", "main"));
+        class_304.class_11900 category = class_304.class_11900.method_74698(class_2960.method_60655("visualsmod", "main"));
 
-        menuKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        menuKey = KeyBindingHelper.registerKeyBinding(new class_304(
                 "key.visualsmod.menu",
-                InputUtil.Type.KEYSYM,
+                class_3675.class_307.field_1668,
                 GLFW.GLFW_KEY_RIGHT_SHIFT,
                 category
         ));
 
-        zoomKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        zoomKey = KeyBindingHelper.registerKeyBinding(new class_304(
                 "key.visualsmod.zoom",
-                InputUtil.Type.KEYSYM,
+                class_3675.class_307.field_1668,
                 GLFW.GLFW_KEY_C,
                 category
         ));
 
-        freelookKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        freelookKey = KeyBindingHelper.registerKeyBinding(new class_304(
                 "key.visualsmod.freelook",
-                InputUtil.Type.KEYSYM,
+                class_3675.class_307.field_1668,
                 GLFW.GLFW_KEY_LEFT_ALT,
                 category
         ));
 
-        swapSelectKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        swapSelectKey = KeyBindingHelper.registerKeyBinding(new class_304(
                 "key.visualsmod.swap_select",
-                InputUtil.Type.KEYSYM,
+                class_3675.class_307.field_1668,
                 GLFW.GLFW_KEY_V,
                 category
         ));
 
-        bindSelectKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        bindSelectKey = KeyBindingHelper.registerKeyBinding(new class_304(
                 "key.visualsmod.bind_select",
-                InputUtil.Type.KEYSYM,
+                class_3675.class_307.field_1668,
                 GLFW.GLFW_KEY_B,
                 category
         ));
 
-        highlightKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        highlightKey = KeyBindingHelper.registerKeyBinding(new class_304(
                 "key.visualsmod.highlight_select",
-                InputUtil.Type.KEYSYM,
+                class_3675.class_307.field_1668,
                 GLFW.GLFW_KEY_H,
                 category
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (menuKey.wasPressed()) {
-                client.setScreen(new MenuScreen());
+            while (menuKey.method_1436()) {
+                client.method_1507(new MenuScreen());
             }
             Features.tick(client);
             DamageFever.tick(client);
@@ -108,6 +108,7 @@ public class VisualsClient implements ClientModInitializer {
             TrailRenderer.tick();
             FuntimeHelper.tick();
             Macros.poll();
+            RadialMenu.poll();
             ItemHighlight.tick(client);
         });
 
@@ -121,10 +122,11 @@ public class VisualsClient implements ClientModInitializer {
             TargetHud.hud(drawContext);
             CooldownHud.hud(drawContext);
             Macros.poll();   // и каждый кадр: тапы не теряются
+            RadialMenu.poll();
         });
 
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-            if (screen instanceof HandledScreen) {
+            if (screen instanceof class_465) {
                 ScreenEvents.afterRender(screen).register((s, drawContext, mouseX, mouseY, tickDelta) ->
                         ItemFeatures.drawPanel(drawContext, client));
             }
@@ -133,8 +135,8 @@ public class VisualsClient implements ClientModInitializer {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("visuals")
                     .executes(ctx -> {
-                        MinecraftClient mc = ctx.getSource().getClient();
-                        mc.execute(() -> mc.setScreen(new MenuScreen()));
+                        class_310 mc = ctx.getSource().getClient();
+                        mc.execute(() -> mc.method_1507(new MenuScreen()));
                         return 1;
                     })
             );
@@ -142,40 +144,47 @@ public class VisualsClient implements ClientModInitializer {
                     .then(ClientCommandManager.literal("add")
                             .executes(ctx -> {
                                 Waypoints.addHere(ctx.getSource().getClient(), null);
-                                ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("Waypoint added"));
+                                ctx.getSource().sendFeedback(net.minecraft.class_2561.method_43470("Waypoint added"));
                                 return 1;
                             })
                             .then(ClientCommandManager.argument("name", com.mojang.brigadier.arguments.StringArgumentType.greedyString())
                                     .executes(ctx -> {
                                         Waypoints.addHere(ctx.getSource().getClient(),
                                                 com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "name"));
-                                        ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("Waypoint added"));
+                                        ctx.getSource().sendFeedback(net.minecraft.class_2561.method_43470("Waypoint added"));
                                         return 1;
                                     })))
                     .then(ClientCommandManager.literal("remove")
                             .then(ClientCommandManager.argument("name", com.mojang.brigadier.arguments.StringArgumentType.greedyString())
                                     .executes(ctx -> {
                                         boolean ok = Waypoints.remove(com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "name"));
-                                        ctx.getSource().sendFeedback(net.minecraft.text.Text.literal(ok ? "Waypoint removed" : "Waypoint not found"));
+                                        ctx.getSource().sendFeedback(net.minecraft.class_2561.method_43470(ok ? "Waypoint removed" : "Waypoint not found"));
                                         return 1;
                                     })))
                     .then(ClientCommandManager.literal("clear")
                             .executes(ctx -> {
                                 Waypoints.clear();
-                                ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("Waypoints cleared"));
+                                ctx.getSource().sendFeedback(net.minecraft.class_2561.method_43470("Waypoints cleared"));
                                 return 1;
                             }))
                     .then(ClientCommandManager.literal("list")
                             .executes(ctx -> {
-                                if (Waypoints.LIST.isEmpty()) ctx.getSource().sendFeedback(net.minecraft.text.Text.literal("No waypoints"));
+                                if (Waypoints.LIST.isEmpty()) ctx.getSource().sendFeedback(net.minecraft.class_2561.method_43470("No waypoints"));
                                 for (Waypoints.Wp w : Waypoints.LIST)
-                                    ctx.getSource().sendFeedback(net.minecraft.text.Text.literal(w.name + ": " + w.x + " " + w.y + " " + w.z));
+                                    ctx.getSource().sendFeedback(net.minecraft.class_2561.method_43470(w.name + ": " + w.x + " " + w.y + " " + w.z));
                                 return 1;
                             }))
             );
+            dispatcher.register(ClientCommandManager.literal("radial")
+                    .executes(ctx -> {
+                        class_310 mc = ctx.getSource().getClient();
+                        mc.execute(() -> mc.method_1507(new RadialMenuScreen()));
+                        return 1;
+                    })
+            );
             dispatcher.register(ClientCommandManager.literal("freelook")
                     .executes(ctx -> {
-                        MinecraftClient mc = ctx.getSource().getClient();
+                        class_310 mc = ctx.getSource().getClient();
                         mc.execute(Freelook::toggleLatch);
                         return 1;
                     })
