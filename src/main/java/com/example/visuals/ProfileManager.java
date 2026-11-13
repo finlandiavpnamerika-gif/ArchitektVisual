@@ -73,10 +73,14 @@ public final class ProfileManager {
         try {
             List<String> friends = new ArrayList<>(Config.friends);
             List<Macro> macros = new ArrayList<>(Config.macros);
+            List<RadialItem> radial = new ArrayList<>(Config.radialItems);
+            int radialKey = Config.radialKey;
             ModuleDefaults.resetAll();
             Config.loadFrom(file(name));
             Config.friends.clear(); Config.friends.addAll(friends);
             Config.macros.clear(); Config.macros.addAll(macros);
+            Config.radialItems.clear(); Config.radialItems.addAll(radial);
+            Config.radialKey = radialKey;
             applyAfterLoad();
             current = name;
             return true;
