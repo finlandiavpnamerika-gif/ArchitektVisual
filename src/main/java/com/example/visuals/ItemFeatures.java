@@ -2,19 +2,19 @@ package com.example.visuals;
 
 import com.example.visuals.mixin.HandledScreenAccessor;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.class_1268;
+import net.minecraft.class_1713;
+import net.minecraft.class_1735;
+import net.minecraft.class_1799;
+import net.minecraft.class_239;
+import net.minecraft.class_2561;
+import net.minecraft.class_304;
+import net.minecraft.class_310;
+import net.minecraft.class_327;
+import net.minecraft.class_332;
+import net.minecraft.class_3965;
+import net.minecraft.class_437;
+import net.minecraft.class_490;
 import org.lwjgl.glfw.GLFW;
 
 public final class ItemFeatures {
@@ -33,8 +33,8 @@ public final class ItemFeatures {
     private static boolean swapSelWasDown = true;
     private static boolean bindSelWasDown = true;
 
-    private static int codeOf(KeyBinding kb) {
-        return KeyBindingHelper.getBoundKeyOf(kb).getCode();
+    private static int codeOf(class_304 kb) {
+        return KeyBindingHelper.getBoundKeyOf(kb).method_1444();
     }
 
     public static String swapKeyName() {
@@ -51,6 +51,7 @@ public final class ItemFeatures {
                 || key == codeOf(VisualsClient.menuKey) || key == codeOf(VisualsClient.zoomKey)) {
             return "Эта клавиша занята модом";
         }
+        if (key == Config.radialKey) return "Клавиша занята круговым меню";
         for (SwapPair p : Config.swapPairs) {
             if (p != self && p.key == key) return "Клавиша уже занята другой парой";
         }
@@ -78,18 +79,18 @@ public final class ItemFeatures {
         return null;
     }
 
-    public static void tick(MinecraftClient mc) {
-        if (mc.player == null || mc.interactionManager == null) return;
+    public static void tick(class_310 mc) {
+        if (mc.field_1724 == null || mc.field_1761 == null) return;
         long now = System.currentTimeMillis();
-        long window = mc.getWindow().getHandle();
-        Screen screen = mc.currentScreen;
-        boolean inInventory = screen instanceof InventoryScreen;
+        long window = mc.method_22683().method_4490();
+        class_437 screen = mc.field_1755;
+        boolean inInventory = screen instanceof class_490;
         boolean active = screen == null || inInventory;
 
         if (returnSlotId != -1 && now >= returnAt
-                && mc.player.currentScreenHandler == mc.player.playerScreenHandler) {
-            mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                    returnSlotId, returnHotbar, SlotActionType.SWAP, mc.player);
+                && mc.field_1724.field_7512 == mc.field_1724.field_7498) {
+            mc.field_1761.method_2906(mc.field_1724.field_7498.field_7763,
+                    returnSlotId, returnHotbar, class_1713.field_7791, mc.field_1724);
             returnSlotId = -1;
         }
 
@@ -121,10 +122,10 @@ public final class ItemFeatures {
         }
     }
 
-    private static void swapPair(MinecraftClient mc, SwapPair p, long now) {
+    private static void swapPair(class_310 mc, SwapPair p, long now) {
         if (now - lastSwap < SWAP_COOLDOWN_MS) return;
-        ItemStack off = mc.player.getOffHandStack();
-        String offName = off.isEmpty() ? "" : nameOf(off);
+        class_1799 off = mc.field_1724.method_6079();
+        String offName = off.method_7960() ? "" : nameOf(off);
         String[] targets;
         if (offName.equalsIgnoreCase(p.a)) targets = new String[]{p.b};
         else if (offName.equalsIgnoreCase(p.b)) targets = new String[]{p.a};
@@ -133,18 +134,18 @@ public final class ItemFeatures {
         for (String t : targets) {
             int slotId = findSlotId(mc, t);
             if (slotId == -1) continue;
-            mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId, slotId, 40,
-                    SlotActionType.SWAP, mc.player);
+            mc.field_1761.method_2906(mc.field_1724.field_7498.field_7763, slotId, 40,
+                    class_1713.field_7791, mc.field_1724);
             lastSwap = now;
             return;
         }
         msg(mc, "AutoSwap: предметы пары не найдены");
     }
 
-    private static void selectHoveredForSwap(MinecraftClient mc, Screen screen) {
-        Slot slot = hovered(screen);
-        if (slot == null || !slot.hasStack()) return;
-        String name = nameOf(slot.getStack());
+    private static void selectHoveredForSwap(class_310 mc, class_437 screen) {
+        class_1735 slot = hovered(screen);
+        if (slot == null || !slot.method_7681()) return;
+        String name = nameOf(slot.method_7677());
         if (firstItem == null) {
             firstItem = name;
             msg(mc, "AutoSwap: выбран «" + name + "», выбери второй предмет");
@@ -154,7 +155,7 @@ public final class ItemFeatures {
         } else {
             final SwapPair pair = new SwapPair(firstItem, name, -1);
             firstItem = null;
-            mc.setScreen(new BindScreen(screen,
+            mc.method_1507(new BindScreen(screen,
                     "AutoSwap: " + pair.a + " <-> " + pair.b,
                     key -> {
                         String err = validateKey(key, pair);
@@ -169,10 +170,10 @@ public final class ItemFeatures {
         }
     }
 
-    private static void removeHoveredPair(MinecraftClient mc, Screen screen) {
-        Slot slot = hovered(screen);
-        if (slot == null || !slot.hasStack()) return;
-        String name = nameOf(slot.getStack());
+    private static void removeHoveredPair(class_310 mc, class_437 screen) {
+        class_1735 slot = hovered(screen);
+        if (slot == null || !slot.method_7681()) return;
+        String name = nameOf(slot.method_7677());
         boolean removed = Config.swapPairs.removeIf(p -> p.has(name));
         if (removed) {
             Config.save();
@@ -180,10 +181,10 @@ public final class ItemFeatures {
         }
     }
 
-    private static void toggleHoveredBind(MinecraftClient mc, Screen screen) {
-        Slot slot = hovered(screen);
-        if (slot == null || !slot.hasStack()) return;
-        final String name = nameOf(slot.getStack());
+    private static void toggleHoveredBind(class_310 mc, class_437 screen) {
+        class_1735 slot = hovered(screen);
+        if (slot == null || !slot.method_7681()) return;
+        final String name = nameOf(slot.method_7677());
         boolean removed = Config.binds.removeIf(b -> b.name.equalsIgnoreCase(name));
         if (removed) {
             Config.save();
@@ -191,7 +192,7 @@ public final class ItemFeatures {
             return;
         }
         final BoundItem bind = new BoundItem(name, -1);
-        mc.setScreen(new BindScreen(screen, "ItemBind: " + name, key -> {
+        mc.method_1507(new BindScreen(screen, "ItemBind: " + name, key -> {
             String err = validateKey(key, bind);
             if (err != null) return err;
             bind.key = key;
@@ -203,17 +204,17 @@ public final class ItemFeatures {
         }));
     }
 
-    private static void useBound(MinecraftClient mc, BoundItem b, long now) {
+    private static void useBound(class_310 mc, BoundItem b, long now) {
         int idx = findInventoryIndex(mc, b.name);
         if (idx == -1) {
             msg(mc, "ItemBind: «" + b.name + "» не найден");
             return;
         }
-        int selected = mc.player.getInventory().getSelectedSlot();
+        int selected = mc.field_1724.method_31548().method_67532();
         if (idx != selected) {
             int slotId = idx < 9 ? 36 + idx : idx;
-            mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId, slotId, selected,
-                    SlotActionType.SWAP, mc.player);
+            mc.field_1761.method_2906(mc.field_1724.field_7498.field_7763, slotId, selected,
+                    class_1713.field_7791, mc.field_1724);
             returnSlotId = slotId;
             returnHotbar = selected;
             returnAt = now + RETURN_DELAY_MS;
@@ -221,54 +222,54 @@ public final class ItemFeatures {
         useMainHand(mc);
     }
 
-    private static void useMainHand(MinecraftClient mc) {
-        HitResult hit = mc.crosshairTarget;
-        if (hit instanceof BlockHitResult bhr && bhr.getType() == HitResult.Type.BLOCK) {
-            if (mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, bhr).isAccepted()) {
-                mc.player.swingHand(Hand.MAIN_HAND);
+    private static void useMainHand(class_310 mc) {
+        class_239 hit = mc.field_1765;
+        if (hit instanceof class_3965 bhr && bhr.method_17783() == class_239.class_240.field_1332) {
+            if (mc.field_1761.method_2896(mc.field_1724, class_1268.field_5808, bhr).method_23665()) {
+                mc.field_1724.method_6104(class_1268.field_5808);
                 return;
             }
         }
-        if (mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND).isAccepted()) {
-            mc.player.swingHand(Hand.MAIN_HAND);
+        if (mc.field_1761.method_2919(mc.field_1724, class_1268.field_5808).method_23665()) {
+            mc.field_1724.method_6104(class_1268.field_5808);
         }
     }
 
-    private static Slot hovered(Screen screen) {
+    private static class_1735 hovered(class_437 screen) {
         return ((HandledScreenAccessor) screen).visuals$getFocusedSlot();
     }
 
-    private static int findInventoryIndex(MinecraftClient mc, String name) {
+    private static int findInventoryIndex(class_310 mc, String name) {
         for (int i = 0; i < 36; i++) {
-            ItemStack s = mc.player.getInventory().getStack(i);
-            if (!s.isEmpty() && nameOf(s).equalsIgnoreCase(name)) return i;
+            class_1799 s = mc.field_1724.method_31548().method_5438(i);
+            if (!s.method_7960() && nameOf(s).equalsIgnoreCase(name)) return i;
         }
         return -1;
     }
 
-    private static int findSlotId(MinecraftClient mc, String name) {
+    private static int findSlotId(class_310 mc, String name) {
         int i = findInventoryIndex(mc, name);
         if (i == -1) return -1;
         return i < 9 ? 36 + i : i;
     }
 
-    private static String nameOf(ItemStack s) {
-        return s.getName().getString().trim();
+    private static String nameOf(class_1799 s) {
+        return s.method_7964().getString().trim();
     }
 
-    static void msg(MinecraftClient mc, String s) {
-        if (mc.player != null) mc.player.sendMessage(Text.literal(s), true);
+    static void msg(class_310 mc, String s) {
+        if (mc.field_1724 != null) mc.field_1724.method_7353(class_2561.method_43470(s), true);
     }
 
-    public static void drawPanel(DrawContext g, MinecraftClient mc) {
-        if (mc.player == null) return;
+    public static void drawPanel(class_332 g, class_310 mc) {
+        if (mc.field_1724 == null) return;
         boolean swapOn = Config.autoswap;
         boolean bindOn = Config.itembind;
         if (!swapOn && !bindOn) return;
-        TextRenderer tr = mc.textRenderer;
+        class_327 tr = mc.field_1772;
 
-        ItemStack off = mc.player.getOffHandStack();
-        String offName = off.isEmpty() ? "" : nameOf(off);
+        class_1799 off = mc.field_1724.method_6079();
+        String offName = off.method_7960() ? "" : nameOf(off);
 
         java.util.List<String> lines = new java.util.ArrayList<>();
         java.util.List<Integer> colors = new java.util.ArrayList<>();
@@ -277,45 +278,45 @@ public final class ItemFeatures {
         if (swapOn) {
             lines.add("AutoSwap");
             colors.add(-171);
-            w = Math.max(w, tr.getWidth("AutoSwap"));
+            w = Math.max(w, tr.method_1727("AutoSwap"));
             for (SwapPair p : Config.swapPairs) {
                 String l = "[" + Keys.name(p.key) + "] " + p.a + " <-> " + p.b;
                 lines.add(l);
                 boolean match = p.a.equalsIgnoreCase(offName) || p.b.equalsIgnoreCase(offName);
                 colors.add(match ? -11141291 : -1);
-                w = Math.max(w, tr.getWidth(l));
+                w = Math.max(w, tr.method_1727(l));
             }
             String hint = firstItem != null ? "Выбрано: " + firstItem + " -> выбери второй"
                     : (Config.swapPairs.isEmpty() ? "Наведи на предмет и нажми [" + swapKeyName() + "]" : null);
             if (hint != null) {
                 lines.add(hint);
                 colors.add(-5592406);
-                w = Math.max(w, tr.getWidth(hint));
+                w = Math.max(w, tr.method_1727(hint));
             }
         }
         if (bindOn) {
             lines.add("ItemBind");
             colors.add(-171);
-            w = Math.max(w, tr.getWidth("ItemBind"));
+            w = Math.max(w, tr.method_1727("ItemBind"));
             for (BoundItem b : Config.binds) {
                 String l = "[" + Keys.name(b.key) + "] " + b.name;
                 lines.add(l);
                 colors.add(-1);
-                w = Math.max(w, tr.getWidth(l));
+                w = Math.max(w, tr.method_1727(l));
             }
             if (Config.binds.isEmpty()) {
                 String hint = "Наведи на предмет и нажми [" + bindKeyName() + "]";
                 lines.add(hint);
                 colors.add(-5592406);
-                w = Math.max(w, tr.getWidth(hint));
+                w = Math.max(w, tr.method_1727(hint));
             }
         }
 
         int x = 6;
         int y = 6;
-        g.fill(x - 3, y - 3, x + w + 3, y + lines.size() * 11 + 1, 0x90000000);
+        g.method_25294(x - 3, y - 3, x + w + 3, y + lines.size() * 11 + 1, 0x90000000);
         for (int i = 0; i < lines.size(); i++) {
-            g.drawTextWithShadow(tr, lines.get(i), x, y, colors.get(i));
+            g.method_25303(tr, lines.get(i), x, y, colors.get(i));
             y += 11;
         }
     }
