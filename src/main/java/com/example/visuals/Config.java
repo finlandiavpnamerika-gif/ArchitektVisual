@@ -47,6 +47,8 @@ public final class Config {
     public static double freelookSens = 1.0;           // чувствительность
     public static boolean itemScroller = false;
     public static final List<Macro> macros = new ArrayList<>();
+    public static int radialKey = 71;                  // GLFW_KEY_G; -1 = колесо выключено
+    public static final List<RadialItem> radialItems = new ArrayList<>();
 
     // --- Разное ---
     public static boolean streamerMode = false;
@@ -916,6 +918,17 @@ public final class Config {
             }
             o.add("macroList", mac);
 
+            // Круговое меню макросов
+            o.addProperty("radialKey", radialKey);
+            JsonArray rad = new JsonArray();
+            for (RadialItem r : radialItems) {
+                JsonObject jo = new JsonObject();
+                jo.addProperty("label", r.label);
+                jo.addProperty("text", r.text);
+                rad.add(jo);
+            }
+            o.add("radialList", rad);
+
             // Item Highlight
             o.addProperty("highlight", highlight);
             JsonArray hl = new JsonArray();
@@ -1361,6 +1374,18 @@ public final class Config {
                                 macros.add(new Macro(Integer.parseInt(parts[0].trim()), cmd));
                             }
                         } catch (Exception ignored) {}
+                    }
+                }
+
+                if (o.has("radialKey")) radialKey = o.get("radialKey").getAsInt();
+                if (o.has("radialList")) {
+                    radialItems.clear();
+                    for (JsonElement el : o.getAsJsonArray("radialList")) {
+                        JsonObject jo = el.getAsJsonObject();
+                        if (!jo.has("text")) continue;
+                        radialItems.add(new RadialItem(
+                                jo.has("label") ? jo.get("label").getAsString() : "",
+                                jo.get("text").getAsString()));
                     }
                 }
 
