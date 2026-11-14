@@ -1,9 +1,9 @@
 package com.example.visuals;
 
-import net.minecraft.class_2561;
-import net.minecraft.class_310;
-import net.minecraft.class_332;
-import net.minecraft.class_437;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.List;
  * Рисование: кольцо строится один раз в набор горизонтальных полос (с запасом на сглаживание краёв),
  * дальше каждый кадр полосы только перекрашиваются - градиент, свечение наведённого сектора и т.д.
  */
-public class RadialMenuScreen extends class_437 {
+public class RadialMenuScreen extends Screen {
     private static final long TAP_MS = 250;
     private static final double GAP = 3.0;       // зазор между секторами в пикселях
     private static final int BANDS = 6;          // ступеней градиента от центра к краю
@@ -41,14 +41,14 @@ public class RadialMenuScreen extends class_437 {
     private long lastFrame = 0;
 
     public RadialMenuScreen() {
-        super(class_2561.method_43470("Radial"));
+        super(Text.literal("Radial"));
     }
 
     @Override
-    protected void method_25426() {
-        super.method_25426();
+    protected void init() {
+        super.init();
         // вернулись из редактора (или открыли командой /radial): клавиша не зажата -> режим клика
-        long window = class_310.method_1551().method_22683().method_4490();
+        long window = MinecraftClient.getInstance().getWindow().getHandle();
         boolean d = Config.radialKey != -1 && Keys.down(window, Config.radialKey);
         if (!d) sticky = true;
         keyWasDown = d;
@@ -56,11 +56,11 @@ public class RadialMenuScreen extends class_437 {
 
     // ---------- геометрия ----------
     private int radius() {
-        return Math.max(60, Math.min(112, Math.min(field_22789, field_22790) / 2 - 40));
+        return Math.max(60, Math.min(112, Math.min(width, height) / 2 - 40));
     }
 
     private int centerY() {
-        return field_22790 / 2 - 6;
+        return height / 2 - 6;
     }
 
     private static int sectorAt(double dx, double dy, int n) {
@@ -191,16 +191,16 @@ public class RadialMenuScreen extends class_437 {
         List<RadialItem> items = Config.radialItems;
         if (idx < 0 || idx >= items.size()) return;
         String text = items.get(idx).text;
-        class_310 mc = class_310.method_1551();
-        mc.method_1507(null);
+        MinecraftClient mc = MinecraftClient.getInstance();
+        mc.setScreen(null);
         Macros.run(mc, text);
     }
 
     // ---------- отрисовка ----------
     @Override
-    public void method_25394(class_332 g, int mouseX, int mouseY, float delta) {
-        class_310 mc = class_310.method_1551();
-        long window = mc.method_22683().method_4490();
+    public void render(DrawContext g, int mouseX, int mouseY, float delta) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        long window = mc.getWindow().getHandle();
         long now = System.currentTimeMillis();
 
         mouseDown = GLFW.glfwGetMouseButton(window, 0) == GLFW.GLFW_PRESS;
@@ -212,7 +212,7 @@ public class RadialMenuScreen extends class_437 {
         int nn = Math.max(1, n);
         int R = radius();
         int r0 = Math.max(26, (int) (R * 0.36));
-        int cx = field_22789 / 2, cy = centerY();
+        int cx = width / 2, cy = centerY();
 
         double p = Math.min(1.0, (now - openedAt) / 220.0);
         double ease = 1 - (1 - p) * (1 - p) * (1 - p);
@@ -220,7 +220,7 @@ public class RadialMenuScreen extends class_437 {
 
         // кнопка "Редактировать" внизу
         int bw = 150, bh = 20;
-        int bx = (field_22789 - bw) / 2, by = field_22790 - bh - 8;
+        int bx = (width - bw) / 2, by = height - bh - 8;
         boolean overBtn = hit(mouseX, mouseY, bx, by, bw, bh);
 
         // наведённый сектор
@@ -242,19 +242,19 @@ public class RadialMenuScreen extends class_437 {
                 } else if (overBtn) {
                     sticky = true;                       // отпустил над кнопкой: остаёмся, чтобы нажать
                 } else {
-                    method_25419();
+                    close();
                     return;
                 }
             }
         } else if (keyDown && !keyWasDown) {
             keyWasDown = true;
-            if (sticky) { method_25419(); return; }      // повторное нажатие закрывает
+            if (sticky) { close(); return; }             // повторное нажатие закрывает
         }
 
         // ---- клик ----
         if (clicked) {
             if (overBtn) {
-                mc.method_1507(new RadialEditScreen(this));
+                mc.setScreen(new RadialEditScreen(this));
                 return;
             }
             if (hovered >= 0) {
@@ -275,7 +275,7 @@ public class RadialMenuScreen extends class_437 {
         }
 
         // ---- фон ----
-        g.method_25296(0, 0, field_22789, field_22790,
+        g.fillGradient(0, 0, width, height,
                 argb(0x000000, (int) (0x58 * fade)), argb(0x000000, (int) (0xA0 * fade)));
 
         // ---- мягкая тень под колесом ----
@@ -285,7 +285,7 @@ public class RadialMenuScreen extends class_437 {
             for (int y = -sr; y < sr; y++) {
                 double yy = y + 0.5;
                 int half = (int) Math.round(Math.sqrt(Math.max(0, sr * sr - yy * yy)));
-                g.method_25294(cx - half, cy + y, cx + half, cy + y + 1, sc);
+                g.fill(cx - half, cy + y, cx + half, cy + y + 1, sc);
             }
         }
 
@@ -332,7 +332,7 @@ public class RadialMenuScreen extends class_437 {
             }
             c = scaleAlpha(c, lvMul[lv] * fade);
             if ((c >>> 24) < 3) continue;
-            g.method_25294(ox + x, oy + y, ox + x + len, oy + y + 1, c);
+            g.fill(ox + x, oy + y, ox + x + len, oy + y + 1, c);
         }
 
         // ---- центр (хаб) ----
@@ -341,7 +341,7 @@ public class RadialMenuScreen extends class_437 {
         for (int y = -hr; y < hr; y++) {
             double yy = y + 0.5;
             int half = (int) Math.round(Math.sqrt(Math.max(0, hr * hr - yy * yy)));
-            g.method_25294(cx - half, cy + y, cx + half, cy + y + 1, cHubA);
+            g.fill(cx - half, cy + y, cx + half, cy + y + 1, cHubA);
         }
         int hubW = hr * 2 - 8;
         int tTxt = argb(Theme.TEXT, (int) Math.max(0x10, 255 * fade));
@@ -349,22 +349,22 @@ public class RadialMenuScreen extends class_437 {
         if (hovered >= 0) {
             RadialItem it = items.get(hovered);
             if (it.label.isEmpty()) {
-                g.method_25300(field_22793, field_22793.method_27523(it.text, hubW), cx, cy - 4, tTxt);
+                g.drawCenteredTextWithShadow(textRenderer, textRenderer.trimToWidth(it.text, hubW), cx, cy - 4, tTxt);
             } else {
-                g.method_25300(field_22793, field_22793.method_27523(it.label, hubW), cx, cy - 10, tTxt);
-                g.method_25300(field_22793, field_22793.method_27523(it.text, hubW), cx, cy + 2, tDim);
+                g.drawCenteredTextWithShadow(textRenderer, textRenderer.trimToWidth(it.label, hubW), cx, cy - 10, tTxt);
+                g.drawCenteredTextWithShadow(textRenderer, textRenderer.trimToWidth(it.text, hubW), cx, cy + 2, tDim);
             }
         } else if (n == 0) {
-            g.method_25300(field_22793, "Пусто", cx, cy - 4, tDim);
+            g.drawCenteredTextWithShadow(textRenderer, "Пусто", cx, cy - 4, tDim);
         } else {
-            g.method_25300(field_22793, "Выбери", cx, cy - 4, tDim);
+            g.drawCenteredTextWithShadow(textRenderer, "Выбери", cx, cy - 4, tDim);
         }
 
         // точка-указатель на краю хаба: куда смотрит курсор
         if (n > 0 && dist > 1 && !overBtn) {
             int px2 = cx + (int) Math.round(dx / dist * (hr - 3));
             int py2 = cy + (int) Math.round(dy / dist * (hr - 3));
-            g.method_25294(px2 - 1, py2 - 1, px2 + 2, py2 + 2, argb(accent, (int) (0xFF * fade)));
+            g.fill(px2 - 1, py2 - 1, px2 + 2, py2 + 2, argb(accent, (int) (0xFF * fade)));
         }
 
         // ---- подписи секторов ----
@@ -377,12 +377,12 @@ public class RadialMenuScreen extends class_437 {
                 double rr = rm + 3 * hv[i];                       // наведённый сектор чуть выдвигает подпись
                 int lx = cx + (int) Math.round(Math.sin(a) * rr);
                 int ly = cy - (int) Math.round(Math.cos(a) * rr);
-                String t = field_22793.method_27523(items.get(i).title(), maxW);
+                String t = textRenderer.trimToWidth(items.get(i).title(), maxW);
                 int col = mix(tDim, tTxt, hv[i]);
-                g.method_25300(field_22793, t, lx, ly - 4, col);
+                g.drawCenteredTextWithShadow(textRenderer, t, lx, ly - 4, col);
             }
         } else {
-            g.method_25300(field_22793, "Добавь команды кнопкой снизу", cx, cy - R - 18, tDim);
+            g.drawCenteredTextWithShadow(textRenderer, "Добавь команды кнопкой снизу", cx, cy - R - 18, tDim);
         }
 
         // ---- подсказка сверху ----
@@ -390,22 +390,22 @@ public class RadialMenuScreen extends class_437 {
         String hint = sticky
                 ? "Клик по сектору - выполнить · Esc / [" + key + "] - закрыть"
                 : "Отпусти [" + key + "] на секторе - выполнить · в центре - отмена";
-        g.method_25300(field_22793, hint, cx, 10, tDim);
+        g.drawCenteredTextWithShadow(textRenderer, hint, cx, 10, tDim);
 
         // ---- кнопка "Редактировать" ----
-        g.method_25294(bx + 1, by + 2, bx + bw + 1, by + bh + 2, argb(0x000000, (int) (0x40 * fade)));
-        g.method_25294(bx + 1, by, bx + bw - 1, by + bh, overBtn ? argb(accent, 0x60) : argb(Theme.BG & 0xFFFFFF, (int) (0xC0 * fade)));
-        g.method_25294(bx, by + 1, bx + 1, by + bh - 1, overBtn ? argb(accent, 0x60) : argb(Theme.BG & 0xFFFFFF, (int) (0xC0 * fade)));
-        g.method_25294(bx + bw - 1, by + 1, bx + bw, by + bh - 1, overBtn ? argb(accent, 0x60) : argb(Theme.BG & 0xFFFFFF, (int) (0xC0 * fade)));
-        g.method_25294(bx + 1, by, bx + bw - 1, by + 1, argb(accent, (int) (0xFF * fade)));
-        g.method_25300(field_22793, "✎ Редактировать колесо", cx, by + 6, tTxt);
+        g.fill(bx + 1, by + 2, bx + bw + 1, by + bh + 2, argb(0x000000, (int) (0x40 * fade)));
+        g.fill(bx + 1, by, bx + bw - 1, by + bh, overBtn ? argb(accent, 0x60) : argb(Theme.BG & 0xFFFFFF, (int) (0xC0 * fade)));
+        g.fill(bx, by + 1, bx + 1, by + bh - 1, overBtn ? argb(accent, 0x60) : argb(Theme.BG & 0xFFFFFF, (int) (0xC0 * fade)));
+        g.fill(bx + bw - 1, by + 1, bx + bw, by + bh - 1, overBtn ? argb(accent, 0x60) : argb(Theme.BG & 0xFFFFFF, (int) (0xC0 * fade)));
+        g.fill(bx + 1, by, bx + bw - 1, by + 1, argb(accent, (int) (0xFF * fade)));
+        g.drawCenteredTextWithShadow(textRenderer, "✎ Редактировать колесо", cx, by + 6, tTxt);
     }
 
     @Override
-    public void method_25419() {
-        class_310.method_1551().method_1507(null);
+    public void close() {
+        MinecraftClient.getInstance().setScreen(null);
     }
 
     @Override
-    public boolean method_25421() { return false; }
+    public boolean shouldPause() { return false; }
 }
