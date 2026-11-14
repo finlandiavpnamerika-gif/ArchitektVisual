@@ -1,6 +1,6 @@
 package com.example.visuals;
 
-import net.minecraft.class_310;
+import net.minecraft.client.MinecraftClient;
 
 /**
  * Выполнение макросов. poll() вызывается и из тика, и из кадра HUD:
@@ -11,10 +11,10 @@ public final class Macros {
     private Macros() {}
 
     public static void poll() {
-        class_310 mc = class_310.method_1551();
-        if (mc.field_1724 == null || mc.method_22683() == null) return;
-        long window = mc.method_22683().method_4490();
-        boolean free = mc.field_1755 == null;
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.player == null || mc.getWindow() == null) return;
+        long window = mc.getWindow().getHandle();
+        boolean free = mc.currentScreen == null;
 
         for (Macro m : Config.macros) {
             boolean d = m.key != -1 && Keys.down(window, m.key);
@@ -24,11 +24,11 @@ public final class Macros {
     }
 
     /** Выполняет команду ("/...") или отправляет сообщение в чат. Используется и круговым меню. */
-    public static void run(class_310 mc, String text) {
-        if (text == null || mc.field_1724 == null || mc.field_1724.field_3944 == null) return;
+    public static void run(MinecraftClient mc, String text) {
+        if (text == null || mc.player == null || mc.player.networkHandler == null) return;
         String t = text.trim();
         if (t.isEmpty()) return;
-        if (t.startsWith("/")) mc.field_1724.field_3944.method_45730(t.substring(1));
-        else mc.field_1724.field_3944.method_45729(t);
+        if (t.startsWith("/")) mc.player.networkHandler.sendChatCommand(t.substring(1));
+        else mc.player.networkHandler.sendChatMessage(t);
     }
 }
