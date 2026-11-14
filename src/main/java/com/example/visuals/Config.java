@@ -36,6 +36,12 @@ public final class Config {
     public static boolean haloBob = true;     // плавное парение вверх-вниз
     public static boolean haloCustom = false; // своя палитра вместо списка цветов
     public static double haloHue = 0.12, haloSat = 0.7, haloVal = 1.0;
+    public static boolean horns = false;       // Рога
+    public static int hornsMode = 0;           // 0-3 = HornsRenderer.COLOR_NAMES, 4 = радуга
+    public static double hornsSize = 1.0;      // множитель размера рогов
+    public static boolean hornsGlow = true;    // раскалённые кончики
+    public static boolean hornsCustom = false; // своя палитра вместо списка цветов
+    public static double hornsHue = 0.0, hornsSat = 0.9, hornsVal = 0.7;
     public static boolean entityBox = false;
     public static boolean predictions = false;
     public static boolean itemPhysic = false;
@@ -555,6 +561,14 @@ public final class Config {
             o.addProperty("haloHue", haloHue);
             o.addProperty("haloSat", haloSat);
             o.addProperty("haloVal", haloVal);
+            o.addProperty("horns", horns);
+            o.addProperty("hornsMode", hornsMode);
+            o.addProperty("hornsSize", hornsSize);
+            o.addProperty("hornsGlow", hornsGlow);
+            o.addProperty("hornsCustom", hornsCustom);
+            o.addProperty("hornsHue", hornsHue);
+            o.addProperty("hornsSat", hornsSat);
+            o.addProperty("hornsVal", hornsVal);
             o.addProperty("entityBox", entityBox);
             o.addProperty("predictions", predictions);
             o.addProperty("itemPhysic", itemPhysic);
@@ -1003,6 +1017,14 @@ public final class Config {
                 haloHue = d(o, "haloHue", haloHue);
                 haloSat = d(o, "haloSat", haloSat);
                 haloVal = d(o, "haloVal", haloVal);
+                horns = b(o, "horns", horns);
+                hornsMode = (int) d(o, "hornsMode", hornsMode);
+                hornsSize = d(o, "hornsSize", hornsSize);
+                hornsGlow = b(o, "hornsGlow", hornsGlow);
+                hornsCustom = b(o, "hornsCustom", hornsCustom);
+                hornsHue = d(o, "hornsHue", hornsHue);
+                hornsSat = d(o, "hornsSat", hornsSat);
+                hornsVal = d(o, "hornsVal", hornsVal);
                 entityBox = b(o, "entityBox", entityBox);
                 predictions = b(o, "predictions", predictions);
                 itemPhysic = b(o, "itemPhysic", itemPhysic);
