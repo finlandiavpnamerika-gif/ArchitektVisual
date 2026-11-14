@@ -1,6 +1,6 @@
 package com.example.visuals;
 
-import net.minecraft.class_310;
+import net.minecraft.client.MinecraftClient;
 
 /**
  * Открытие кругового меню по клавише. poll() вызывается и из тика, и из кадра HUD
@@ -20,13 +20,13 @@ public final class RadialMenu {
     }
 
     public static void poll() {
-        class_310 mc = class_310.method_1551();
-        if (mc.field_1724 == null || mc.method_22683() == null) return;
-        long window = mc.method_22683().method_4490();
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.player == null || mc.getWindow() == null) return;
+        long window = mc.getWindow().getHandle();
         boolean d = Config.radialKey != -1 && Keys.down(window, Config.radialKey);
-        if (d && !wasDown && mc.field_1755 == null) {
+        if (d && !wasDown && mc.currentScreen == null) {
             mc.execute(() -> {
-                if (mc.field_1755 == null) mc.method_1507(new RadialMenuScreen());
+                if (mc.currentScreen == null) mc.setScreen(new RadialMenuScreen());
             });
         }
         wasDown = d;
