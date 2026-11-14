@@ -1850,7 +1850,10 @@ public class MenuScreen extends Screen {
                 }
             }
             case "friends" -> screenButton(g, "-> Открыть Friends", () -> new FriendsScreen(this));
-            case "macro" -> screenButton(g, "-> Настроить макросы", () -> new MacrosScreen(this));
+            case "macro" -> {
+    screenButton(g, "-> Настроить макросы", () -> new MacrosScreen(this));
+    screenButton(g, "-> Круговое меню макросов", () -> new RadialEditScreen(this));
+}
             case "configs" -> screenButton(g, "-> Открыть конфиги", () -> new ConfigsScreen(this));
             case "time" -> Config.timeValue = (int) cslider(g, "Время", 0, 24000, Config.timeValue, true);
             case "weather" -> Config.weatherType = ccycle(g, "Тип", new String[]{"Ясно", "Дождь", "Гроза"}, Config.weatherType);
