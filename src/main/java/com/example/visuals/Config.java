@@ -29,6 +29,13 @@ public final class Config {
     public static double hatHeight = 1.0;   // множитель высоты конуса
     public static boolean hatCustom = false; // своя палитра вместо списка цветов
     public static double hatHue = 0.75, hatSat = 0.8, hatVal = 1.0;
+    public static boolean halo = false;       // Angel Halo
+    public static int haloMode = 0;           // 0-3 = HaloRenderer.COLOR_NAMES, 4 = радуга
+    public static double haloSize = 1.0;      // множитель радиуса нимба
+    public static double haloHeight = 1.0;    // множитель высоты над головой
+    public static boolean haloBob = true;     // плавное парение вверх-вниз
+    public static boolean haloCustom = false; // своя палитра вместо списка цветов
+    public static double haloHue = 0.12, haloSat = 0.7, haloVal = 1.0;
     public static boolean entityBox = false;
     public static boolean predictions = false;
     public static boolean itemPhysic = false;
@@ -539,6 +546,15 @@ public final class Config {
             o.addProperty("hatHue", hatHue);
             o.addProperty("hatSat", hatSat);
             o.addProperty("hatVal", hatVal);
+            o.addProperty("halo", halo);
+            o.addProperty("haloMode", haloMode);
+            o.addProperty("haloSize", haloSize);
+            o.addProperty("haloHeight", haloHeight);
+            o.addProperty("haloBob", haloBob);
+            o.addProperty("haloCustom", haloCustom);
+            o.addProperty("haloHue", haloHue);
+            o.addProperty("haloSat", haloSat);
+            o.addProperty("haloVal", haloVal);
             o.addProperty("entityBox", entityBox);
             o.addProperty("predictions", predictions);
             o.addProperty("itemPhysic", itemPhysic);
@@ -978,6 +994,15 @@ public final class Config {
                 hatHue = d(o, "hatHue", hatHue);
                 hatSat = d(o, "hatSat", hatSat);
                 hatVal = d(o, "hatVal", hatVal);
+                halo = b(o, "halo", halo);
+                haloMode = (int) d(o, "haloMode", haloMode);
+                haloSize = d(o, "haloSize", haloSize);
+                haloHeight = d(o, "haloHeight", haloHeight);
+                haloBob = b(o, "haloBob", haloBob);
+                haloCustom = b(o, "haloCustom", haloCustom);
+                haloHue = d(o, "haloHue", haloHue);
+                haloSat = d(o, "haloSat", haloSat);
+                haloVal = d(o, "haloVal", haloVal);
                 entityBox = b(o, "entityBox", entityBox);
                 predictions = b(o, "predictions", predictions);
                 itemPhysic = b(o, "itemPhysic", itemPhysic);
