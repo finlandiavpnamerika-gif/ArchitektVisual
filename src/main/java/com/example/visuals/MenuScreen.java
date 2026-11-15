@@ -665,7 +665,7 @@ public class MenuScreen extends class_437 {
         }
 
         // 6. Extra Visuals 1
-        int hEx1 = 34 + mh("hat", Config.hatCustom ? 6 : 4) + mh("halo", Config.haloCustom ? 7 : 5) + mh("pred", 0) + mh("crit", 3) + mh("kill", 5) + mh("atk", 6);
+        int hEx1 = 34 + mh("hat", Config.hatCustom ? 6 : 4) + mh("halo", Config.haloCustom ? 7 : 5) + mh("horns", Config.hornsCustom ? 6 : 4) + mh("pred", 0) + mh("crit", 3) + mh("kill", 5) + mh("atk", 6);
         panel(g, "Extra Visuals 1", x0 + step, y1, colW, hEx1);
         Config.chinaHat = module(g, "hat", "China Hat", "", Config.chinaHat, Config.hatCustom ? 6 : 4);
         if (open.contains("hat")) {
@@ -695,6 +695,20 @@ public class MenuScreen extends class_437 {
             Config.haloHeight = cslider(g, "Высота", 0.5, 2.0, Config.haloHeight, false);
             Config.haloBob = cbool(g, "Парение", Config.haloBob);
             resetRow(g, "halo");
+        }
+        Config.horns = module(g, "horns", "Рога", "", Config.horns, Config.hornsCustom ? 6 : 4);
+        if (open.contains("horns")) {
+            Config.hornsCustom = cbool(g, "Своя палитра", Config.hornsCustom);
+            if (Config.hornsCustom) {
+                Config.hornsHue = cgrad(g, Config.hornsHue, pos -> hsv(pos, 1.0, 1.0));
+                Config.hornsSat = cgrad(g, Config.hornsSat, pos -> hsv(Config.hornsHue, pos, Math.max(0.35, Config.hornsVal)));
+                Config.hornsVal = cgrad(g, Config.hornsVal, pos -> hsv(Config.hornsHue, Config.hornsSat, pos));
+            } else {
+                Config.hornsMode = ccycle(g, "Цвет", HornsRenderer.COLOR_NAMES, Config.hornsMode);
+            }
+            Config.hornsSize = cslider(g, "Размер", 0.5, 2.0, Config.hornsSize, false);
+            Config.hornsGlow = cbool(g, "Раскал", Config.hornsGlow);
+            resetRow(g, "horns");
         }
         Config.predictions = module(g, "pred", "Predictions", "", Config.predictions, 0);
 
@@ -835,7 +849,7 @@ public class MenuScreen extends class_437 {
         // ========== ТРЕТИЙ РЯД: World ==========
         int maxH2 = Math.max(Math.max(hTw, hEx1), Math.max(hEx2, hMisc));
         int y2 = y1 + maxH2 + 10;
-        int hWorld = 34 + mh("hbox", 12) + mh("bout", 7) + mh("chunk", 7) + mh("iesp", 8) + mh("wp", 10 + Waypoints.LIST.size()) + mh("ptr", 5) + mh("etr", 6) + mh("pcd", 7);
+        int hWorld = 34 + mh("hbox", 12) + mh("bout", 7) + mh("chunk", 7) + mh("iesp", 8) + mh("wp", 10 + Waypoints.LIST.size()) + mh("evpt", 3) + mh("ptr", 5) + mh("etr", 6) + mh("pcd", 7);
         panel(g, "World", x0, y2, colW, hWorld);
 
         Config.hbox = module(g, "hbox", "Hitboxes", "", Config.hbox, 12);
@@ -890,6 +904,9 @@ public class MenuScreen extends class_437 {
 
         Config.wp = module(g, "wp", "Waypoints", "/waypoint add", Config.wp, 10 + Waypoints.LIST.size());
         if (open.contains("wp")) { wpBlock(g); cy += 2; resetRow(g, "wp"); }
+
+        Config.eventPts = module(g, "evpt", "Event Point", "/eventpoint test", Config.eventPts, 3);
+        if (open.contains("evpt")) { evptBlock(g); cy += 2; resetRow(g, "evpt"); }
 
         Config.ptrail = module(g, "ptr", "Pearl Trail", "", Config.ptrail, 5);
         if (open.contains("ptr")) {
@@ -1048,11 +1065,11 @@ public class MenuScreen extends class_437 {
 
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
-            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "halo", "pred", "physic", "shulker", "hl", "crit", "kill", "atk", "wings", "aura", "cape", "chams"},
+            {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "halo", "horns", "pred", "physic", "shulker", "hl", "crit", "kill", "atk", "wings", "aura", "cape", "chams"},
             {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem", "stats", "dlog", "pcd", "cdh", "nt", "tip"},
             {"sprint", "zoom", "respawn", "freelook", "noov", "hitsound", "swing", "stream"},
             {"autoswap", "itembind", "friends", "macro", "configs"},
-            {"time", "weather", "hbox", "bout", "chunk", "iesp", "wp", "ptr", "etr", "clouds"}
+            {"time", "weather", "hbox", "bout", "chunk", "iesp", "wp", "evpt", "ptr", "etr", "clouds"}
     };
 
     private static String sbLabel(String id) {
@@ -1072,6 +1089,7 @@ public class MenuScreen extends class_437 {
             case "jc" -> "JumpCircle";
             case "hat" -> "China Hat";
             case "halo" -> "Нимб";
+            case "horns" -> "Рога";
             case "pred" -> "Predictions";
             case "physic" -> "Item Physic";
             case "shulker" -> "Shulker Prev";
@@ -1099,6 +1117,7 @@ public class MenuScreen extends class_437 {
             case "etr" -> "Elytra Trail";
             case "pcd" -> "Pearl Cooldown";
             case "wp" -> "Waypoints";
+            case "evpt" -> "Event Point";
             case "crit" -> "Crit Effects";
             case "kill" -> "Kill Effect";
             case "atk" -> "Attack Indicator";
@@ -1148,6 +1167,7 @@ public class MenuScreen extends class_437 {
             case "jc" -> Config.jumpCircle;
             case "hat" -> Config.chinaHat;
             case "halo" -> Config.halo;
+            case "horns" -> Config.horns;
             case "pred" -> Config.predictions;
             case "physic" -> Config.itemPhysic;
             case "shulker" -> Config.shulkerPreview;
@@ -1175,6 +1195,7 @@ public class MenuScreen extends class_437 {
             case "etr" -> Config.etrail;
             case "pcd" -> Config.pcdHud;
             case "wp" -> Config.wp;
+            case "evpt" -> Config.eventPts;
             case "crit" -> Config.critFx;
             case "kill" -> Config.killFx;
             case "atk" -> Config.atkInd;
@@ -1217,6 +1238,7 @@ public class MenuScreen extends class_437 {
             case "jc": Config.jumpCircle = v; break;
             case "hat": Config.chinaHat = v; break;
             case "halo": Config.halo = v; break;
+            case "horns": Config.horns = v; break;
             case "pred": Config.predictions = v; break;
             case "physic": Config.itemPhysic = v; break;
             case "shulker": Config.shulkerPreview = v; break;
@@ -1244,6 +1266,7 @@ public class MenuScreen extends class_437 {
             case "etr": Config.etrail = v; break;
             case "pcd": Config.pcdHud = v; break;
             case "wp": Config.wp = v; break;
+            case "evpt": Config.eventPts = v; break;
             case "crit": Config.critFx = v; break;
             case "kill": Config.killFx = v; break;
             case "atk": Config.atkInd = v; break;
@@ -1399,6 +1422,12 @@ public class MenuScreen extends class_437 {
         if (mouseX < sbSplitX) sbScrollMid = Math.max(0, Math.min(sbMaxMid, sbScrollMid - (float) verticalAmount * 22f));
         else sbScrollRight = Math.max(0, Math.min(sbMaxRight, sbScrollRight - (float) verticalAmount * 22f));
         return true;
+    }
+
+    private void evptBlock(class_332 g) {
+        Config.epBeam = cbool(g, "Луч в мире", Config.epBeam);
+        Config.epMinutes = cslider(g, "Держать метку, мин", 1, 30, Config.epMinutes, true);
+        Config.epScale = cslider(g, "Размер метки", 0.5, 2.0, Config.epScale, false);
     }
 
     private void wpBlock(class_332 g) {
@@ -1563,6 +1592,18 @@ public class MenuScreen extends class_437 {
                 Config.haloSize = cslider(g, "Размер", 0.5, 2.0, Config.haloSize, false);
                 Config.haloHeight = cslider(g, "Высота", 0.5, 2.0, Config.haloHeight, false);
                 Config.haloBob = cbool(g, "Парение", Config.haloBob);
+            }
+            case "horns" -> {
+                Config.hornsCustom = cbool(g, "Своя палитра", Config.hornsCustom);
+                if (Config.hornsCustom) {
+                    Config.hornsHue = cgrad(g, Config.hornsHue, pos -> hsv(pos, 1.0, 1.0));
+                    Config.hornsSat = cgrad(g, Config.hornsSat, pos -> hsv(Config.hornsHue, pos, Math.max(0.35, Config.hornsVal)));
+                    Config.hornsVal = cgrad(g, Config.hornsVal, pos -> hsv(Config.hornsHue, Config.hornsSat, pos));
+                } else {
+                    Config.hornsMode = ccycle(g, "Цвет", HornsRenderer.COLOR_NAMES, Config.hornsMode);
+                }
+                Config.hornsSize = cslider(g, "Размер", 0.5, 2.0, Config.hornsSize, false);
+                Config.hornsGlow = cbool(g, "Раскал", Config.hornsGlow);
             }
             case "hl" -> {
                 ItemHighlight.Entry toRemove = null;
@@ -1729,6 +1770,7 @@ public class MenuScreen extends class_437 {
                 Config.pcdY = (int) cslider(g, "Y", 0, 250, Config.pcdY, true);
             }
             case "wp" -> wpBlock(g);
+            case "evpt" -> evptBlock(g);
             case "wings" -> {
                 Config.wingStyle = ccycle(g, "Стиль", Cosmetics.WING_STYLES, Config.wingStyle);
                 Config.wingColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.wingColor);
