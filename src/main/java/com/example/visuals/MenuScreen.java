@@ -1755,11 +1755,26 @@ public class MenuScreen extends class_437 {
                 Config.cbLevels = cbool(g, "Уровни каждые 16", Config.cbLevels);
                 Config.cbAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.cbAlpha, false);
             }
-           case "iesp" -> {
+          case "iesp" -> {
                 Config.ieRange = cslider(g, "Дальность", 8, 128, Config.ieRange, true);
                 Config.ieValuable = cbool(g, "Только ценные", Config.ieValuable);
                 Config.ieFill = cbool(g, "Заливка", Config.ieFill);
                 Config.ieTracers = cbool(g, "Трейсеры", Config.ieTracers);
+                Config.ieColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.ieColor);
+                Config.ieColorHi = ccycle(g, "Цвет ценных", Config.COLOR_NAMES, Config.ieColorHi);
+                Config.ieWidth = cslider(g, "Толщина", 0.005, 0.06, Config.ieWidth, false);
+            }
+            case "ptr" -> {
+                Config.ptColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.ptColor);
+                Config.ptRainbow = cbool(g, "Радуга", Config.ptRainbow);
+                Config.ptLength = (int) cslider(g, "Длина (тики)", 10, 200, Config.ptLength, true);
+                Config.ptWidth = cslider(g, "Толщина", 0.02, 0.2, Config.ptWidth, false);
+            }
+            case "etr" -> {
+                Config.etColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.etColor);
+                Config.etRainbow = cbool(g, "Радуга", Config.etRainbow);
+                Config.etLength = (int) cslider(g, "Длина (тики)", 10, 200, Config.etLength, true);
+                Config.etWidth = cslider(g, "Толщина", 0.04, 0.4, Config.etWidth, false);
                 Config.etAll = cbool(g, "Все игроки", Config.etAll);
             }
             case "pcd" -> {
@@ -1809,26 +1824,6 @@ public class MenuScreen extends class_437 {
                 Config.chMobs = cbool(g, "Мобы", Config.chMobs);
                 Config.chFriends = cbool(g, "Друзья", Config.chFriends);
                 Config.chSelf = cbool(g, "Свой (3-е лицо)", Config.chSelf);
-            }
-            case "swing" -> {
-                Config.swingSpeed = cslider(g, "Скорость взмаха", 0.3, 3.0, Config.swingSpeed, false);
-                Config.swingSelfOnly = cbool(g, "Только свой", Config.swingSelfOnly);
-            }
-            case "clouds" -> {
-                Config.cloudHide = cbool(g, "Скрыть облака", Config.cloudHide);
-                Config.cloudTint = cbool(g, "Свой цвет", Config.cloudTint);
-                Config.cloudHue = cslider(g, "Оттенок", 0.0, 1.0, Config.cloudHue, false);
-                Config.cloudSat = cslider(g, "Насыщенность", 0.0, 1.0, Config.cloudSat, false);
-                Config.cloudRainbow = cbool(g, "Радуга", Config.cloudRainbow);
-                Config.cloudHeightOffset = cslider(g, "Высота (смещение)", -40, 120, Config.cloudHeightOffset, true);
-            }
-            case "tip" -> {
-                Config.tipDur = cbool(g, "Прочность", Config.tipDur);
-                Config.tipId = cbool(g, "ID предмета", Config.tipId);
-                Config.tipStack = cbool(g, "Размер стака", Config.tipStack);
-            }
-            case "server" -> {
-                Config.serverIp = cbool(g, "IP сервера", Config.serverIp);
                 Config.serverTps = cbool(g, "TPS", Config.serverTps);
                 Config.serverPing = cbool(g, "Ping", Config.serverPing);
                 Config.serverColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.serverColor);
@@ -1860,24 +1855,12 @@ public class MenuScreen extends class_437 {
                 Config.totemColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.totemColor);
                 Config.totemScale = cslider(g, "Размер", 0.5, 2.5, Config.totemScale, false);
                 Config.totemAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.totemAlpha, false);
-            case "combo" -> {
-                Config.comboColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.comboColor);
-                Config.comboTimeout = cslider(g, "Таймаут (сек)", 1.0, 10.0, Config.comboTimeout, false);
-                Config.comboScale = cslider(g, "Размер", 0.5, 2.5, Config.comboScale, false);
-                Config.comboAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.comboAlpha, false);
-                Config.comboX = (int) cslider(g, "X", 0, 400, Config.comboX, true);
-                Config.comboY = (int) cslider(g, "Y", 0, 250, Config.comboY, true);
+                Config.totemX = (int) cslider(g, "X", 0, 400, Config.totemX, true);
+                Config.totemY = (int) cslider(g, "Y", 0, 250, Config.totemY, true);
             }
-            case "wm" -> {
-                Config.watermarkName = ccycle(g, "Название", WatermarkHud.NAMES, Config.watermarkName);
-                Config.watermarkNick = cbool(g, "Ник", Config.watermarkNick);
-                Config.watermarkFps = cbool(g, "FPS", Config.watermarkFps);
-                Config.watermarkTime = cbool(g, "Время", Config.watermarkTime);
-                Config.watermarkRainbow = cbool(g, "Радуга", Config.watermarkRainbow);
-                Config.watermarkColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.watermarkColor);
-                Config.watermarkScale = cslider(g, "Размер", 0.5, 2.5, Config.watermarkScale, false);
-                Config.watermarkAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.watermarkAlpha, false);
-                Config.hitSoundPitch = cslider(g, "Высота тона", 0.5, 2.0, Config.hitSoundPitch, false);
+            case "near" -> {
+                Config.nearColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.nearColor);
+                Config.nearRange = cslider(g, "Дистанция", 20, 300, Config.nearRange, true);
             }
             case "sprint" -> Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs);
             case "freelook" -> {
