@@ -739,7 +739,7 @@ public class MenuScreen extends class_437 {
         }
 
         // 7. Extra Visuals 2
-        int hEx2 = 34 + mh("physic", 2) + mh("shulker", 0) + mh("hl", 3 * Config.highlights.size() + 1) + mh("inv", 7) + mh("totem", 7) + mh("cdh", 5);
+        int hEx2 = 34 + mh("physic", 2) + mh("shulker", 0) + mh("hl", 3 * Config.highlights.size() + 1) + mh("inv", 7) + mh("totem", 7) + mh("near", 7) + mh("cdh", 5);
         panel(g, "Extra Visuals 2", x0 + step * 2, y1, colW, hEx2);
         Config.itemPhysic = module(g, "physic", "Item Physic", "", Config.itemPhysic, 1);
         if (open.contains("physic")) { Config.physicLift = cslider(g, "Высота (см)", -15, 15, Config.physicLift, true); cy += 2;  resetRow(g, "physic");}
@@ -779,6 +779,19 @@ public class MenuScreen extends class_437 {
             Config.totemY = (int) cslider(g, "Y", 0, 250, Config.totemY, true);
             cy += 2;
             resetRow(g, "totem");
+        }
+
+        Config.nearHud = module(g, "near", "Players Near", "", Config.nearHud, 7);
+        if (open.contains("near")) {
+            Config.nearColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.nearColor);
+            Config.nearRange = cslider(g, "Дистанция", 20, 300, Config.nearRange, true);
+            Config.nearMax = cslider(g, "Макс. игроков", 1, 12, Config.nearMax, true);
+            Config.nearScale = cslider(g, "Размер", 0.5, 2.5, Config.nearScale, false);
+            Config.nearAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.nearAlpha, false);
+            Config.nearX = (int) cslider(g, "X", 0, 400, Config.nearX, true);
+            Config.nearY = (int) cslider(g, "Y", 0, 250, Config.nearY, true);
+            cy += 2;
+            resetRow(g, "near");
         }
 
         Config.cdHud = module(g, "cdh", "Cooldown HUD", "", Config.cdHud, 5);
@@ -1066,7 +1079,7 @@ public class MenuScreen extends class_437 {
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
             {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "halo", "horns", "pred", "physic", "shulker", "hl", "crit", "kill", "atk", "wings", "aura", "cape", "chams"},
-            {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem", "stats", "dlog", "pcd", "cdh", "nt", "tip"},
+            {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem", "stats", "dlog", "pcd", "cdh", "near", "nt", "tip"},
             {"sprint", "zoom", "respawn", "freelook", "noov", "hitsound", "swing", "stream"},
             {"autoswap", "itembind", "friends", "macro", "configs"},
             {"time", "weather", "hbox", "bout", "chunk", "iesp", "wp", "evpt", "ptr", "etr", "clouds"}
@@ -1126,6 +1139,7 @@ public class MenuScreen extends class_437 {
             case "clock" -> "Time & Date";
             case "inv" -> "Inventory HUD";
             case "totem" -> "Totem Counter";
+            case "near" -> "Players Near";
             case "cdh" -> "Cooldown HUD";
             case "wm" -> "Watermark";
             case "noov" -> "NoOverlay";
@@ -1204,6 +1218,7 @@ public class MenuScreen extends class_437 {
             case "clock" -> Config.clockHud;
             case "inv" -> Config.invHud;
             case "totem" -> Config.totemHud;
+            case "near" -> Config.nearHud;
             case "cdh" -> Config.cdHud;
             case "wm" -> Config.watermark;
             case "noov" -> Config.noOverlay;
@@ -1275,6 +1290,7 @@ public class MenuScreen extends class_437 {
             case "clock": Config.clockHud = v; break;
             case "inv": Config.invHud = v; break;
             case "totem": Config.totemHud = v; break;
+            case "near": Config.nearHud = v; break;
             case "cdh": Config.cdHud = v; break;
             case "wm": Config.watermark = v; break;
             case "noov": Config.noOverlay = v; break;
@@ -1739,26 +1755,11 @@ public class MenuScreen extends class_437 {
                 Config.cbLevels = cbool(g, "Уровни каждые 16", Config.cbLevels);
                 Config.cbAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.cbAlpha, false);
             }
-            case "iesp" -> {
+           case "iesp" -> {
                 Config.ieRange = cslider(g, "Дальность", 8, 128, Config.ieRange, true);
                 Config.ieValuable = cbool(g, "Только ценные", Config.ieValuable);
                 Config.ieFill = cbool(g, "Заливка", Config.ieFill);
                 Config.ieTracers = cbool(g, "Трейсеры", Config.ieTracers);
-                Config.ieColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.ieColor);
-                Config.ieColorHi = ccycle(g, "Цвет ценных", Config.COLOR_NAMES, Config.ieColorHi);
-                Config.ieWidth = cslider(g, "Толщина", 0.005, 0.06, Config.ieWidth, false);
-            }
-            case "ptr" -> {
-                Config.ptColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.ptColor);
-                Config.ptRainbow = cbool(g, "Радуга", Config.ptRainbow);
-                Config.ptLength = (int) cslider(g, "Длина (тики)", 10, 200, Config.ptLength, true);
-                Config.ptWidth = cslider(g, "Толщина", 0.02, 0.2, Config.ptWidth, false);
-            }
-            case "etr" -> {
-                Config.etColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.etColor);
-                Config.etRainbow = cbool(g, "Радуга", Config.etRainbow);
-                Config.etLength = (int) cslider(g, "Длина (тики)", 10, 200, Config.etLength, true);
-                Config.etWidth = cslider(g, "Толщина", 0.04, 0.4, Config.etWidth, false);
                 Config.etAll = cbool(g, "Все игроки", Config.etAll);
             }
             case "pcd" -> {
@@ -1859,16 +1860,6 @@ public class MenuScreen extends class_437 {
                 Config.totemColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.totemColor);
                 Config.totemScale = cslider(g, "Размер", 0.5, 2.5, Config.totemScale, false);
                 Config.totemAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.totemAlpha, false);
-                Config.totemX = (int) cslider(g, "X", 0, 400, Config.totemX, true);
-                Config.totemY = (int) cslider(g, "Y", 0, 250, Config.totemY, true);
-            }
-            case "cdh" -> {
-                Config.cdTime = cbool(g, "Показывать время", Config.cdTime);
-                Config.cdColor = ccycle(g, "Цвет", CooldownHud.COLOR_NAMES, Config.cdColor);
-                Config.cdAlpha = cslider(g, "Прозрачность", 0.1, 1.0, Config.cdAlpha, false);
-                Config.cdX = (int) cslider(g, "X", 0, 400, Config.cdX, true);
-                Config.cdY = (int) cslider(g, "Y", 0, 250, Config.cdY, true);
-            }
             case "combo" -> {
                 Config.comboColor = ccycle(g, "Цвет", Config.COLOR_NAMES, Config.comboColor);
                 Config.comboTimeout = cslider(g, "Таймаут (сек)", 1.0, 10.0, Config.comboTimeout, false);
