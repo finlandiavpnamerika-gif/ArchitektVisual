@@ -21,8 +21,8 @@ import org.joml.Vector3f;
  * ("Аирдроп / 1131 метров"), как у обычной метки на скрине.
  *
  * Как ловит: ищет в сообщении координаты (x y z / x: .. z: .. / "123 64 -456" / "123 -456")
- * и слово-ключ ивента из таблицы KINDS ниже. Без координат метку поставить нельзя.
- * Таблицу KINDS правь под свой сервер.
+ * и слово-ключ ивента из таблиц STRONG и WEAK ниже. Без координат метку поставить нельзя.
+ * Таблицы STRONG и WEAK правь под свой сервер.
  */
 public final class EventPoints {
     private EventPoints() {}
@@ -40,30 +40,53 @@ public final class EventPoints {
     private static final int ICON_RGB = 0x3D6BFF;        // синий квадрат с домиком
     private static final double ARRIVE_DIST = 4.0;        // подошёл ближе - метка пропадает
 
-    // ====== ТАБЛИЦА ИВЕНТОВ: правь здесь ======
-    // Первое совпадение выигрывает, поэтому конкретные - выше, общее "ивент/событие" - в самом конце.
+    // ====== НАЗВАНИЯ ИВЕНТОВ: правь здесь ======
+    // Как выбирается название (по порядку):
+    //  1) текст в кавычках «Маяк убийцы»;
+    //  2) то, что идёт после слов "Ивент:" / "Событие:";
+    //  3) СИЛЬНЫЙ ключ из таблицы STRONG - выигрывает тот, что стоит в сообщении РАНЬШЕ всех;
+    //  4) начало сообщения (до слов "появился", "начался", "на координатах" и т.п.), если есть слово "ивент/событие";
+    //  5) СЛАБЫЙ ключ из таблицы WEAK (обычные слова, которые могут быть просто упомянуты).
     // [0] = регулярка (без учёта регистра), [1] = название на метке.
-    private static final String[][] KINDS = {
-            {"аирдроп|эирдроп|аэродроп|airdrop|air drop", "Аирдроп"},
-            {"метеорит|meteor",                           "Метеорит"},
-            {"мистическ\\S*\\s+сундук|мистик\\S*\\s+сундук", "Мистический сундук"},
-            {"сундук|chest",                              "Сундук"},
-            {"босс|boss",                                 "Босс"},
-            {"торговец|trader",                           "Торговец"},
-            {"портал|portal",                             "Портал"},
-            {"дракон|dragon",                             "Дракон"},
-            {"вулкан",                                    "Вулкан"},
-            {"крепост",                                   "Крепость"},
-            {"ивент|событи|event",                        "Событие"},
+    private static final String[][] STRONG = {
+            {"аирдроп|эирдроп|аэродроп|airdrop|air drop",       "Аирдроп"},
+            {"метеорит|meteor",                                 "Метеорит"},
+            {"мистическ\\S*\\s+сундук|мистик\\S*\\s+сундук",     "Мистический сундук"},
+            {"маяк\\S*\\s+убийц\\S*|убийц\\S*\\s+маяк\\S*|маяк\\s+смерт\\S*", "Маяк убийцы"},
+            {"вулкан",                                          "Вулкан"},
+            {"торговец|trader",                                 "Торговец"},
     };
-    private static final Pattern[] KIND_PATTERNS = new Pattern[KINDS.length];
-    static {
-        for (int i = 0; i < KINDS.length; i++)
-            KIND_PATTERNS[i] = Pattern.compile(KINDS[i][0], Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    private static final String[][] WEAK = {
+            {"сундук|chest",   "Сундук"},
+            {"босс|boss",      "Босс"},
+            {"портал|portal",  "Портал"},
+            {"дракон|dragon",  "Дракон"},
+            {"крепост",        "Крепость"},
+            {"маяк",           "Маяк"},
+    };
+    private static final int F = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
+    private static final Pattern[] STRONG_P = compile(STRONG);
+    private static final Pattern[] WEAK_P = compile(WEAK);
+    private static Pattern[] compile(String[][] t) {
+        Pattern[] r = new Pattern[t.length];
+        for (int i = 0; i < t.length; i++) r[i] = Pattern.compile(t[i][0], F);
+        return r;
     }
 
-    // название в кавычках: «Падение метеорита» -> используем как название для общего "Событие"
+    // общее слово "ивент/событие" - сигнал, что это вообще сообщение про ивент
+    private static final Pattern GENERIC = Pattern.compile("ивент|событи|event", F);
+    // название в кавычках
     private static final Pattern QUOTED = Pattern.compile("[«\"“]([^»\"”]{2,28})[»\"”]");
+    // "Ивент: Название ..." / "Событие - Название ..."
+    private static final Pattern AFTER_EVENT = Pattern.compile("(?:ивент|событие|event)\\s*[:\\-–—]\\s*([^.!,;\\n(\\[]{3,40})", F);
+    // где обрывается название: "... появился", "... начался", "на координатах", "на 100 64 200"
+    private static final Pattern CUT = Pattern.compile(
+            "\\s+(появил\\S*|начал\\S*|упал\\S*|упад\\S*|открыл\\S*|открыт\\S*|находит\\S*|расположен\\S*|"
+                    + "заспавн\\S*|спавн\\S*|на\\s+координат\\S*|координат\\S*|через|в\\s+\\d|на\\s+\\d|на\\s+x\\b|"
+                    + "x\\s*[:=]).*$", F);
+    // [Ивент] / (Ивент) в самом начале
+    private static final Pattern LEAD_TAGS = Pattern.compile("^(?:\\s*[\\[(][^\\])]*[\\])])+\\s*");
+    private static final Pattern LEAD_WORD = Pattern.compile("^(?:ивент|событие|event)\\s*[:\\-–—]?\\s*", F);
 
     private static final String NUM = "(-?\\d+(?:\\.\\d+)?)";
     private static final Pattern XYZ = Pattern.compile(
@@ -94,15 +117,8 @@ public final class EventPoints {
         class_310 mc = class_310.method_1551();
         if (mc.field_1724 == null || mc.field_1687 == null) return null;
 
-        String title = null;
-        for (int i = 0; i < KINDS.length; i++) {
-            if (KIND_PATTERNS[i].matcher(text).find()) { title = KINDS[i][1]; break; }
-        }
+        String title = pickTitle(text);
         if (title == null) return null;
-        if (title.equals("Событие")) {
-            Matcher q = QUOTED.matcher(text);
-            if (q.find()) title = q.group(1).trim();
-        }
 
         double[] c = coords(text, mc.field_1724.method_23318());
         if (c == null) return null;
@@ -110,10 +126,10 @@ public final class EventPoints {
         String dim = Waypoints.dim(mc);
         long expires = System.currentTimeMillis() + (long) (Math.max(1.0, Config.epMinutes) * 60_000L);
 
-        // то же событие (то же название рядом) - просто обновляем, а не плодим копии
+        // то же место (в пределах 16 блоков) - обновляем метку, а не плодим копии
         for (Pt p : LIST) {
-            if (p.title.equals(title) && p.dim.equals(dim)
-                    && Math.abs(p.x - c[0]) <= 16 && Math.abs(p.z - c[2]) <= 16) {
+            if (p.dim.equals(dim) && Math.abs(p.x - c[0]) <= 16 && Math.abs(p.z - c[2]) <= 16) {
+                if (!title.equals("Событие")) p.title = title;
                 p.x = c[0]; p.y = c[1]; p.z = c[2]; p.expires = expires;
                 return p;
             }
@@ -123,6 +139,74 @@ public final class EventPoints {
         LIST.add(p);
         while (LIST.size() > MAX_POINTS) LIST.remove(0);
         return p;
+    }
+
+    /** Выбирает название ивента по тексту сообщения. null - это не сообщение про ивент. */
+    private static String pickTitle(String text) {
+        boolean generic = GENERIC.matcher(text).find();
+
+        // самый ранний сильный ключ
+        String strong = earliest(text, STRONG_P, STRONG);
+        String weak = earliest(text, WEAK_P, WEAK);
+        if (!generic && strong == null && weak == null) return null;     // не про ивент
+
+        // 1) в кавычках
+        Matcher q = QUOTED.matcher(text);
+        while (q.find()) {
+            String name = q.group(1).trim();
+            if (!GENERIC.matcher(name).matches()) return nice(name);
+        }
+        // 2) после "Ивент:" / "Событие:"
+        Matcher ae = AFTER_EVENT.matcher(text);
+        if (ae.find()) {
+            String name = clean(ae.group(1));
+            if (name != null) return name;
+        }
+        // 3) сильный ключ, который стоит раньше всех
+        if (strong != null) return strong;
+        // 4) начало сообщения
+        if (generic) {
+            String t = LEAD_TAGS.matcher(text.trim()).replaceFirst("");
+            t = LEAD_WORD.matcher(t).replaceFirst("");
+            String name = clean(t);
+            if (name != null && !GENERIC.matcher(name).matches()) return name;
+        }
+        // 5) слабый ключ
+        if (weak != null) return weak;
+        return "Событие";
+    }
+
+    /** Ключ из таблицы, который встречается в тексте раньше всех (при равенстве - длиннее). */
+    private static String earliest(String text, Pattern[] ps, String[][] names) {
+        int bestStart = Integer.MAX_VALUE, bestLen = 0;
+        String best = null;
+        for (int i = 0; i < ps.length; i++) {
+            Matcher m = ps[i].matcher(text);
+            if (!m.find()) continue;
+            int len = m.end() - m.start();
+            if (m.start() < bestStart || (m.start() == bestStart && len > bestLen)) {
+                bestStart = m.start(); bestLen = len; best = names[i][1];
+            }
+        }
+        return best;
+    }
+
+    /** Обрезает "... появился на ...", хвостовую пунктуацию, длину; null если ничего путного не осталось. */
+    private static String clean(String s) {
+        if (s == null) return null;
+        s = CUT.matcher(s.trim()).replaceFirst("");
+        s = s.replaceAll("[\\s:!.\\-–—,;]+$", "").trim();
+        if (s.length() > 28) {
+            int sp = s.lastIndexOf(' ', 28);
+            s = s.substring(0, sp > 8 ? sp : 28).trim();
+        }
+        if (s.length() < 3) return null;
+        return nice(s);
+    }
+
+    private static String nice(String s) {
+        s = s.trim();
+        return s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 
     /** Достаёт координаты {x, y, z}. Если Y нет - берёт высоту игрока. null - координат нет. */
