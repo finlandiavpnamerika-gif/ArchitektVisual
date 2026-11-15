@@ -42,6 +42,10 @@ public final class Config {
     public static boolean hornsGlow = true;    // раскалённые кончики
     public static boolean hornsCustom = false; // своя палитра вместо списка цветов
     public static double hornsHue = 0.0, hornsSat = 0.9, hornsVal = 0.7;
+    public static boolean eventPts = false;   // Event Point: метка ивента из чата
+    public static boolean epBeam = true;      // луч в мире
+    public static double epMinutes = 5;       // сколько минут держится метка
+    public static double epScale = 1.0;       // размер метки на экране
     public static boolean entityBox = false;
     public static boolean predictions = false;
     public static boolean itemPhysic = false;
@@ -569,6 +573,10 @@ public final class Config {
             o.addProperty("hornsHue", hornsHue);
             o.addProperty("hornsSat", hornsSat);
             o.addProperty("hornsVal", hornsVal);
+            o.addProperty("eventPts", eventPts);
+            o.addProperty("epBeam", epBeam);
+            o.addProperty("epMinutes", epMinutes);
+            o.addProperty("epScale", epScale);
             o.addProperty("entityBox", entityBox);
             o.addProperty("predictions", predictions);
             o.addProperty("itemPhysic", itemPhysic);
@@ -1025,6 +1033,10 @@ public final class Config {
                 hornsHue = d(o, "hornsHue", hornsHue);
                 hornsSat = d(o, "hornsSat", hornsSat);
                 hornsVal = d(o, "hornsVal", hornsVal);
+                eventPts = b(o, "eventPts", eventPts);
+                epBeam = b(o, "epBeam", epBeam);
+                epMinutes = d(o, "epMinutes", epMinutes);
+                epScale = d(o, "epScale", epScale);
                 entityBox = b(o, "entityBox", entityBox);
                 predictions = b(o, "predictions", predictions);
                 itemPhysic = b(o, "itemPhysic", itemPhysic);
