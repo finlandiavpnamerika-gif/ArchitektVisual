@@ -38,6 +38,7 @@ public final class ModuleDefaults {
             Map.entry("halo", new String[]{"haloCustom", "haloHue", "haloSat", "haloVal", "haloMode", "haloSize", "haloHeight", "haloBob"}),
             Map.entry("horns", new String[]{"hornsCustom", "hornsHue", "hornsSat", "hornsVal", "hornsMode", "hornsSize", "hornsGlow"}),
             Map.entry("evpt", new String[]{"epBeam", "epMinutes", "epScale"}),
+            Map.entry("near", new String[]{"nearColor", "nearRange", "nearMax", "nearScale", "nearAlpha", "nearX", "nearY"}),
             Map.entry("physic", new String[]{"physicLift"}),
             Map.entry("server", new String[]{"serverIp", "serverTps", "serverPing", "serverColor", "serverScale", "serverAlpha", "serverX", "serverY"}),
             Map.entry("clock", new String[]{"clockSeconds", "clockDate", "clockGame", "clockColor", "clockScale", "clockAlpha", "clockX", "clockY"}),
@@ -102,7 +103,7 @@ public final class ModuleDefaults {
         "hud", "arrayList", "armorHud", "potionHud", "keystrokes", "autoswap", "itembind", "customTime", "customWeather",
         "chinaHat", "halo", "horns", "predictions", "itemPhysic", "shulkerPreview", "highlight", "streamerMode",
         "noOverlay", "hitSound", "comboHud", "watermark",
-        "serverHud", "clockHud", "invHud", "totemHud",
+        "serverHud", "clockHud", "invHud", "totemHud", "nearHud",
         "critFx", "killFx", "atkInd", "statsHud", "dlHud",
         "hbox", "bout", "chunkB", "itemEsp", "wp", "eventPts", "ptrail", "etrail", "pcdHud",
         "wingsOn", "auraOn", "capeOn", "ntOn", "chamsOn", "swingAnim", "cloudsOn", "tipOn"
