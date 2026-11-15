@@ -38,7 +38,7 @@ public final class NearHud {
         int accent = Config.COLORS[Math.max(0, Math.min(Config.nearColor, Config.COLORS.length - 1))];
 
         double range = Math.max(10, Config.nearRange);
-        int max = Math.max(1, Math.min(12, Config.nearMax));
+        int max = Math.max(1, Math.min(12, (int) Config.nearMax));
         double px = mc.field_1724.method_23317(), py = mc.field_1724.method_23318(), pz = mc.field_1724.method_23321();
         float viewYaw = mc.field_1724.method_36454();
 
