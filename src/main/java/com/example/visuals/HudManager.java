@@ -2,10 +2,10 @@ package com.example.visuals;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.class_310;
+import net.minecraft.class_327;
+import net.minecraft.class_332;
+import net.minecraft.class_408;
 import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
@@ -27,7 +27,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.keystrokesX = x; Config.keystrokesY = y; }
             public double scale() { return Config.keystrokesScale; }
             public double alpha() { return Config.keystrokesAlpha; }
-            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return KeystrokesHud.draw(g, mc, a); }
+            public int[] draw(class_332 g, class_310 mc, float a) { return KeystrokesHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("ArrayList") {
             public boolean enabled() { return Config.arrayList; }
@@ -36,7 +36,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.arrayListX = x; Config.arrayListY = y; }
             public double scale() { return Config.arrayListScale; }
             public double alpha() { return Config.arrayListAlpha; }
-            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return ArrayListHud.draw(g, mc, a); }
+            public int[] draw(class_332 g, class_310 mc, float a) { return ArrayListHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("Armor") {
             public boolean enabled() { return Config.armorHud; }
@@ -45,7 +45,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.armorHudX = x; Config.armorHudY = y; }
             public double scale() { return Config.armorHudScale; }
             public double alpha() { return Config.armorHudAlpha; }
-            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return ArmorHud.draw(g, mc, a); }
+            public int[] draw(class_332 g, class_310 mc, float a) { return ArmorHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("Potion") {
             public boolean enabled() { return Config.potionHud; }
@@ -54,7 +54,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.potionX = x; Config.potionY = y; }
             public double scale() { return Config.potionScale; }
             public double alpha() { return Config.potionAlpha; }
-            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return PotionHud.draw(g, mc, a); }
+            public int[] draw(class_332 g, class_310 mc, float a) { return PotionHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("Watermark") {
             public boolean enabled() { return Config.watermark; }
@@ -63,7 +63,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.watermarkX = x; Config.watermarkY = y; }
             public double scale() { return Config.watermarkScale; }
             public double alpha() { return Config.watermarkAlpha; }
-            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return WatermarkHud.draw(g, mc, a); }
+            public int[] draw(class_332 g, class_310 mc, float a) { return WatermarkHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("Combo") {
             public boolean enabled() { return Config.comboHud; }
@@ -72,7 +72,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.comboX = x; Config.comboY = y; }
             public double scale() { return Config.comboScale; }
             public double alpha() { return Config.comboAlpha; }
-            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return ComboHud.draw(g, mc, a); }
+            public int[] draw(class_332 g, class_310 mc, float a) { return ComboHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("Server") {
             public boolean enabled() { return Config.serverHud; }
@@ -81,7 +81,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.serverX = x; Config.serverY = y; }
             public double scale() { return Config.serverScale; }
             public double alpha() { return Config.serverAlpha; }
-            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return ServerInfoHud.draw(g, mc, a); }
+            public int[] draw(class_332 g, class_310 mc, float a) { return ServerInfoHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("Clock") {
             public boolean enabled() { return Config.clockHud; }
@@ -90,7 +90,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.clockX = x; Config.clockY = y; }
             public double scale() { return Config.clockScale; }
             public double alpha() { return Config.clockAlpha; }
-            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return ClockHud.draw(g, mc, a); }
+            public int[] draw(class_332 g, class_310 mc, float a) { return ClockHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("Inventory") {
             public boolean enabled() { return Config.invHud; }
@@ -99,7 +99,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.invX = x; Config.invY = y; }
             public double scale() { return Config.invScale; }
             public double alpha() { return Config.invAlpha; }
-            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return InventoryHud.draw(g, mc, a); }
+            public int[] draw(class_332 g, class_310 mc, float a) { return InventoryHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("Totems") {
             public boolean enabled() { return Config.totemHud; }
@@ -108,7 +108,16 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.totemX = x; Config.totemY = y; }
             public double scale() { return Config.totemScale; }
             public double alpha() { return Config.totemAlpha; }
-            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return TotemHud.draw(g, mc, a); }
+            public int[] draw(class_332 g, class_310 mc, float a) { return TotemHud.draw(g, mc, a); }
+        });
+        ELEMENTS.add(new HudElement("Near") {
+            public boolean enabled() { return Config.nearHud; }
+            public int x() { return Config.nearX; }
+            public int y() { return Config.nearY; }
+            public void setPos(int x, int y) { Config.nearX = x; Config.nearY = y; }
+            public double scale() { return Config.nearScale; }
+            public double alpha() { return Config.nearAlpha; }
+            public int[] draw(class_332 g, class_310 mc, float a) { return NearHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("Stats") {
             public boolean enabled() { return Config.statsHud; }
@@ -117,7 +126,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.statsX = x; Config.statsY = y; }
             public double scale() { return Config.statsScale; }
             public double alpha() { return Config.statsAlpha; }
-            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return StatsHud.draw(g, mc, a); }
+            public int[] draw(class_332 g, class_310 mc, float a) { return StatsHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("DmgLog") {
             public boolean enabled() { return Config.dlHud; }
@@ -126,7 +135,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.dlX = x; Config.dlY = y; }
             public double scale() { return Config.dlScale; }
             public double alpha() { return Config.dlAlpha; }
-            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return DamageLogHud.draw(g, mc, a); }
+            public int[] draw(class_332 g, class_310 mc, float a) { return DamageLogHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("Pearl") {
             public boolean enabled() { return Config.pcdHud; }
@@ -135,7 +144,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.pcdX = x; Config.pcdY = y; }
             public double scale() { return Config.pcdScale; }
             public double alpha() { return Config.pcdAlpha; }
-            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return PearlHud.draw(g, mc, a); }
+            public int[] draw(class_332 g, class_310 mc, float a) { return PearlHud.draw(g, mc, a); }
         });
         ELEMENTS.add(new HudElement("Info") {
             public boolean enabled() { return Config.hud; }
@@ -144,7 +153,7 @@ public final class HudManager {
             public void setPos(int x, int y) { Config.hudX = x; Config.hudY = y; }
             public double scale() { return Config.hudScale; }
             public double alpha() { return Config.hudAlpha; }
-            public int[] draw(DrawContext g, MinecraftClient mc, float a) { return InfoHud.draw(g, mc, a); }
+            public int[] draw(class_332 g, class_310 mc, float a) { return InfoHud.draw(g, mc, a); }
         });
     }
 
@@ -156,13 +165,13 @@ public final class HudManager {
     private static boolean moved = false;
 
     /** Вызывается каждый кадр из Features.hud. */
-    public static void render(DrawContext g, MinecraftClient mc) {
-        if (mc.player == null || mc.options.hudHidden) {
+    public static void render(class_332 g, class_310 mc) {
+        if (mc.field_1724 == null || mc.field_1690.field_1842) {
             stopEdit();
             return;
         }
 
-        Matrix3x2fStack m = g.getMatrices();
+        Matrix3x2fStack m = g.method_51448();
         for (HudElement e : ELEMENTS) {
             e.visible = false;
             if (!e.enabled()) continue;
@@ -190,8 +199,8 @@ public final class HudManager {
     }
 
     /** Открыт ли чат. */
-    private static boolean isChatOpen(MinecraftClient mc) {
-        return mc.currentScreen instanceof ChatScreen;
+    private static boolean isChatOpen(class_310 mc) {
+        return mc.field_1755 instanceof class_408;
     }
 
     private static void stopEdit() {
@@ -201,10 +210,10 @@ public final class HudManager {
         editActive = false;
     }
 
-    private static void edit(DrawContext g, MinecraftClient mc) {
-        long window = mc.getWindow().getHandle();
-        int sw = mc.getWindow().getScaledWidth();
-        int sh = mc.getWindow().getScaledHeight();
+    private static void edit(class_332 g, class_310 mc) {
+        long window = mc.method_22683().method_4490();
+        int sw = mc.method_22683().method_4486();
+        int sh = mc.method_22683().method_4502();
 
         double[] cx = new double[1];
         double[] cy = new double[1];
@@ -254,19 +263,19 @@ public final class HudManager {
         }
 
         // --- оверлей редактирования ---
-        TextRenderer tr = mc.textRenderer;
+        class_327 tr = mc.field_1772;
         HudElement hover = dragging != null ? dragging : top;
         for (HudElement e : ELEMENTS) {
             if (!e.visible) continue;
             boolean hot = e == hover;
             int p = 2;
-            if (hot) g.fill(e.bx - p, e.by - p, e.bx + e.bw + p, e.by + e.bh + p, 0x18FFFFFF);
+            if (hot) g.method_25294(e.bx - p, e.by - p, e.bx + e.bw + p, e.by + e.bh + p, 0x18FFFFFF);
             HudStyle.rectRing(g, e.bx - p, e.by - p, e.bw + p * 2, e.bh + p * 2,
                     HudStyle.withAlpha(Theme.ACCENT, hot ? 1f : 0.45f));
             int ty = e.by - p - 10;
             if (ty < 1) ty = e.by + e.bh + p + 2;
-            g.drawTextWithShadow(tr, e.name, e.bx, ty, hot ? Theme.TEXT : Theme.TEXT_DIM);
+            g.method_25303(tr, e.name, e.bx, ty, hot ? Theme.TEXT : Theme.TEXT_DIM);
         }
-        g.drawCenteredTextWithShadow(tr, "Перетаскивай HUD мышью", sw / 2, 4, Theme.TEXT_DIM);
+        g.method_25300(tr, "Перетаскивай HUD мышью", sw / 2, 4, Theme.TEXT_DIM);
     }
 }
