@@ -195,6 +195,14 @@ public final class Config {
     public static double totemAlpha = 1.0;
     public static int totemColor = 4;
     public static boolean totemHideZero = false;
+    public static boolean nearHud = false;    // Players Near
+    public static int nearX = 5;
+    public static int nearY = 100;
+    public static double nearScale = 1.0;
+    public static double nearAlpha = 1.0;
+    public static int nearColor = 1;
+    public static double nearRange = 100;     // радиус поиска, блоки
+    public static double nearMax = 6;         // максимум строк в окне
 
     // Cooldown HUD
     public static boolean cdHud = true;
@@ -761,6 +769,14 @@ public final class Config {
             o.addProperty("totemAlpha", totemAlpha);
             o.addProperty("totemColor", totemColor);
             o.addProperty("totemHideZero", totemHideZero);
+            o.addProperty("nearHud", nearHud);
+            o.addProperty("nearX", nearX);
+            o.addProperty("nearY", nearY);
+            o.addProperty("nearScale", nearScale);
+            o.addProperty("nearAlpha", nearAlpha);
+            o.addProperty("nearColor", nearColor);
+            o.addProperty("nearRange", nearRange);
+            o.addProperty("nearMax", nearMax);
             o.addProperty("cdHud", cdHud);
             o.addProperty("cdX", cdX);
             o.addProperty("cdY", cdY);
@@ -1221,6 +1237,14 @@ public final class Config {
                 totemAlpha = d(o, "totemAlpha", totemAlpha);
                 totemColor = (int) d(o, "totemColor", totemColor);
                 totemHideZero = b(o, "totemHideZero", totemHideZero);
+                nearHud = b(o, "nearHud", nearHud);
+                nearX = (int) d(o, "nearX", nearX);
+                nearY = (int) d(o, "nearY", nearY);
+                nearScale = d(o, "nearScale", nearScale);
+                nearAlpha = d(o, "nearAlpha", nearAlpha);
+                nearColor = (int) d(o, "nearColor", nearColor);
+                nearRange = d(o, "nearRange", nearRange);
+                nearMax = d(o, "nearMax", nearMax);
                 cdHud = b(o, "cdHud", cdHud);
                 cdX = (int) d(o, "cdX", cdX);
                 cdY = (int) d(o, "cdY", cdY);
