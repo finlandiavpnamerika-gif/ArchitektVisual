@@ -40,6 +40,7 @@ public class VisualsClient implements ClientModInitializer {
         Particles.register();
         DamageFever.register();
         Combat.register();
+        FakePlayer.register();
         Waypoints.load();
         ItemTooltipCallback.EVENT.register((stack, context, type, lines) ->
                 TooltipsPlus.add(stack, type != null && type.method_8035(), lines));
