@@ -18,7 +18,6 @@ public final class Config {
 
     public static boolean customMainMenu = true;
     public static int menuTheme = 1;   // палитра меню (Theme.NAMES)
-    public static int menuStyle = 0;   // 0 = Classic (4 колонки), 1 = Sidebar
 
     // --- Визуал ---
     public static boolean customCrosshair = true;
@@ -552,7 +551,6 @@ public final class Config {
         try {
             JsonObject o = new JsonObject();
             o.addProperty("customMainMenu", customMainMenu);
-            o.addProperty("menuStyle", menuStyle);
             o.addProperty("menuTheme", menuTheme);
             o.addProperty("customCrosshair", customCrosshair);
             o.addProperty("chinaHat", chinaHat);
@@ -1020,7 +1018,6 @@ public final class Config {
             if (Files.exists(file)) {
                 JsonObject o = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
                 customMainMenu = b(o, "customMainMenu", customMainMenu);
-                menuStyle = (int) d(o, "menuStyle", menuStyle);
                 menuTheme = (int) d(o, "menuTheme", menuTheme);
                 customCrosshair = b(o, "customCrosshair", customCrosshair);
                 chinaHat = b(o, "chinaHat", chinaHat);
