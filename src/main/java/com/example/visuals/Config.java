@@ -18,6 +18,7 @@ public final class Config {
 
     public static boolean customMainMenu = true;
     public static int menuTheme = 1;   // палитра меню (Theme.NAMES)
+    public static int menuStyle = 0;   // стиль меню: 0 = Sidebar (как было), 1 = Pulse
 
     // --- Визуал ---
     public static boolean customCrosshair = true;
@@ -552,6 +553,7 @@ public final class Config {
             JsonObject o = new JsonObject();
             o.addProperty("customMainMenu", customMainMenu);
             o.addProperty("menuTheme", menuTheme);
+            o.addProperty("menuStyle", menuStyle);
             o.addProperty("customCrosshair", customCrosshair);
             o.addProperty("chinaHat", chinaHat);
             o.addProperty("chinaHatColor", chinaHatColor);
@@ -1019,6 +1021,7 @@ public final class Config {
                 JsonObject o = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
                 customMainMenu = b(o, "customMainMenu", customMainMenu);
                 menuTheme = (int) d(o, "menuTheme", menuTheme);
+                menuStyle = (int) d(o, "menuStyle", menuStyle);
                 customCrosshair = b(o, "customCrosshair", customCrosshair);
                 chinaHat = b(o, "chinaHat", chinaHat);
                 chinaHatColor = (int) d(o, "chinaHatColor", chinaHatColor);
