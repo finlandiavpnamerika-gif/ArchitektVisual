@@ -16,9 +16,12 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.ActionResult;
@@ -27,7 +30,7 @@ import net.minecraft.util.Identifier;
 /**
  * FakePlayer: тренировочный манекен для PvP.
  * Существует ТОЛЬКО на клиенте (сервер о нём ничего не знает, видите его только вы).
- * Стоит на месте, получает урон от вашего оружия (с учётом отката атаки, крита и Остроты).
+ * Стоит на месте, получает урон от вашего оружия (от оружия в руке, с учётом отката атаки, крита, Остроты и Силы).
  *  - Тотем ВКЛ: когда HP доходит до 0, тотем "срабатывает" (анимация и звук), HP снова 20. Убить нельзя.
  *  - Тотем ВЫКЛ: на 0 HP манекен умирает, и функция сама выключается.
  */
@@ -51,6 +54,10 @@ public final class FakePlayer {
     private static boolean respawn = false;
     private static float pendingDamage = 0f;
     private static int dying = 0;
+    /** Пока > 0, миксин NoOverlay не прячет частицы тотема (иначе поп манекена не видно). */
+    public static int popTicks = 0;
+    /** Сколько тиков рука манекена пустая после попа, потом появляется новый тотем. */
+    private static int popGap = 0;
 
     /** Вызвать один раз в VisualsClient.onInitializeClient() после Combat.register(). */
     public static void register() {
@@ -72,7 +79,12 @@ public final class FakePlayer {
             if (me != null && player == me && dying == 0) {
                 // --- урон, как в ваниле: атрибут оружия * откат, крит x1.5 ---
                 float c = me.getAttackCooldownProgress(0.5f);
-                float dmg = (float) me.getAttributeValue(EntityAttributes.ATTACK_DAMAGE);
+                String itemId = Registries.ITEM.getId(me.getMainHandStack().getItem()).getPath();
+                double table = itemDamage(itemId);
+                float dmg = table >= 0
+                        ? (float) (table + effectBonus(me))   // меч/топор/кирка/... + Сила/Слабость
+                        : (float) me.getAttributeValue(EntityAttributes.ATTACK_DAMAGE);   // прочие предметы и кулак
+                if (dmg < 0f) dmg = 0f;
                 dmg *= 0.2f + c * c * 0.8f;
                 float bonus = sharpnessBonus(me) * c;   // зачарование масштабируется откатом, крит его не усиливает
                 boolean crit = c > 0.9f && me.fallDistance > 0 && !me.isOnGround() && !me.isClimbing()
@@ -91,6 +103,43 @@ public final class FakePlayer {
             // FAIL = пакет атаки на сервер НЕ отправляется (манекена там нет)
             return ActionResult.FAIL;
         });
+    }
+
+    private static final String[] MATS = {"wooden", "golden", "stone", "copper", "iron", "diamond", "netherite"};
+    private static final double[] SWORD = {4, 4, 5, 5, 6, 7, 8};
+    private static final double[] AXE = {7, 7, 9, 9, 9, 9, 10};
+    private static final double[] PICK = {2, 2, 3, 3, 4, 5, 6};
+    private static final double[] SHOVEL = {2.5, 2.5, 3.5, 3.5, 4.5, 5.5, 6.5};
+
+    /** Полный урон оружия по таблице (как в ваниле, включая базовую единицу), -1 если предмет не в таблице. */
+    private static double itemDamage(String id) {
+        if (id.equals("mace")) return 6.0;
+        if (id.equals("trident")) return 9.0;
+        int us = id.lastIndexOf('_');
+        if (us < 0) return -1;
+        String mat = id.substring(0, us);
+        String kind = id.substring(us + 1);
+        int m = -1;
+        for (int i = 0; i < MATS.length; i++) if (MATS[i].equals(mat)) m = i;
+        if (m < 0) return -1;
+        switch (kind) {
+            case "sword": return SWORD[m];
+            case "axe": return AXE[m];
+            case "pickaxe": return PICK[m];
+            case "shovel": return SHOVEL[m];
+            case "hoe": return 1.0;
+            default: return -1;
+        }
+    }
+
+    /** Сила: +3 урона за уровень, Слабость: -4 за уровень. */
+    private static float effectBonus(ClientPlayerEntity me) {
+        float b = 0f;
+        StatusEffectInstance str = me.getStatusEffect(StatusEffects.STRENGTH);
+        if (str != null) b += 3.0f * (str.getAmplifier() + 1);
+        StatusEffectInstance weak = me.getStatusEffect(StatusEffects.WEAKNESS);
+        if (weak != null) b -= 4.0f * (weak.getAmplifier() + 1);
+        return b;
     }
 
     private static Method resetMethod;
@@ -147,6 +196,7 @@ public final class FakePlayer {
         dummyWorld = null;
         pendingDamage = 0f;
         dying = 0;
+        popGap = 0;
         respawn = false;
     }
 
@@ -156,9 +206,11 @@ public final class FakePlayer {
         dummyWorld = null;
         pendingDamage = 0f;
         dying = 0;
+        popGap = 0;
     }
 
     private static void tick(MinecraftClient mc) {
+        if (popTicks > 0) popTicks--;
         ClientWorld world = mc.world;
         ClientPlayerEntity me = mc.player;
         if (world == null || me == null) {
@@ -172,6 +224,7 @@ public final class FakePlayer {
             dummyWorld = null;
             pendingDamage = 0f;
             dying = 0;
+            popGap = 0;
         }
 
         if (!enabled) {
@@ -197,9 +250,13 @@ public final class FakePlayer {
         }
 
         // тотем в руке (в левой, как в PvP)
-        boolean hasTotem = dummy.getOffHandStack().isOf(Items.TOTEM_OF_UNDYING);
-        if (hasTotem != totem) {
-            dummy.equipStack(EquipmentSlot.OFFHAND, totem ? new ItemStack(Items.TOTEM_OF_UNDYING) : ItemStack.EMPTY);
+        if (popGap > 0) {
+            popGap--;   // рука пустая: старый тотем "сгорел", скоро появится новый
+        } else {
+            boolean hasTotem = dummy.getOffHandStack().isOf(Items.TOTEM_OF_UNDYING);
+            if (hasTotem != totem) {
+                dummy.equipStack(EquipmentSlot.OFFHAND, totem ? new ItemStack(Items.TOTEM_OF_UNDYING) : ItemStack.EMPTY);
+            }
         }
 
         // урон от удара
@@ -219,9 +276,13 @@ public final class FakePlayer {
             dummy.setHealth(hp);
             Combat.playSound(mc, "entity.player.hurt", 1.0f, 1.0f);
         } else if (totem) {
-            // бесконечный тотем: "сработал", HP снова полное, тотем остаётся в руке
+            // бесконечный тотем: "сработал", HP снова полное, потом в руке появляется новый
             dummy.setHealth(dummy.getMaxHealth());
-            dummy.handleStatus((byte) 35);   // 35 = анимация и звук тотема бессмертия
+            dummy.equipStack(EquipmentSlot.OFFHAND, ItemStack.EMPTY);   // тотем "сгорел"
+            popGap = 12;                                                // через 12 тиков появится новый
+            popTicks = 35;                                              // разрешаем частицы тотема
+            mc.particleManager.addEmitter(dummy, ParticleTypes.TOTEM_OF_UNDYING, 30);
+            Combat.playSound(mc, "item.totem.use", 1.0f, 1.0f);
         } else {
             dummy.setHealth(0f);             // смерть (падение); Combat засчитает килл
             Combat.playSound(mc, "entity.player.death", 1.0f, 1.0f);
