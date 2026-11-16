@@ -1,6 +1,7 @@
 package com.example.visuals;
 
 import com.mojang.authlib.GameProfile;
+import java.lang.reflect.Method;
 import java.util.UUID;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -85,11 +86,41 @@ public final class FakePlayer {
                     me.setSprinting(false);
                     me.setVelocity(me.getVelocity().multiply(0.6, 1.0, 0.6));
                 }
-                me.resetLastAttackedTicks();   // откат атаки сбрасывается, как при настоящем ударе
+                resetCooldown(me);   // откат атаки сбрасывается, как при настоящем ударе
             }
             // FAIL = пакет атаки на сервер НЕ отправляется (манекена там нет)
             return ActionResult.FAIL;
         });
+    }
+
+    private static Method resetMethod;
+    private static boolean resetSearched = false;
+
+    /** Сброс отката атаки. Имя метода менялось между версиями, поэтому ищем его на лету. */
+    private static void resetCooldown(ClientPlayerEntity me) {
+        if (!resetSearched) {
+            resetSearched = true;
+            resetMethod = findNoArg(me.getClass(), "method_7350", "resetLastAttackedTicks",
+                    "resetAttackCooldown", "resetAttackStrengthTicker");
+        }
+        try {
+            if (resetMethod != null) resetMethod.invoke(me);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private static Method findNoArg(Class<?> c, String... names) {
+        for (Class<?> k = c; k != null; k = k.getSuperclass()) {
+            for (String n : names) {
+                try {
+                    Method m = k.getDeclaredMethod(n);
+                    m.setAccessible(true);
+                    return m;
+                } catch (NoSuchMethodException ignored) {
+                }
+            }
+        }
+        return null;
     }
 
     /** Бонус Остроты на оружии в основной руке: 0.5 * уровень + 0.5 (как в ваниле). */
