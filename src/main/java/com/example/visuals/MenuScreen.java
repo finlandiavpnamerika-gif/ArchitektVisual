@@ -8,9 +8,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 import net.minecraft.class_124;
+import net.minecraft.class_1792;
+import net.minecraft.class_1799;
 import net.minecraft.class_2561;
+import net.minecraft.class_2960;
 import net.minecraft.class_332;
 import net.minecraft.class_3532;
+import net.minecraft.class_7923;
 import net.minecraft.class_437;
 
 public class MenuScreen extends class_437 {
@@ -320,7 +324,7 @@ public class MenuScreen extends class_437 {
         // ========== ПЕРВЫЙ РЯД ==========
 
         // 1. Utilities
-        int hUtil = 34 + mh("sprint", 2) + mh("zoom", 2) + mh("respawn", 0) + mh("freelook", 5) + mh("noov", 5) + mh("hitsound", 4);
+        int hUtil = 34 + mh("sprint", 2) + mh("zoom", 2) + mh("respawn", 0) + mh("freelook", 5) + mh("noov", 5) + mh("hitsound", 4) + mh("fake", 2);
         panel(g, "Utilities", x0, y0, colW, hUtil);
         Config.sprint = module(g, "sprint", "AutoSprint", "", Config.sprint, 1);
         if (open.contains("sprint")) { Config.sprintAllDirs = cbool(g, "Все стороны", Config.sprintAllDirs); cy += 2;  resetRow(g, "sprint");}
@@ -352,6 +356,9 @@ public class MenuScreen extends class_437 {
             Config.hitSoundPitch = cslider(g, "Высота тона", 0.5, 2.0, Config.hitSoundPitch, false);
             cy += 2; resetRow(g, "hitsound");
         }
+
+        FakePlayer.enabled = module(g, "fake", "FakePlayer", "", FakePlayer.enabled, 2);
+        if (open.contains("fake")) { fakeBlock(g); cy += 2; }
 
         // 2. Visuals
         int hVis = 34 + mh("fb", 2) + mh("cross", 5) + mh("trails", Config.trailsCustom ? 6 : 4) + mh("zones", 2) + mh("tesp", 7) + mh("sky", 6) + mh("part", 10) + mh("dmg", 6) + mh("fog", 7) + mh("thud", 6) + mh("hv", 11) + mh("ci", 2) + mh("jc", 10);
@@ -1080,7 +1087,7 @@ public class MenuScreen extends class_437 {
     private static final String[][] SB_MODS = {
             {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "halo", "horns", "pred", "physic", "shulker", "hl", "crit", "kill", "atk", "wings", "aura", "cape", "chams"},
             {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem", "stats", "dlog", "pcd", "cdh", "near", "nt", "tip"},
-            {"sprint", "zoom", "respawn", "freelook", "noov", "hitsound", "swing", "stream"},
+            {"sprint", "zoom", "respawn", "freelook", "noov", "hitsound", "swing", "stream", "fake"},
             {"autoswap", "itembind", "friends", "macro", "configs"},
             {"time", "weather", "hbox", "bout", "chunk", "iesp", "wp", "evpt", "ptr", "etr", "clouds"}
     };
@@ -1149,6 +1156,7 @@ public class MenuScreen extends class_437 {
             case "respawn" -> "AutoRespawn";
             case "freelook" -> "Freelook";
             case "stream" -> "StreamerMode";
+            case "fake" -> "FakePlayer";
             case "autoswap" -> "AutoSwap";
             case "itembind" -> "ItemBind";
             case "friends" -> "Friends";
@@ -1228,6 +1236,7 @@ public class MenuScreen extends class_437 {
             case "respawn" -> Config.autoRespawn;
             case "freelook" -> Config.thirdPerson;
             case "stream" -> Config.streamerMode;
+            case "fake" -> FakePlayer.enabled;
             case "autoswap" -> Config.autoswap;
             case "itembind" -> Config.itembind;
             case "time" -> Config.customTime;
@@ -1300,6 +1309,7 @@ public class MenuScreen extends class_437 {
             case "respawn": Config.autoRespawn = v; break;
                             case "freelook": Config.thirdPerson = v; break;
             case "stream": Config.streamerMode = v; break;
+            case "fake": FakePlayer.enabled = v; break;
             case "autoswap": Config.autoswap = v; break;
             case "itembind": Config.itembind = v; break;
             case "time": Config.customTime = v; break;
@@ -1463,6 +1473,28 @@ public class MenuScreen extends class_437 {
         if (del != null) { Waypoints.LIST.remove(del); Waypoints.save(); }
     }
 
+    private void fakeBlock(class_332 g) {
+        FakePlayer.totem = totemRow(g, FakePlayer.totem);
+        if (actionRow(g, "Поставить передо мной")) FakePlayer.respawnInFront();
+    }
+
+    private class_1799 totemStack() {
+        class_2960 ident = class_2960.method_12829("totem_of_undying");
+        class_1792 it = ident == null ? null : class_7923.field_41178.method_63535(ident);
+        return it == null ? class_1799.field_8037 : it.method_7854();
+    }
+
+    private boolean totemRow(class_332 g, boolean v) {
+        boolean hov = hit(cx, cy, cw, 18);
+        rbox(g, cx, cy, cw, 18, mix(0x20000000, Theme.ROW_HOVER, anim("ft:" + curId, hov) * 0.6f));
+        g.method_51427(totemStack(), cx + 2, cy + 1);
+        text(g, "Тотем в руке", cx + 22, cy + 5, v ? Theme.TEXT : Theme.TEXT_DIM);
+        sw(g, cx + cw - 28, cy + 3, "c:" + curId + "/totem", v);
+        if (clicked && hov) v = !v;
+        cy += 20;
+        return v;
+    }
+
     private boolean actionRow(class_332 g, String label) {
         boolean hov = hit(cx, cy, cw, 18);
         rbox(g, cx, cy, cw, 18, mix(0x20000000, Theme.ROW_HOVER, anim("ar:" + curId + label, hov) * 0.6f));
@@ -1530,6 +1562,7 @@ public class MenuScreen extends class_437 {
                 Config.jcLand = cbool(g, "При приземлении", Config.jcLand);
             }
             case "ci" -> screenButton(g, "-> Открыть редактор", () -> new CustomItemsScreen(this));
+            case "fake" -> fakeBlock(g);
             case "hv" -> {
                 Config.leftHanded = cbool(g, "Левша (главная рука слева)", Config.leftHanded);
                 Config.svHand = ccycle(g, "Рука", HandView.HANDS, Config.svHand);
