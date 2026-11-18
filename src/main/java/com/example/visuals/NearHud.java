@@ -66,7 +66,7 @@ public final class NearHud {
 
         String title = "Players Near";
         String count = demo ? "0" : String.valueOf(total);
-        int w = PAD + tr.method_1727(title) + 10 + tr.method_1727(count) + PAD;
+        int w = PAD + HudStyle.titleWidth(tr, Theme.ICON_WORLD, title) + 10 + tr.method_1727(count) + PAD;
         for (Row r : rows) {
             int rw = PAD + ARROW_W + tr.method_1727(r.name) + 12 + tr.method_1727(distText(r.dist)) + PAD;
             if (rw > w) w = rw;
@@ -77,7 +77,7 @@ public final class NearHud {
 
         HudStyle.panel(g, 0, 0, w, h, a, accent);
         HudStyle.header(g, 0, 0, w, HEADER, a, accent);
-        HudStyle.text(g, tr, title, PAD, 3, Theme.TEXT, a, true);
+        HudStyle.title(g, tr, Theme.ICON_WORLD, title, PAD, 3, a, Theme.ACCENT);
         HudStyle.textRight(g, tr, count, w - PAD, 3, Theme.TEXT_DIM, a, true);
         HudStyle.divider(g, 1, w - 1, HEADER, accent, a * 0.5f);
 
