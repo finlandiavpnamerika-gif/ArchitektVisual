@@ -66,7 +66,7 @@ public final class PotionHud {
             String k = key(e.method_5579());
             alive.add(k);
             MAX.merge(k, e.method_5584(), Math::max);
-            String name = e.method_5579().comp_349().method_5560().getString();
+            String name = e.method_5579().value().method_5560().getString();
             if (Config.potionLevel && e.method_5578() > 0) name += " " + roman(e.method_5578() + 1);
             names[i] = name;
             times[i] = time(e);
@@ -85,7 +85,7 @@ public final class PotionHud {
             int x = PAD;
             for (int i = 0; i < n; i++) {
                 class_1293 e = list.get(i);
-                int side = e.method_5579().comp_349().method_5573() ? HudStyle.GOOD : HudStyle.BAD;
+                int side = e.method_5579().value().method_5573() ? HudStyle.GOOD : HudStyle.BAD;
                 HudStyle.roundFill(g, x, PAD, tw[i], 38, 2, HudStyle.withAlpha(0x38000000, a));
                 HudStyle.roundFill(g, x + 2, PAD, tw[i] - 4, 2, 1, HudStyle.withAlpha(side, a));
                 if (Config.potionIcons) {
@@ -131,7 +131,7 @@ public final class PotionHud {
         int y = HEADER + 3;
         for (int i = 0; i < n; i++) {
             class_1293 e = list.get(i);
-            class_1291 fx = e.method_5579().comp_349();
+            class_1291 fx = e.method_5579().value();
             int side = fx.method_5573() ? HudStyle.GOOD : HudStyle.BAD;
 
             // цветная метка: полезный / вредный
