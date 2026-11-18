@@ -18,7 +18,7 @@ public final class HudStyle {
     /** Радиус скругления панелей. */
     public static final int R = 4;
 
-    /** Тёмная «сланцевая» поверхность панелей и тонкая светлая рамка (стиль Pulse). */
+    /** Тёмная «сланцевая» поверхность панелей и тонкая светлая рамка. */
     public static final int SURFACE = 0xD2191B28;
     public static final int BORDER  = 0x22FFFFFF;
     /** Нейтральный текст второго плана. */
@@ -194,17 +194,107 @@ public final class HudStyle {
         text(g, tr, ch, x + (size - tr.method_1727(ch)) / 2, y + (size - 8) / 2, Theme.TEXT, a, true);
     }
 
-    /** Фирменная «пульс»-линия 16x9. (x, y) - левый верхний угол. */
-    public static void pulseLogo(class_332 g, int x, int y, int color, float a) {
-        int[] xs = {0, 4, 6, 9, 12, 14, 16};
-        int[] ys = {5, 5, 0, 8, 3, 5, 5};
-        int c = withAlpha(color, a);
-        for (int k = 0; k + 1 < xs.length; k++) {
-            int steps = Math.max(Math.abs(xs[k + 1] - xs[k]), Math.abs(ys[k + 1] - ys[k]));
-            for (int t = 0; t <= steps; t++) {
-                int px = x + xs[k] + (xs[k + 1] - xs[k]) * t / Math.max(1, steps);
-                int py = y + ys[k] + (ys[k + 1] - ys[k]) * t / Math.max(1, steps);
-                g.method_25294(px, py, px + 1, py + 1, c);
+    // ---------- логотип ----------
+
+    /** Фирменный знак «A» (красный). Хранится как маска прозрачности 48x42 (по байту на пиксель, hex). */
+    private static final int LOGO_SW = 48, LOGO_SH = 42;
+    private static final int LOGO_RGB = 0xFB0101;
+    private static final String LOGO_HEX =
+            "000000000000000000000000000000000000000000000000000000000000000017000000000000000000000000000000" +
+            "0000000000000000000000000000000000000000000000000000000000000383ED130000000000000000000000000000" +
+            "000000000000000000000000000000000000000000000000000000000017BDFFFF880000000000000000000000000000" +
+            "000000000000000000000000000000000000000000000000000000003FE6FFFFFFF10F00000000000000000000000000" +
+            "00000000000000000000000000000000000000000000000000000178FBFFFFFFFFFF6E00000000000000000000000000" +
+            "0000000000000000000000000000000000000000000000000013B5FFFFFFFFFFFFFFCE00000000000000000000000000" +
+            "00000000000000000000000000000000000000000000000037E1FFFFFFFFFFFFFFFFFF27000000000000000000000000" +
+            "00000000000000000000000000000000000000000000006DF9FFFFFFFFFFFFFFFFFFFF76000000000000000000000000" +
+            "0000000000000000000000000000000000000000000DA8FFFFFFFFFFFFFFFFFFFFFFFFBE000000000000000000000000" +
+            "00000000000000000000000000000000000000002BD7FFFFFFFFFFFFFDEAFFFFFFFFFFF7020000000000000000000000" +
+            "000000000000000000000000000000000000005CF4FFFFFFFFFFFFE8468EFFFFFFFFFFFF2B0000000000000000000000" +
+            "00000000000000000000000000000000000796FFFFFFFFFFFFFFBE190072FFFFFFFFFFFF5C0000000000000000001912" +
+            "000000000000000000000000000000001FCAFFFFFFFFFFFFFE8603000059FFFFFFFFFFFF89000000000000000A78AA00" +
+            "00000000000000000000000000000046ECFFFFFFFFFFFFF1500000000040FFFFFFFFFFFFAF00000000000E74E7E81A00" +
+            "000000000000000000000000000179FCFFFFFFFFFFFFD929000000000028FFFFFFFFF6C2690000003395F1FFF3360000" +
+            "0000000000000000000000000FB0FFFFFFFFFFFFFFB50F0000000000000EB18C613205000A438AD9FFFFFFED3A000000" +
+            "00000000000000000000002BD8FFFFFFFFFFFFFE8804220F030000000006172F4D719CCDFBFFFFFFFFFFCD2400000000" +
+            "0000000000000000000059F4FFFFFFFFFFFFF75C0072FFFFFDF5EFF0F8FEFFFFFFFFFFFFFFFFFFFFF77E060000000000" +
+            "0000000000000000048DFFFFFFFFFFFFFFE8390028F7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA9D1F00000000000000" +
+            "0000000000000013BCFFFFFFFFFFFFFFD3200002C6FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE4851D000000000000000000" +
+            "0000000000002DDDFFFFFFFFFFFFFFB90E00006CFFFFFFFFFFFFFFFFFFFFFFFFFFE89A45030000000000000000000000" +
+            "000000000050F3FFFFFFFFFFFFFF9B04000002A7EFFFFFFFFFFFFFFFFFE4B276340200196BB91D000000000000000000" +
+            "000000017AFDFFFFFFFFFFFFFE7C000000000000011F40565F5A4C33120000001569C1FDFFFF3F000000000000000000" +
+            "000007A3FFFFFFFFFFFFFFF95C00000000000000000000000000000000003FB9FBFFFFFFFFFF63000000000000000000" +
+            "0015C5FFFFFFFFFFFFFFEC3D00000000000000000000000000000000000094FFFFFFFFFFFFFF84000000000000000000" +
+            "16DEFFFFFFFFFFFFFFDE2700000000000000000000000000000000000000A5FFFFFFFFFFFFFFA6000000000000000000" +
+            "003FC8FFFFFFFFFFCF190000000000000000000000000000000000000000B6FFFFFFFFFFFFFFC8000000000000000000" +
+            "0000014FD0FFFFBE0E000000000000000000000000000000000000000000C7FFFFFFFFFFFFFFE9000000000000000000" +
+            "0000000001528D0700000000000000000000000000000000000000000000D9FFFFFFFFFFFFFFFE0C0000000000000000" +
+            "000000000000000000000000000000000000000000000000000000000000EAFFFFFFFFFFFFFFFF2F0000000000000000" +
+            "000000000000000000000000000000000000000000000000000000000001FAFFFFFFFFFFFFFFFF530000000000000000" +
+            "00000000000000000000000000000000000000000000000000000000000CFFFFFFFFFFFFFFFFFF780000000000000000" +
+            "00000000000000000000000000000000000000000000000000000000001DFFFFFFFFFFFFFFFFFF9F0000000000000000" +
+            "00000000000000000000000000000000000000000000000000000000002EFFFFFFFFFFFFFFFFFFC60000000000000000" +
+            "00000000000000000000000000000000000000000000000000000000003EFFFFFFFFFFFFFFFFFFEF0000000000000000" +
+            "00000000000000000000000000000000000000000000000000000000004DFFFFFFFFFFFFFFFFFFFF1900000000000000" +
+            "00000000000000000000000000000000000000000000000000000000005DFFFFFFFFFFFFFFFFFFFF4300000000000000" +
+            "00000000000000000000000000000000000000000000000000000000006DFFFFFFFFFFFFFFFFFFFF6D00000000000000" +
+            "00000000000000000000000000000000000000000000000000000000006CFEFFFFFFFFFFFFFFFFFF9900000000000000" +
+            "0000000000000000000000000000000000000000000000000000000000001C62A6E6FFFFFFFFFFFFC500000000000000" +
+            "00000000000000000000000000000000000000000000000000000000000000000001255E94C8F5FFF102000000000000" +
+            "000000000000000000000000000000000000000000000000000000000000000000000000000003234706000000000000";
+
+    private static byte[] logoMask;
+    private static int[] logoCache;
+    private static int logoCacheW = -1, logoCacheH = -1;
+
+    /** Ширина логотипа при высоте h (сохраняет пропорции). */
+    public static int logoWidth(int h) {
+        return Math.max(1, Math.round(h * (float) LOGO_SW / LOGO_SH));
+    }
+
+    /** Маска, уменьшенная до tw x th усреднением по области (получается мягкий край). */
+    private static int[] logoPixels(int tw, int th) {
+        if (logoCache != null && logoCacheW == tw && logoCacheH == th) return logoCache;
+        if (logoMask == null) {
+            byte[] m = new byte[LOGO_SW * LOGO_SH];
+            for (int i = 0; i < m.length; i++) m[i] = (byte) Integer.parseInt(LOGO_HEX.substring(i * 2, i * 2 + 2), 16);
+            logoMask = m;
+        }
+        int[] out = new int[tw * th];
+        for (int ty = 0; ty < th; ty++) {
+            float sy0 = ty * (float) LOGO_SH / th, sy1 = (ty + 1) * (float) LOGO_SH / th;
+            for (int tx = 0; tx < tw; tx++) {
+                float sx0 = tx * (float) LOGO_SW / tw, sx1 = (tx + 1) * (float) LOGO_SW / tw;
+                float sum = 0f, wsum = 0f;
+                for (int sy = (int) sy0; sy < Math.ceil(sy1) && sy < LOGO_SH; sy++) {
+                    float wy = Math.min(sy + 1, sy1) - Math.max(sy, sy0);
+                    for (int sx = (int) sx0; sx < Math.ceil(sx1) && sx < LOGO_SW; sx++) {
+                        float wx = Math.min(sx + 1, sx1) - Math.max(sx, sx0);
+                        float w = wx * wy;
+                        sum += (logoMask[sy * LOGO_SW + sx] & 0xFF) * w;
+                        wsum += w;
+                    }
+                }
+                out[ty * tw + tx] = wsum <= 0f ? 0 : Math.min(255, Math.round(sum / wsum));
+            }
+        }
+        logoCache = out; logoCacheW = tw; logoCacheH = th;
+        return out;
+    }
+
+    /** Рисует логотип высотой h с левым верхним углом (x, y). Ширина - {@link #logoWidth(int)}. */
+    public static void logo(class_332 g, int x, int y, int h, float a) {
+        int tw = logoWidth(h);
+        int[] px = logoPixels(tw, h);
+        for (int ty = 0; ty < h; ty++) {
+            int tx = 0;
+            while (tx < tw) {
+                int al = px[ty * tw + tx];
+                int run = tx + 1;
+                while (run < tw && px[ty * tw + run] == al) run++;
+                if (al > 0) g.method_25294(x + tx, y + ty, x + run, y + ty + 1,
+                        withAlpha(0xFF000000 | LOGO_RGB, a * al / 255f));
+                tx = run;
             }
         }
     }
