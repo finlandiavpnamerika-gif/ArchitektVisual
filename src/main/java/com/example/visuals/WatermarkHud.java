@@ -7,7 +7,7 @@ import net.minecraft.class_332;
 import net.minecraft.class_640;
 
 /**
- * Watermark: капсула как у Pulse - логотип + название, ник с аватаром, пинг и FPS (и время по желанию).
+ * Watermark: капсула - логотип «A» + название, ник с аватаром, пинг и FPS (и время по желанию).
  * Пинг показывается вместе с FPS (опция "FPS").
  */
 public final class WatermarkHud {
@@ -15,7 +15,8 @@ public final class WatermarkHud {
 
     public static final String[] NAMES = {"ArchitektVisuals", "Architekt", "AV"};
 
-    private static final int H = 20, PAD = 8, LOGO_W = 16, GAP = 6;
+    private static final int H = 20, PAD = 8, LOGO_H = 12, GAP = 6;
+    private static final int LOGO_W = HudStyle.logoWidth(LOGO_H);
 
     private static int rainbow(float offset) {
         float h = ((System.currentTimeMillis() % 4000L) / 4000f + offset) % 1f;
@@ -61,7 +62,7 @@ public final class WatermarkHud {
         HudStyle.capsule(g, 0, 0, w, H, a);
 
         int x = PAD;
-        HudStyle.pulseLogo(g, x, (H - 9) / 2, accent, a);
+        HudStyle.logo(g, x, (H - LOGO_H) / 2, LOGO_H, a);
         x += LOGO_W + 5;
 
         // название: при радуге каждая буква своего цвета
