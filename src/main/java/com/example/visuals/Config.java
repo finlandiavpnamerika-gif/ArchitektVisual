@@ -382,6 +382,12 @@ public final class Config {
     public static double swingSpeed = 1.0;
     public static boolean swingSelfOnly = true;
 
+    // Item Scroller (сам переключатель itemScroller объявлен выше, рядом с freelook)
+    public static boolean scrollerWheel = true;
+    public static boolean scrollerDrag = true;
+    public static boolean scrollerInvert = false;
+    public static double scrollerDelay = 30;       // мс между действиями
+
     // Custom Clouds
     public static boolean cloudsOn = false;
     public static boolean cloudHide = false;
@@ -465,7 +471,7 @@ public final class Config {
 
     // --- Sky Shader ---
     public static boolean skyShader = false;
-    public static int skyPreset = 0;               // 0 Aurora, 1 Galaxy, 2 Purple Night
+    public static int skyPreset = 0;               // индекс в SkyRenderer.PRESETS (0 Aurora ... 8 Eclipse Night, 9 Alpine Sunset)
     public static double skyAlpha = 1.0;
     public static double skySpeed = 1.0;
     public static boolean skyNightOnly = false;
@@ -915,6 +921,10 @@ public final class Config {
             o.addProperty("swingAnim", swingAnim);
             o.addProperty("swingSpeed", swingSpeed);
             o.addProperty("swingSelfOnly", swingSelfOnly);
+            o.addProperty("scrollerWheel", scrollerWheel);
+            o.addProperty("scrollerDrag", scrollerDrag);
+            o.addProperty("scrollerInvert", scrollerInvert);
+            o.addProperty("scrollerDelay", scrollerDelay);
             o.addProperty("cloudsOn", cloudsOn);
             o.addProperty("cloudHide", cloudHide);
             o.addProperty("cloudTint", cloudTint);
@@ -1383,6 +1393,10 @@ public final class Config {
                 swingAnim = b(o, "swingAnim", swingAnim);
                 swingSpeed = d(o, "swingSpeed", swingSpeed);
                 swingSelfOnly = b(o, "swingSelfOnly", swingSelfOnly);
+                scrollerWheel = b(o, "scrollerWheel", scrollerWheel);
+                scrollerDrag = b(o, "scrollerDrag", scrollerDrag);
+                scrollerInvert = b(o, "scrollerInvert", scrollerInvert);
+                scrollerDelay = d(o, "scrollerDelay", scrollerDelay);
                 cloudsOn = b(o, "cloudsOn", cloudsOn);
                 cloudHide = b(o, "cloudHide", cloudHide);
                 cloudTint = b(o, "cloudTint", cloudTint);
