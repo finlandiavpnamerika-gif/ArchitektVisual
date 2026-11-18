@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.entity.player.ItemCooldownManager;
-import net.minecraft.item.ItemStack;
+import net.minecraft.class_1657;
+import net.minecraft.class_1792;
+import net.minecraft.class_1796;
+import net.minecraft.class_1799;
+import net.minecraft.class_310;
+import net.minecraft.class_327;
+import net.minecraft.class_332;
 
 /** HUD с кулдаунами предметов (жемчуг, хорус, щит, серверные кулдауны и т.д.). */
 public final class CooldownHud {
@@ -29,40 +30,40 @@ public final class CooldownHud {
     }
 
     private static final class Row {
-        ItemStack stack;
+        class_1799 stack;
         float progress;
         float seconds; // < 0 = пока неизвестно
     }
 
-    private static final Map<Item, St> STATE = new HashMap<>();
+    private static final Map<class_1792, St> STATE = new HashMap<>();
 
     private static int col(int rgb, int a) {
         return (Math.max(0, Math.min(255, a)) << 24) | (rgb & 0xFFFFFF);
     }
 
-    public static void hud(DrawContext ctx) {
+    public static void hud(class_332 ctx) {
         if (!Config.cdHud) return;
-        MinecraftClient mc = MinecraftClient.getInstance();
-        PlayerEntity player = mc.player;
-        if (player == null || mc.options.hudHidden) {
+        class_310 mc = class_310.method_1551();
+        class_1657 player = mc.field_1724;
+        if (player == null || mc.field_1690.field_1842) {
             STATE.clear();
             return;
         }
 
-        ItemCooldownManager cm = player.getItemCooldownManager();
+        class_1796 cm = player.method_7357();
         long now = System.currentTimeMillis();
-        Set<Item> seen = new HashSet<>();
+        Set<class_1792> seen = new HashSet<>();
         List<Row> rows = new ArrayList<>();
 
-        List<ItemStack> stacks = new ArrayList<>();
-        for (int i = 0; i < 36; i++) stacks.add(player.getInventory().getStack(i));
-        stacks.add(player.getOffHandStack());
+        List<class_1799> stacks = new ArrayList<>();
+        for (int i = 0; i < 36; i++) stacks.add(player.method_31548().method_5438(i));
+        stacks.add(player.method_6079());
 
-        for (ItemStack s : stacks) {
-            if (s.isEmpty()) continue;
-            Item item = s.getItem();
+        for (class_1799 s : stacks) {
+            if (s.method_7960()) continue;
+            class_1792 item = s.method_7909();
             if (seen.contains(item)) continue;
-            float p = cm.getCooldownProgress(s, 0f);
+            float p = cm.method_7905(s, 0f);
             if (p <= 0f) continue;
             seen.add(item);
 
@@ -91,37 +92,52 @@ public final class CooldownHud {
 
         if (rows.isEmpty()) return;
 
-        int a = (int) (255 * Config.cdAlpha);
+        float a = HudStyle.clampAlpha(Config.cdAlpha);
+        class_327 tr = mc.field_1772;
         int x = Config.cdX;
         int y = Config.cdY;
+        final int PAD = 6, HEAD = 15, ROW = 21;
 
-        for (Row r : rows) {
-            int w = 20 + 4 + BAR_W + 4 + (Config.cdTime ? 30 : 0);
-            ctx.fill(x - 3, y - 2, x + w, y + ROW_H - 4, col(0x000000, (int) (0x90 * Config.cdAlpha)));
+        String title = "Cooldowns";
+        int w = HudStyle.titleWidth(tr, Theme.ICON_UTILS, title) + PAD * 2;
+        int n = rows.size();
+        String[] names = new String[n], times = new String[n];
+        for (int i = 0; i < n; i++) {
+            Row r = rows.get(i);
+            names[i] = tr.method_27523(r.stack.method_7964().getString(), 80);
+            if (!Config.cdTime) times[i] = "";
+            else if (r.seconds < 0) times[i] = Math.round(r.progress * 100) + "%";
+            else if (r.seconds >= 10f) times[i] = (int) Math.ceil(r.seconds) + "с";
+            else times[i] = String.format(Locale.ROOT, "%.1fс", r.seconds);
+            w = Math.max(w, PAD + 2 + 16 + 5 + tr.method_1727(names[i]) + 12 + tr.method_1727(times[i]) + PAD);
+        }
+        int h = HEAD + 4 + n * ROW + 1;
 
-            ctx.drawItem(r.stack, x, y);
+        HudStyle.panel(ctx, x, y, w, h, a, Theme.ACCENT);
+        HudStyle.header(ctx, x, y, w, HEAD - 2, a, Theme.ACCENT);
+        HudStyle.title(ctx, tr, Theme.ICON_UTILS, title, x + PAD, y + 4, a, Theme.ACCENT);
+        HudStyle.divider(ctx, x + PAD, x + w - PAD, y + HEAD, 0xFFFFFFFF, a * 0.35f);
 
-            int bx = x + 24;
-            int by = y + 6;
-            ctx.fill(bx, by, bx + BAR_W, by + 5, col(0x2A2A2A, a));
-            int filled = Math.round(BAR_W * r.progress);
-
+        int ry = y + HEAD + 3;
+        for (int i = 0; i < n; i++) {
+            Row r = rows.get(i);
             int rgb;
             if (Config.cdColor == 0) {
                 rgb = r.progress > 0.5f ? 0xE74C3C : (r.progress > 0.2f ? 0xF1C40F : 0x2ECC71);
             } else {
                 rgb = Config.COLORS[Math.min(Config.cdColor - 1, Config.COLORS.length - 1)];
             }
-            ctx.fill(bx, by, bx + filled, by + 5, col(rgb, a));
+            int color = 0xFF000000 | (rgb & 0xFFFFFF);
 
-            if (Config.cdTime) {
-                String t = r.seconds >= 0
-                        ? String.format(Locale.ROOT, "%.1fс", r.seconds)
-                        : String.format(Locale.ROOT, "%d%%", Math.round(r.progress * 100));
-                ctx.drawText(mc.textRenderer, t, bx + BAR_W + 4, y + 4, col(0xFFFFFF, a), true);
-            }
+            HudStyle.roundFill(ctx, x + 3, ry + 2, 2, ROW - 6, 1, HudStyle.withAlpha(color, a));   // цветная метка слева
+            ctx.method_51427(r.stack, x + PAD + 1, ry + 1);
 
-            y += ROW_H;
+            int tx = x + PAD + 1 + 16 + 5;
+            HudStyle.text(ctx, tr, names[i], tx, ry + 2, Theme.TEXT, a, true);
+            if (!times[i].isEmpty()) HudStyle.textRight(ctx, tr, times[i], x + w - PAD, ry + 2, Theme.TEXT, a, true);
+            HudStyle.bar(ctx, tx, ry + 13, x + w - PAD - tx, 3, r.progress, color, a);
+
+            ry += ROW;
         }
     }
 }
