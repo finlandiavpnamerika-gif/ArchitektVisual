@@ -2,13 +2,13 @@ package com.example.visuals;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.Random;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.world.World;
+import net.minecraft.class_12249;
+import net.minecraft.class_1937;
+import net.minecraft.class_310;
+import net.minecraft.class_4184;
+import net.minecraft.class_4587;
+import net.minecraft.class_4588;
+import net.minecraft.class_4597;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 
@@ -16,7 +16,8 @@ import org.joml.Matrix4fStack;
  * Sky Shader: своё небо вместо ванильного.
  * Рисуется купол из цветных квадов вокруг камеры (после мира, с проверкой глубины, поэтому земля его закрывает).
  * Прозрачность купола у горизонта плавно уходит в ноль, чтобы ванильный горизонт и туман не давали шва.
- * Пресеты: Aurora (северное сияние), Galaxy (туманность и Млечный Путь), Purple Night (фиолетовое небо).
+ * Пресеты: Aurora (северное сияние), Galaxy (туманность и Млечный Путь), Purple Night (фиолетовое небо),
+ * Eclipse Night (звёздная ночь с затмением и золотой пылью), Alpine Sunset (закат с веером розовых лучей).
  * Цвета купола считаются один раз при смене пресета; каждый кадр анимируются поворот, мерцание звёзд и сияние.
  */
 public final class SkyRenderer {
@@ -24,13 +25,15 @@ public final class SkyRenderer {
 
     public static final String[] PRESETS = {
         "Aurora", "Galaxy", "Purple Night",
-        "Sunset", "Blood Moon", "Nebula", "Synthwave", "Emerald Aurora"
+        "Sunset", "Blood Moon", "Nebula", "Synthwave", "Emerald Aurora",
+        "Eclipse Night", "Alpine Sunset"
     };
 
     private static final int   AZ = 64, EL = 18;               // сетка купола
     private static final float EL_MIN = -0.10f;                // чуть ниже горизонта (рад)
     private static final float EL_MAX = (float) (Math.PI / 2);
     private static final int   STARS = 1100;
+    private static final int   P_ECLIPSE = 8, P_ALPINE = 9;      // номера новых пресетов
 
     // направления вершин купола (единичные) и их цвета
     private static final float[] DX = new float[(AZ + 1) * (EL + 1)];
@@ -85,36 +88,36 @@ public final class SkyRenderer {
 
     // ================= рендер =================
 
-    public static void render(Camera camera, Matrix4f positionMatrix,
-                              VertexConsumerProvider.Immediate consumers, float tickProgress) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (!Config.skyShader || mc.world == null || mc.player == null) return;
-        if (mc.world.getRegistryKey() != World.OVERWORLD) return;   // только Верхний мир
+    public static void render(class_4184 camera, Matrix4f positionMatrix,
+                              class_4597.class_4598 consumers, float tickProgress) {
+        class_310 mc = class_310.method_1551();
+        if (!Config.skyShader || mc.field_1687 == null || mc.field_1724 == null) return;
+        if (mc.field_1687.method_27983() != class_1937.field_25179) return;   // только Верхний мир
 
         // ночь / дождь
         float night = 1f;
         if (Config.skyNightOnly) {
-            float ang = (float) ((mc.world.getTimeOfDay() % 24000L) / 24000.0 * Math.PI * 2.0);
+            float ang = (float) ((mc.field_1687.method_8532() % 24000L) / 24000.0 * Math.PI * 2.0);
             float sun = (float) Math.sin(ang);                 // 1 = полдень, -1 = полночь
             night = clamp01((0.12f - sun) / 0.40f);
         }
-        float rain = mc.world.getRainGradient(tickProgress);
+        float rain = mc.field_1687.method_8430(tickProgress);
         float k = (float) Config.skyAlpha * night * (1f - 0.75f * rain);
         if (k <= 0.01f) return;
 
         int preset = Math.max(0, Math.min(Config.skyPreset, PRESETS.length - 1));
         if (cachedPreset != preset) { buildColors(preset); cachedPreset = preset; }
 
-        float R = Math.max(64f, mc.options.getViewDistance().getValue() * 16f * 2.2f);
+        float R = Math.max(64f, mc.field_1690.method_42503().method_41753() * 16f * 2.2f);
         float t = (System.currentTimeMillis() % 1000000L) / 1000f * (float) Config.skySpeed;
-        Matrix4f rot = new Matrix4f().rotationY(t * 0.02f);    // медленный поворот неба вокруг вертикали
-        Matrix4f id = new MatrixStack().peek().getPositionMatrix();
+        Matrix4f rot = new Matrix4f().rotationY(preset == P_ALPINE ? 0f : t * 0.02f);    // медленный поворот неба вокруг вертикали (закат стоит на месте)
+        Matrix4f id = new class_4587().method_23760().method_23761();
 
         Matrix4fStack mv = RenderSystem.getModelViewStack();
         mv.pushMatrix();
         mv.mul(positionMatrix);
         try {
-            VertexConsumer q = consumers.getBuffer(RenderLayers.debugQuads());
+            class_4588 q = consumers.method_73477(class_12249.method_76023());
 
             // купол
             for (int j = 0; j < EL; j++) {
@@ -132,7 +135,7 @@ public final class SkyRenderer {
             }
 
             // звёзды (чуть ближе купола, чтобы не конфликтовать по глубине)
-            if (Config.skyStars && preset != 3) {   // на закате звёзд нет
+            if (Config.skyStars && preset != 3 && preset != P_ALPINE) {   // на закате звёзд нет
                 float Rs = R * 0.99f;
                 for (int s = 0; s < STARS; s++) {
                     float fade = smooth(0.0f, 0.20f, SY[s]);
@@ -148,6 +151,26 @@ public final class SkyRenderer {
                             px + rx - ux, py + ry - uy, pz + rz - uz, col,
                             px + rx + ux, py + ry + uy, pz + rz + uz, col,
                             px - rx + ux, py - ry + uy, pz - rz + uz, col);
+
+                    // Eclipse Night: у самых крупных звёзд лучики-крестики
+                    if (preset == P_ECLIPSE && SSIZE[s] > 0.0070f) {
+                        float fl = hs * 4.5f, fw = hs * 0.30f;
+                        int fc = argb((int) (255 * k * fade * tw * 0.55f), SCOL[s]);
+                        float lx = SRX[s] * fl, ly = SRY[s] * fl, lz = SRZ[s] * fl;   // длинная ось по "право"
+                        float wx = SUX[s] * fw, wy = SUY[s] * fw, wz = SUZ[s] * fw;   // тонкая по "вверх"
+                        dquad(q, rot,
+                                px - lx - wx, py - ly - wy, pz - lz - wz, fc,
+                                px + lx - wx, py + ly - wy, pz + lz - wz, fc,
+                                px + lx + wx, py + ly + wy, pz + lz + wz, fc,
+                                px - lx + wx, py - ly + wy, pz - lz + wz, fc);
+                        float mx2 = SUX[s] * fl, my2 = SUY[s] * fl, mz2 = SUZ[s] * fl;
+                        float nx = SRX[s] * fw, ny = SRY[s] * fw, nz = SRZ[s] * fw;
+                        dquad(q, rot,
+                                px - nx - mx2, py - ny - my2, pz - nz - mz2, fc,
+                                px + nx - mx2, py + ny - my2, pz + nz - mz2, fc,
+                                px + nx + mx2, py + ny + my2, pz + nz + mz2, fc,
+                                px - nx + mx2, py - ny + my2, pz - nz + mz2, fc);
+                    }
                 }
             }
 
@@ -157,10 +180,11 @@ public final class SkyRenderer {
                 case 7 -> aurora(q, id, R * 0.985f, t, k, 0x55FF66, 0x1E90FF);
                 case 4 -> disc(q, id, R * 0.97f, 0.55f, 0.50f, 0.67f, 0.075f, 0xFF4A35, 0xC01808, k, 0.14f);
                 case 6 -> disc(q, id, R * 0.97f, -0.80f, 0.17f, 0.57f, 0.17f, 0xFFE14D, 0xFF2E93, k, 0.10f);
+                case 8 -> eclipse(q, id, R, t, k);
                 default -> {}
             }
 
-            consumers.draw(RenderLayers.debugQuads());
+            consumers.method_22994(class_12249.method_76023());
         } finally {
             mv.popMatrix();
         }
@@ -173,7 +197,7 @@ public final class SkyRenderer {
     private static final float[] TX = new float[AS + 1], TY = new float[AS + 1], TZ = new float[AS + 1];
     private static final int[] AC = new int[AS + 1];
 
-    private static void aurora(VertexConsumer q, Matrix4f m, float R, float t, float k, int colA, int colB) {
+    private static void aurora(class_4588 q, Matrix4f m, float R, float t, float k, int colA, int colB) {
         for (int r = 0; r < 3; r++) {
             float az0 = r * 2.1f + 0.4f;
             float span = 2.6f;
@@ -219,7 +243,9 @@ public final class SkyRenderer {
                 case 4 -> bloodSky(dx, dy, dz, out);
                 case 5 -> nebulaSky(dx, dy, dz, out);
                 case 6 -> synthSky(dx, dy, dz, out);
-                default -> emeraldSky(dx, dy, dz, out);
+                case 7 -> emeraldSky(dx, dy, dz, out);
+                case 8 -> eclipseSky(dx, dy, dz, out);
+                default -> alpineSky(dx, dy, dz, out);
             }
             float alpha = smooth(0.0f, 0.25f, dy);      // у горизонта купол прозрачный -> виден ванильный туман
             int r = (int) (clamp01(out[0]) * 255), g = (int) (clamp01(out[1]) * 255), b = (int) (clamp01(out[2]) * 255);
@@ -272,7 +298,7 @@ public final class SkyRenderer {
 
     private static final int DISC_SEG = 40;
 
-    private static void disc(VertexConsumer q, Matrix4f m, float R,
+    private static void disc(class_4588 q, Matrix4f m, float R,
                              float dx, float dy, float dz,
                              float ang, int cTop, int cBot, float k, float glow) {
         float l = (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
@@ -377,6 +403,125 @@ public final class SkyRenderer {
         o[2] = 0.12f + 0.12f * low + 0.20f * grn + 0.55f * blu;
     }
 
+    // ================= Eclipse Night =================
+
+    /** Направление затмённой луны (единичный вектор). */
+    private static final float[] MOON = norm3(-0.55f, 0.30f, 0.78f);
+
+    private static final int EMB = 28;   // золотые пылинки, дрейфующие по небу
+    private static final float[] EAZ = new float[EMB], EEL = new float[EMB], ESZ = new float[EMB], EPH = new float[EMB];
+    static {
+        Random r = new Random(4242);
+        for (int i = 0; i < EMB; i++) {
+            EAZ[i] = (float) (r.nextFloat() * Math.PI * 2.0);
+            EEL[i] = 0.10f + 1.15f * r.nextFloat();
+            ESZ[i] = 0.0035f + 0.0045f * r.nextFloat();
+            EPH[i] = r.nextFloat() * 6.2831f;
+        }
+    }
+
+    /** Тёмно-синее небо с закрученными волнами облаков (как на скрине: почти чёрный верх, синеватый низ). */
+    private static void eclipseSky(float dx, float dy, float dz, float[] o) {
+        float h = clamp01(dy), low = 1f - h;
+        float wx = fbm(dx * 1.6f + 7f, dy * 1.6f, dz * 1.6f, 3);
+        float wy = fbm(dx * 1.6f, dy * 1.6f + 3f, dz * 1.6f + 9f, 3);
+        float sw = fbm(dx * 2.0f + wx * 1.8f, dy * 2.0f + wy * 1.8f, dz * 2.0f, 4);
+        float band = smooth(0.42f, 0.72f, sw);
+        o[0] = 0.012f + 0.030f * low * low + 0.09f * band;
+        o[1] = 0.018f + 0.050f * low + 0.12f * band;
+        o[2] = 0.060f + 0.130f * low + 0.26f * band * (0.5f + 0.5f * low);
+    }
+
+    /** Луна-затмение: золотой серп с ореолом и тёмный диск + дрейфующие золотые пылинки. */
+    private static void eclipse(class_4588 q, Matrix4f m, float R, float t, float k) {
+        float dx = MOON[0], dy = MOON[1], dz = MOON[2];
+        float rx = dz, rz = -dx;
+        float rl = (float) Math.sqrt(rx * rx + rz * rz);
+        rx /= rl; rz /= rl;
+        float ux = dy * rz, uy = dz * rx - dx * rz, uz = -dy * rx;
+
+        float pulse = 0.92f + 0.08f * (float) Math.sin(t * 0.7f);
+        disc(q, m, R * 0.97f, dx, dy, dz, 0.075f, 0xFFF0B8, 0xFFA629, k, 0.16f * pulse);
+
+        // тёмный диск чуть ближе и смещён вниз-влево: остаётся золотой серп сверху справа
+        float ox = -0.012f, oy = -0.010f;
+        float ex = dx + rx * ox + ux * oy, ey = dy + uy * oy, ez = dz + rz * ox + uz * oy;
+        disc(q, m, R * 0.965f, ex, ey, ez, 0.066f, 0x05060F, 0x05060F, k, 0f);
+
+        embers(q, m, R * 0.95f, t, k);
+    }
+
+    private static void embers(class_4588 q, Matrix4f m, float R, float t, float k) {
+        for (int s = 0; s < EMB; s++) {
+            float az = EAZ[s] + t * 0.012f * (0.6f + EPH[s] * 0.2f);
+            float el = EEL[s] + 0.03f * (float) Math.sin(t * 0.35f + EPH[s]);
+            float ce = (float) Math.cos(el);
+            float dx = ce * (float) Math.cos(az), dy = (float) Math.sin(el), dz = ce * (float) Math.sin(az);
+
+            float rx = dz, rz = -dx;
+            float rl = (float) Math.sqrt(rx * rx + rz * rz);
+            rx /= rl; rz /= rl;
+            float ux = dy * rz, uy = dz * rx - dx * rz, uz = -dy * rx;
+
+            float tw = 0.65f + 0.35f * (float) Math.sin(t * 0.8f + EPH[s] * 2f);
+            int col = argb((int) (255 * 0.8f * k * tw * smooth(0.05f, 0.20f, dy)), 0xFFA53A);
+            float hs = ESZ[s] * R;
+            float cx = dx * R, cy = dy * R, cz = dz * R;
+            for (int i = 0; i < 8; i++) {
+                float p0 = (float) (Math.PI * 2.0) * i / 8, p1 = (float) (Math.PI * 2.0) * (i + 1) / 8;
+                float c0 = (float) Math.cos(p0) * hs, s0 = (float) Math.sin(p0) * hs;
+                float c1 = (float) Math.cos(p1) * hs, s1 = (float) Math.sin(p1) * hs;
+                dquad(q, m, cx, cy, cz, col,
+                        cx + rx * c0 + ux * s0, cy + uy * s0, cz + rz * c0 + uz * s0, col,
+                        cx + rx * c1 + ux * s1, cy + uy * s1, cz + rz * c1 + uz * s1, col,
+                        cx, cy, cz, col);
+            }
+        }
+    }
+
+    // ================= Alpine Sunset =================
+
+    /** Точка на горизонте, из которой расходится веер лучей. */
+    private static final float[] SUN = norm3(-0.80f, 0.12f, 0.59f);
+
+    /** Alpine Sunset: синий-фиолетовый верх, розово-оранжевые лучи-перья, расходящиеся от солнца у горизонта. */
+    private static void alpineSky(float dx, float dy, float dz, float[] o) {
+        float sx = SUN[0], sy = SUN[1], sz = SUN[2];
+        float rx = sz, rz = -sx;
+        float rl = (float) Math.sqrt(rx * rx + rz * rz);
+        rx /= rl; rz /= rl;
+        float ux = sy * rz, uy = sz * rx - sx * rz, uz = -sy * rx;
+
+        float c = Math.max(-1f, Math.min(1f, dx * sx + dy * sy + dz * sz));
+        float theta = (float) Math.acos(c);                                   // угол до солнца
+        float phi = (float) Math.atan2(dx * ux + dy * uy + dz * uz, dx * rx + dz * rz);   // азимут вокруг оси "солнце"
+        float h = clamp01(dy), low = 1f - h;
+
+        float cp = (float) Math.cos(phi) * 3.0f, sp = (float) Math.sin(phi) * 3.0f;
+        float n1 = fbm(cp + 11f, sp, theta * 0.55f, 4);            // лучи: часто по азимуту, длинные по углу
+        float n2 = fbm(cp * 0.5f - 3f, sp * 0.5f + 5f, theta * 0.9f, 3);
+        float fade = 1f - smooth(1.5f, 2.7f, theta);
+        float ray = smooth(0.40f, 0.72f, n1) * fade * (0.60f + 0.40f * low);
+        float body = smooth(0.40f, 0.85f, n2) * fade * 0.35f;
+        float glow = (float) Math.exp(-theta * theta / 0.30f);
+        float near = (float) Math.exp(-theta * theta / 0.9f);
+
+        // розовый далеко от солнца -> оранжевый рядом
+        float wr = 1.00f, wg = lerp(0.36f, 0.55f, near), wb = lerp(0.55f, 0.22f, near);
+        float l2 = low * low;
+        float br = lerp(0.07f, 0.34f, l2), bg = lerp(0.12f, 0.40f, l2), bb = lerp(0.62f, 0.92f, l2);
+        float mix = clamp01(ray * 0.9f + body * 0.5f);
+        float gm = clamp01(glow * 0.80f);                          // тёплое свечение у солнца: подмешиваем, а не добавляем
+        o[0] = lerp(lerp(br, wr, mix), 1.00f, gm);
+        o[1] = lerp(lerp(bg, wg, mix), 0.62f, gm);
+        o[2] = lerp(lerp(bb, wb, mix), 0.25f, gm);
+    }
+
+    private static float[] norm3(float x, float y, float z) {
+        float l = (float) Math.sqrt(x * x + y * y + z * z);
+        return new float[]{x / l, y / l, z / l};
+    }
+
     // ================= шум =================
 
     private static float hash(int x, int y, int z) {
@@ -435,7 +580,7 @@ public final class SkyRenderer {
     }
 
     /** Четырёхугольник, видимый с обеих сторон. */
-    private static void dquad(VertexConsumer q, Matrix4f m,
+    private static void dquad(class_4588 q, Matrix4f m,
                               float ax, float ay, float az, int ac,
                               float bx, float by, float bz, int bc,
                               float cx, float cy, float cz, int cc,
@@ -444,14 +589,14 @@ public final class SkyRenderer {
         quad(q, m, dx, dy, dz, dc, cx, cy, cz, cc, bx, by, bz, bc, ax, ay, az, ac);
     }
 
-    private static void quad(VertexConsumer q, Matrix4f m,
+    private static void quad(class_4588 q, Matrix4f m,
                              float ax, float ay, float az, int ac,
                              float bx, float by, float bz, int bc,
                              float cx, float cy, float cz, int cc,
                              float dx, float dy, float dz, int dc) {
-        q.vertex(m, ax, ay, az).color(ac);
-        q.vertex(m, bx, by, bz).color(bc);
-        q.vertex(m, cx, cy, cz).color(cc);
-        q.vertex(m, dx, dy, dz).color(dc);
+        q.method_22918(m, ax, ay, az).method_39415(ac);
+        q.method_22918(m, bx, by, bz).method_39415(bc);
+        q.method_22918(m, cx, cy, cz).method_39415(cc);
+        q.method_22918(m, dx, dy, dz).method_39415(dc);
     }
 }
