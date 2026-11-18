@@ -382,6 +382,11 @@ public final class Config {
     public static double swingSpeed = 1.0;
     public static boolean swingSelfOnly = true;
 
+    // Aspect Ratio
+    public static boolean aspectOn = false;
+    public static int aspectPreset = 1;            // индекс в AspectRatio.NAMES (0 = своё значение)
+    public static double aspectCustom = 1.333;     // ширина / высота, когда выбран пресет "Своё"
+
     // Item Scroller (сам переключатель itemScroller объявлен выше, рядом с freelook)
     public static boolean scrollerWheel = true;
     public static boolean scrollerDrag = true;
@@ -921,6 +926,9 @@ public final class Config {
             o.addProperty("swingAnim", swingAnim);
             o.addProperty("swingSpeed", swingSpeed);
             o.addProperty("swingSelfOnly", swingSelfOnly);
+            o.addProperty("aspectOn", aspectOn);
+            o.addProperty("aspectPreset", aspectPreset);
+            o.addProperty("aspectCustom", aspectCustom);
             o.addProperty("scrollerWheel", scrollerWheel);
             o.addProperty("scrollerDrag", scrollerDrag);
             o.addProperty("scrollerInvert", scrollerInvert);
@@ -1393,6 +1401,9 @@ public final class Config {
                 swingAnim = b(o, "swingAnim", swingAnim);
                 swingSpeed = d(o, "swingSpeed", swingSpeed);
                 swingSelfOnly = b(o, "swingSelfOnly", swingSelfOnly);
+                aspectOn = b(o, "aspectOn", aspectOn);
+                aspectPreset = (int) d(o, "aspectPreset", aspectPreset);
+                aspectCustom = d(o, "aspectCustom", aspectCustom);
                 scrollerWheel = b(o, "scrollerWheel", scrollerWheel);
                 scrollerDrag = b(o, "scrollerDrag", scrollerDrag);
                 scrollerInvert = b(o, "scrollerInvert", scrollerInvert);
