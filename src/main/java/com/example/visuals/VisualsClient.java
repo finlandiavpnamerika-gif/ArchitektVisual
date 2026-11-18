@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.minecraft.class_2561;
 import net.minecraft.class_2960;
 import net.minecraft.class_304;
@@ -133,6 +134,9 @@ public class VisualsClient implements ClientModInitializer {
             if (screen instanceof class_465) {
                 ScreenEvents.afterRender(screen).register((s, drawContext, mouseX, mouseY, tickDelta) ->
                         ItemFeatures.drawPanel(drawContext, client));
+                // Item Scroller: колесо мыши над предметом (false = прокрутка поглощена)
+                ScreenMouseEvents.allowMouseScroll(screen).register((s, mouseX, mouseY, horizontal, vertical) ->
+                        !(s instanceof class_465<?> hs && ItemScroller.onScroll(hs, vertical)));
             }
         });
 
