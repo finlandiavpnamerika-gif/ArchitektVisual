@@ -30,7 +30,8 @@
     "NoVanillaNametagLivingMixin",
     "SwingSpeedMixin",
     "ArmorFeatureTintMixin",
-    "EquipmentRendererTintMixin"
+    "EquipmentRendererTintMixin",
+    "AspectRatioMixin"
   ],
   "injectors": {
     "defaultRequire": 1
