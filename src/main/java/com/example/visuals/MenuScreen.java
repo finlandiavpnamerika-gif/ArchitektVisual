@@ -367,7 +367,7 @@ public class MenuScreen extends class_437 {
     private static final String[][] SB_MODS = {
             {"fb", "cross", "trails", "zones", "tesp", "sky", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "halo", "horns", "pred", "physic", "shulker", "hl", "crit", "kill", "atk", "wings", "aura", "cape", "chams"},
             {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem", "stats", "dlog", "pcd", "cdh", "near", "nt", "tip"},
-            {"sprint", "zoom", "respawn", "freelook", "noov", "hitsound", "swing", "stream", "fake"},
+            {"sprint", "zoom", "respawn", "freelook", "noov", "hitsound", "swing", "iscroll", "stream", "fake"},
             {"autoswap", "itembind", "friends", "macro", "configs"},
             {"time", "weather", "hbox", "bout", "chunk", "iesp", "wp", "evpt", "ptr", "etr", "clouds"}
     };
@@ -407,6 +407,7 @@ public class MenuScreen extends class_437 {
             case "nt" -> "Nametags+";
             case "chams" -> "Chams";
             case "swing" -> "Swing Animation";
+            case "iscroll" -> "Item Scroller";
             case "clouds" -> "Custom Clouds";
             case "tip" -> "Tooltips Plus";
             case "hbox" -> "Hitboxes";
@@ -487,6 +488,7 @@ public class MenuScreen extends class_437 {
             case "nt" -> Config.ntOn;
             case "chams" -> Config.chamsOn;
             case "swing" -> Config.swingAnim;
+            case "iscroll" -> Config.itemScroller;
             case "clouds" -> Config.cloudsOn;
             case "tip" -> Config.tipOn;
             case "hbox" -> Config.hbox;
@@ -560,6 +562,7 @@ public class MenuScreen extends class_437 {
             case "nt": Config.ntOn = v; break;
             case "chams": Config.chamsOn = v; break;
             case "swing": Config.swingAnim = v; break;
+            case "iscroll": Config.itemScroller = v; break;
             case "clouds": Config.cloudsOn = v; break;
             case "tip": Config.tipOn = v; break;
             case "hbox": Config.hbox = v; break;
@@ -1347,6 +1350,12 @@ public class MenuScreen extends class_437 {
             case "swing" -> {
                 Config.swingSpeed = cslider(g, "Скорость взмаха", 0.3, 3.0, Config.swingSpeed, false);
                 Config.swingSelfOnly = cbool(g, "Только свой", Config.swingSelfOnly);
+            }
+            case "iscroll" -> {
+                Config.scrollerWheel = cbool(g, "Колесо мыши", Config.scrollerWheel);
+                Config.scrollerDrag = cbool(g, "Shift + протяжка", Config.scrollerDrag);
+                Config.scrollerInvert = cbool(g, "Инвертировать колесо", Config.scrollerInvert);
+                Config.scrollerDelay = cslider(g, "Задержка (мс)", 0, 200, Config.scrollerDelay, true);
             }
             case "clouds" -> {
                 Config.cloudHide = cbool(g, "Скрыть облака", Config.cloudHide);
