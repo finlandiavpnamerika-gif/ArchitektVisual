@@ -63,6 +63,7 @@ public final class ModuleDefaults {
             Map.entry("nt", new String[]{"ntRange", "ntScale", "ntBg", "ntHealth", "ntDist", "ntDistScale", "ntHide"}),
             Map.entry("chams", new String[]{"chPlayers", "chMobs", "chFriends", "chSelf"}),
             Map.entry("swing", new String[]{"swingSpeed", "swingSelfOnly"}),
+            Map.entry("iscroll", new String[]{"scrollerWheel", "scrollerDrag", "scrollerInvert", "scrollerDelay"}),
             Map.entry("clouds", new String[]{"cloudHide", "cloudTint", "cloudHue", "cloudSat", "cloudRainbow", "cloudHeightOffset"}),
             Map.entry("tip", new String[]{"tipDur", "tipId", "tipStack"}),
             Map.entry("noov", new String[]{"noHurtShake", "noFireOverlay", "noTotemParticles", "noFireworkParticles"}),
@@ -106,7 +107,7 @@ public final class ModuleDefaults {
         "serverHud", "clockHud", "invHud", "totemHud", "nearHud",
         "critFx", "killFx", "atkInd", "statsHud", "dlHud",
         "hbox", "bout", "chunkB", "itemEsp", "wp", "eventPts", "ptrail", "etrail", "pcdHud",
-        "wingsOn", "auraOn", "capeOn", "ntOn", "chamsOn", "swingAnim", "cloudsOn", "tipOn"
+        "wingsOn", "auraOn", "capeOn", "ntOn", "chamsOn", "swingAnim", "cloudsOn", "tipOn", "itemScroller"
     };
 
     /** Выключает все модули (настройки внутри модулей не трогает). */
