@@ -35,6 +35,7 @@ public final class ArrayListHud {
         if (Config.particles) mods.add("Particles");
         if (Config.skyShader) mods.add("SkyShader");
         if (Config.itemScroller) mods.add("ItemScroller");
+        if (Config.aspectOn) mods.add("AspectRatio");
         if (Config.damageFever) mods.add("DamageViewer");
         if (Config.targetHud) mods.add("TargetHUD");
         if (Config.handView) mods.add("HandView");
