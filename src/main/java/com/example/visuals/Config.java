@@ -18,7 +18,7 @@ public final class Config {
 
     public static boolean customMainMenu = true;
     public static int menuTheme = 1;   // палитра меню (Theme.NAMES)
-    public static int menuStyle = 0;   // стиль меню: 0 = Sidebar (как было), 1 = Pulse
+    public static int menuStyle = 0;   // стиль меню: 0 = Sidebar (как было), 1 = Tiles
 
     // --- Визуал ---
     public static boolean customCrosshair = true;
