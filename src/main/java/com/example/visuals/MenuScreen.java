@@ -311,9 +311,9 @@ public class MenuScreen extends class_437 {
         g.method_25296(0, 0, field_22789, field_22790 / 4, ff(withAlpha(Theme.ACCENT, 0x18)), 0x00000000);        // лёгкий блик сверху
         RainyScene.drawRain(g, field_22789, field_22790, 0.3f);
 
-        if (Config.menuStyle == 1) renderPulse(g);
+        if (Config.menuStyle == 1) renderTiles(g);
         else {
-            if (pvSearch != null) pvSearch.method_46419(-100);   // поле поиска Pulse скрыто
+            if (tileSearch != null) tileSearch.method_46419(-100);   // поле поиска плиточного меню скрыто
             renderSidebar(g);
         }
         drawBottom(g);
@@ -349,13 +349,13 @@ public class MenuScreen extends class_437 {
         if (btn(g, bx + (bw + gap) * 2, by, bw, bh,
                 "Стиль меню: " + MENU_STYLES[Math.max(0, Math.min(Config.menuStyle, MENU_STYLES.length - 1))], "style")) {
             Config.menuStyle = (Config.menuStyle + 1) % MENU_STYLES.length;
-            pvSel = "";
-            if (pvSearch != null) pvSearch.method_1852("");
+            tileSel = "";
+            if (tileSearch != null) tileSearch.method_1852("");
             Config.save();
         }
     }
 
-    private static final String[] MENU_STYLES = {"Sidebar", "Pulse"};
+    private static final String[] MENU_STYLES = {"Sidebar", "Tiles"};
 
     // =====================================================================
     //  SIDEBAR-стиль: слева категории, в центре модули, справа настройки
@@ -728,32 +728,32 @@ public class MenuScreen extends class_437 {
     }
 
     // =====================================================================
-    //  PULSE-стиль: вкладки сверху, поиск, сетка плиток 2 колонки, док снизу
+    //  Плиточный стиль («Tiles»): вкладки сверху, поиск, сетка плиток 2 колонки, док снизу
     //  Клик по переключателю - вкл/выкл, клик по остальной части плитки - настройки модуля
     // =====================================================================
-    private static final String[] PV_TABS = {"Visuals", "HUD", "Utilities", "Client", "World"};
-    private static int pvCat = 0;
-    private static String pvSel = "";
-    private static String pvLastKey = "";
-    private class_342 pvSearch;
-    private int pvPx, pvPy, pvPw, pvPh;
+    private static final String[] TILE_TABS = {"Visuals", "HUD", "Utilities", "Client", "World"};
+    private static int tileCat = 0;
+    private static String tileSel = "";
+    private static String tileLastKey = "";
+    private class_342 tileSearch;
+    private int tilePx, tilePy, tilePw, tilePh;
 
-    private void pvLayout() {
-        pvPw = Math.min(field_22789 - 16, 380);
+    private void tileLayout() {
+        tilePw = Math.min(field_22789 - 16, 380);
         int top = field_22790 >= 300 ? 40 : 8;
         int availBottom = field_22790 - 64 - 8;
-        pvPh = Math.max(100, Math.min(280, availBottom - top));
-        pvPx = (field_22789 - pvPw) / 2;
-        pvPy = top + Math.max(0, (availBottom - top - pvPh) / 2);
+        tilePh = Math.max(100, Math.min(280, availBottom - top));
+        tilePx = (field_22789 - tilePw) / 2;
+        tilePy = top + Math.max(0, (availBottom - top - tilePh) / 2);
     }
 
     @Override
     protected void method_25426() {
         super.method_25426();
-        pvLayout();
-        pvSearch = new class_342(this.field_22793, pvPx + pvPw - 124, -100, 112, 16, class_2561.method_43470("Поиск"));
-        pvSearch.method_1880(24);
-        this.method_37063(pvSearch);
+        tileLayout();
+        tileSearch = new class_342(this.field_22793, tilePx + tilePw - 124, -100, 112, 16, class_2561.method_43470("Поиск"));
+        tileSearch.method_1880(24);
+        this.method_37063(tileSearch);
     }
 
     // ломаная линия толщиной 1px
@@ -768,41 +768,41 @@ public class MenuScreen extends class_437 {
         }
     }
 
-    private void pvLogo(class_332 g, int cxm, int y) {
+    private void tileLogo(class_332 g, int cxm, int y) {
         String name = "ArchitektVisuals";
         int tw = field_22793.method_1727(name) + 2;
-        int total = 26 + tw;
+        int lh = 16, lw = HudStyle.logoWidth(lh);
+        int total = lw + 8 + tw;
         int x0 = cxm - total / 2;
-        pline(g, new int[]{x0, x0 + 5, x0 + 8, x0 + 12, x0 + 16, x0 + 19, x0 + 24},
-                new int[]{y + 6, y + 6, y - 1, y + 13, y + 3, y + 6, y + 6}, Theme.ACCENT);
+        HudStyle.logo(g, x0, y - 2, lh, 1f);
         g.method_27534(field_22793, class_2561.method_43470(name).method_27692(class_124.field_1067),
-                x0 + 26 + tw / 2, y + 2, ff(Theme.TEXT));
+                x0 + lw + 8 + tw / 2, y + 2, ff(Theme.TEXT));
     }
 
     // одна плитка: подпись слева, переключатель справа
-    private void pvTile(class_332 g, String id, int x, int y, int w, int h) {
+    private void tileCard(class_332 g, String id, int x, int y, int w, int h) {
         boolean hasSw = sbHasSwitch(id);
         boolean on = hasSw && sbGet(id);
         boolean hov = hit(x, y, w, h);
-        float hv = anim("pv:h:" + id, hov);
-        float onp = anim("pv:on:" + id, on);
+        float hv = anim("tl:h:" + id, hov);
+        float onp = anim("tl:on:" + id, on);
         rr(g, x, y, w, h, 5, mix(0x58000000, withAlpha(Theme.ACCENT, 0x40), Math.min(1f, hv * 0.5f + onp * 0.25f)));
         HudStyle.roundRing(g, x, y, w, h, 5, ff(mix(0x18FFFFFF, withAlpha(Theme.ACCENT, 0x70), Math.max(onp * 0.8f, hv * 0.5f))));
         int labelW = w - (hasSw ? 46 : 28);
         text(g, field_22793.method_27523(sbLabel(id), labelW), x + 10, y + (h - 8) / 2,
                 mix(0xFF6E6E80, Theme.TEXT, Math.max(onp, hv * 0.7f)));
-        if (hasSw) sw(g, x + w - 30, y + (h - 12) / 2, "pv:" + id, on);
+        if (hasSw) sw(g, x + w - 30, y + (h - 12) / 2, "tl:" + id, on);
         else text(g, ">", x + w - 14, y + (h - 8) / 2, Theme.TEXT_DIM);
         if (clicked && hov) {
             if (hasSw && mx >= x + w - 34) sbSet(id, !on);
             else {
-                pvSel = id;
-                if (pvSearch != null) pvSearch.method_1852("");
+                tileSel = id;
+                if (tileSearch != null) tileSearch.method_1852("");
             }
         }
     }
 
-    private void pvDock(class_332 g) {
+    private void tileDock(class_332 g) {
         String[] icons = {Theme.ICON_VISUAL, Theme.ICON_CLIENT, Theme.ICON_UTILS, Theme.ICON_WORLD};
         String[] names = {"Модули", "Friends", "Макросы", "Конфиги"};
         int bw = 28, bh = 22, gap = 6;
@@ -814,14 +814,14 @@ public class MenuScreen extends class_437 {
         for (int i = 0; i < icons.length; i++) {
             int x = dx + i * (bw + gap);
             boolean hov = hit(x, dy, bw, bh);
-            boolean act = i == 0 && pvSel.isEmpty();
-            float p = anim("pvd:" + i, hov);
+            boolean act = i == 0 && tileSel.isEmpty();
+            float p = anim("tld:" + i, hov);
             rr(g, x, dy, bw, bh, 6, act ? withAlpha(Theme.ACCENT, 0xD0) : mix(0x30000000, withAlpha(Theme.ACCENT, 0x70), p));
             g.method_25300(field_22793, icons[i], x + bw / 2, dy + (bh - 8) / 2, ff(Theme.TEXT));
             if (hov) g.method_25300(field_22793, names[i], x + bw / 2, dy - 14, ff(Theme.TEXT_DIM));
             if (clicked && hov) {
                 switch (i) {
-                    case 0 -> { pvSel = ""; if (pvSearch != null) pvSearch.method_1852(""); }
+                    case 0 -> { tileSel = ""; if (tileSearch != null) tileSearch.method_1852(""); }
                     case 1 -> field_22787.execute(() -> field_22787.method_1507(new FriendsScreen(this)));
                     case 2 -> field_22787.execute(() -> field_22787.method_1507(new MacrosScreen(this)));
                     default -> field_22787.execute(() -> field_22787.method_1507(new ConfigsScreen(this)));
@@ -830,12 +830,12 @@ public class MenuScreen extends class_437 {
         }
     }
 
-    private void renderPulse(class_332 g) {
-        pvLayout();
-        int px = pvPx, py = pvPy, pw = pvPw, ph = pvPh;
-        boolean overlay = !pvSel.isEmpty();
+    private void renderTiles(class_332 g) {
+        tileLayout();
+        int px = tilePx, py = tilePy, pw = tilePw, ph = tilePh;
+        boolean overlay = !tileSel.isEmpty();
 
-        if (py >= 34) pvLogo(g, field_22789 / 2, py - 28);
+        if (py >= 34) tileLogo(g, field_22789 / 2, py - 28);
 
         shadow(g, px, py, pw, ph, 8);
         rr(g, px, py, pw, ph, 8, Theme.PANEL_BG);
@@ -850,69 +850,69 @@ public class MenuScreen extends class_437 {
         // ---------------- настройки выбранного модуля ----------------
         if (overlay) {
             sbSplitX = 0;   // колесо мыши крутит правую (настройки) прокрутку
-            if (pvSearch != null) pvSearch.method_46419(-100);
+            if (tileSearch != null) tileSearch.method_46419(-100);
 
             boolean hovB = hit(px + 12, py + 7, 54, 16);
             rr(g, px + 12, py + 7, 54, 16, 5, hovB ? withAlpha(Theme.ACCENT, 0x80) : 0x30000000);
             g.method_25300(field_22793, "← Назад", px + 12 + 27, py + 12, ff(Theme.TEXT));
-            if (clicked && hovB) { pvSel = ""; return; }
+            if (clicked && hovB) { tileSel = ""; return; }
 
-            text(g, sbLabel(pvSel), px + 76, py + 12, Theme.TEXT);
-            if (sbHasSwitch(pvSel)) {
-                boolean on = sbGet(pvSel);
-                sw(g, px + pw - 40, py + 8, "pvo:" + pvSel, on);
-                if (clicked && hit(px + pw - 44, py + 5, 32, 18)) sbSet(pvSel, !on);
+            text(g, sbLabel(tileSel), px + 76, py + 12, Theme.TEXT);
+            if (sbHasSwitch(tileSel)) {
+                boolean on = sbGet(tileSel);
+                sw(g, px + pw - 40, py + 8, "tlo:" + tileSel, on);
+                if (clicked && hit(px + pw - 44, py + 5, 32, 18)) sbSet(tileSel, !on);
             }
 
-            if (!pvSel.equals(sbLastSel)) { sbLastSel = pvSel; sbScrollRight = 0; }
+            if (!tileSel.equals(sbLastSel)) { sbLastSel = tileSel; sbScrollRight = 0; }
             sbScrollRight = Math.max(0, Math.min(sbScrollRight, sbMaxRight));
-            cx = px + 16; cw = pw - 32 - 8; cy = vTop - Math.round(sbScrollRight); curId = pvSel;
+            cx = px + 16; cw = pw - 32 - 8; cy = vTop - Math.round(sbScrollRight); curId = tileSel;
             int startR = cy;
             int smx = mx, smy = my; boolean scl = clicked;
             if (active == -1 && !hit(px + 12, vTop, pw - 24, vH)) { mx = -1000; my = -1000; clicked = false; }
             g.method_44379(px + 12, vTop, px + pw - 12, vTop + vH);
-            sbSettings(g, pvSel);
+            sbSettings(g, tileSel);
             g.method_44380();
             mx = smx; my = smy; clicked = scl;
             scrollbar(g, px + pw - 14, vTop, vH, cy - startR, 2);
-            pvDock(g);
+            tileDock(g);
             return;
         }
 
         // ---------------- шапка: вкладки + поиск ----------------
         sbSplitX = Integer.MAX_VALUE;   // колесо мыши крутит сетку плиток
-        if (pvSearch != null) {
-            pvSearch.method_46419(py + 6);
-            pvSearch.method_25394(g, mx, my, 0f);
-            if (pvSearch.method_1882().isEmpty() && !pvSearch.method_25370())
-                text(g, "Поиск", pvSearch.method_46426() + 5, py + 10, 0xFF777777);
+        if (tileSearch != null) {
+            tileSearch.method_46419(py + 6);
+            tileSearch.method_25394(g, mx, my, 0f);
+            if (tileSearch.method_1882().isEmpty() && !tileSearch.method_25370())
+                text(g, "Поиск", tileSearch.method_46426() + 5, py + 10, 0xFF777777);
         }
-        String q = pvSearch == null ? "" : pvSearch.method_1882().trim().toLowerCase();
+        String q = tileSearch == null ? "" : tileSearch.method_1882().trim().toLowerCase();
         boolean searching = !q.isEmpty();
 
         int tx = px + 14, ty = py + 10;
-        for (int i = 0; i < PV_TABS.length; i++) {
-            int tw = field_22793.method_1727(PV_TABS[i]);
-            boolean act = i == pvCat && !searching;
+        for (int i = 0; i < TILE_TABS.length; i++) {
+            int tw = field_22793.method_1727(TILE_TABS[i]);
+            boolean act = i == tileCat && !searching;
             boolean hov = hit(tx - 3, ty - 3, tw + 6, 15);
-            text(g, PV_TABS[i], tx, ty, act ? Theme.TEXT : (hov ? Theme.TEXT : Theme.TEXT_DIM));
+            text(g, TILE_TABS[i], tx, ty, act ? Theme.TEXT : (hov ? Theme.TEXT : Theme.TEXT_DIM));
             if (act) rr(g, tx, ty + 11, tw, 1, 0, Theme.ACCENT);
             if (clicked && hov) {
-                pvCat = i;
-                if (pvSearch != null) pvSearch.method_1852("");
+                tileCat = i;
+                if (tileSearch != null) tileSearch.method_1852("");
             }
             tx += tw;
-            if (i < PV_TABS.length - 1) { text(g, "/", tx + 5, ty, 0xFF55556A); tx += 14; }
+            if (i < TILE_TABS.length - 1) { text(g, "/", tx + 5, ty, 0xFF55556A); tx += 14; }
         }
 
         // ---------------- сетка плиток ----------------
         java.util.List<String> ids = new java.util.ArrayList<>();
-        if (!searching) { for (String m : SB_MODS[pvCat]) ids.add(m); }
+        if (!searching) { for (String m : SB_MODS[tileCat]) ids.add(m); }
         else for (String[] cat : SB_MODS) for (String m : cat)
             if (sbLabel(m).toLowerCase().contains(q) || m.contains(q)) ids.add(m);
 
-        String key = pvCat + "|" + q;
-        if (!key.equals(pvLastKey)) { pvLastKey = key; sbScrollMid = 0; }
+        String key = tileCat + "|" + q;
+        if (!key.equals(tileLastKey)) { tileLastKey = key; sbScrollMid = 0; }
         sbScrollMid = Math.max(0, Math.min(sbScrollMid, sbMaxMid));
 
         int x0 = px + 14, iw = pw - 28 - 6, colW = (iw - 6) / 2, th = 22, rowGap = 4;
@@ -923,7 +923,7 @@ public class MenuScreen extends class_437 {
             int x = x0 + (i % 2) * (colW + 6);
             int y = vTop - Math.round(sbScrollMid) + (i / 2) * (th + rowGap);
             if (y + th < vTop || y > vTop + vH) continue;
-            pvTile(g, ids.get(i), x, y, colW, th);
+            tileCard(g, ids.get(i), x, y, colW, th);
         }
         if (ids.isEmpty()) text(g, "Ничего не найдено", x0 + 4, vTop + 6, Theme.TEXT_DIM);
         g.method_44380();
@@ -931,7 +931,7 @@ public class MenuScreen extends class_437 {
         int rows = (ids.size() + 1) / 2;
         scrollbar(g, px + pw - 12, vTop, vH, rows * (th + rowGap), 1);
 
-        pvDock(g);
+        tileDock(g);
     }
 
     // колесо мыши
