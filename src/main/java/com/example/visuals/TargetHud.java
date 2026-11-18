@@ -1,20 +1,23 @@
 package com.example.visuals;
 
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.class_1269;
+import net.minecraft.class_1297;
+import net.minecraft.class_1304;
+import net.minecraft.class_1799;
+import net.minecraft.class_1309;
+import net.minecraft.class_310;
+import net.minecraft.class_327;
+import net.minecraft.class_332;
+import net.minecraft.class_3532;
+import net.minecraft.class_408;
 import org.joml.Matrix3x2fStack;
 
 /**
  * TargetHUD: окошко с ником, здоровьем и полоской HP цели.
  * Цель = существо, на которое смотришь, или то, которое ты недавно ударил (3 сек).
  * После потери цели окно плавно гаснет. Размер, позиция и цвет настраиваются.
+ * Вид как у Pulse: аватар, ник, чип дистанции, пилюльная полоса HP и капсула с бронёй цели.
  */
 public final class TargetHud {
     private TargetHud() {}
@@ -28,37 +31,43 @@ public final class TargetHud {
     // снимок цели (чтобы окно могло гаснуть, даже когда цель уже недоступна)
     private static String name = "";
     private static float hp, maxHp, absorb, shownHp = -1f, dist;
+    private static final class_1799[] gear = new class_1799[5];   // шлем, нагрудник, поножи, ботинки, предмет в руке
 
     /** Вызвать один раз из VisualsClient.onInitializeClient(). */
     public static void register() {
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hit) -> {
-            if (world.isClient()) {
-                MinecraftClient mc = MinecraftClient.getInstance();
-                if (mc.player != null && player == mc.player) { hitId = entity.getId(); hitAt = System.currentTimeMillis(); }
+            if (world.method_8608()) {
+                class_310 mc = class_310.method_1551();
+                if (mc.field_1724 != null && player == mc.field_1724) { hitId = entity.method_5628(); hitAt = System.currentTimeMillis(); }
             }
-            return ActionResult.PASS;
+            return class_1269.field_5811;
         });
     }
 
-    public static void tick(MinecraftClient mc) {
-        if (!Config.targetHud || mc.world == null || mc.player == null) { has = false; return; }
+    public static void tick(class_310 mc) {
+        if (!Config.targetHud || mc.field_1687 == null || mc.field_1724 == null) { has = false; return; }
         long now = System.currentTimeMillis();
-        LivingEntity t = null;
-        Entity looked = mc.targetedEntity;
-        if (looked instanceof LivingEntity le && le.isAlive()) t = le;
+        class_1309 t = null;
+        class_1297 looked = mc.field_1692;
+        if (looked instanceof class_1309 le && le.method_5805()) t = le;
         else if (now - hitAt < KEEP_AFTER_HIT_MS) {
-            Entity e = mc.world.getEntityById(hitId);
-            if (e instanceof LivingEntity le && le.isAlive() && le.distanceTo(mc.player) < 40f) t = le;
+            class_1297 e = mc.field_1687.method_8469(hitId);
+            if (e instanceof class_1309 le && le.method_5805() && le.method_5739(mc.field_1724) < 40f) t = le;
         }
         if (t == null) return;
-        if (!has || !t.getName().getString().equals(name)) shownHp = -1f;   // новая цель: полоска не "едет"
+        if (!has || !t.method_5477().getString().equals(name)) shownHp = -1f;   // новая цель: полоска не "едет"
         has = true;
         lastSeen = now;
-        name = t.getName().getString();
-        hp = t.getHealth();
-        maxHp = Math.max(1f, t.getMaxHealth());
-        absorb = t.getAbsorptionAmount();
-        dist = t.distanceTo(mc.player);
+        name = t.method_5477().getString();
+        hp = t.method_6032();
+        maxHp = Math.max(1f, t.method_6063());
+        absorb = t.method_6067();
+        dist = t.method_5739(mc.field_1724);
+        gear[0] = t.method_6118(class_1304.field_6169);
+        gear[1] = t.method_6118(class_1304.field_6174);
+        gear[2] = t.method_6118(class_1304.field_6172);
+        gear[3] = t.method_6118(class_1304.field_6166);
+        gear[4] = t.method_6047();
     }
 
     private static int ca(int color, float a) {
@@ -66,24 +75,13 @@ public final class TargetHud {
         return (al << 24) | (color & 0xFFFFFF);
     }
 
-    private static void rr(DrawContext g, int x, int y, int w, int h, int r, int c) {
-        if (r <= 0 || w < 2 * r || h < 2 * r) { g.fill(x, y, x + w, y + h, c); return; }
-        g.fill(x, y + r, x + w, y + h - r, c);
-        for (int i = 0; i < r; i++) {
-            double dy = r - i - 0.5;
-            int inset = r - (int) Math.round(Math.sqrt(r * r - dy * dy));
-            g.fill(x + inset, y + i, x + w - inset, y + i + 1, c);
-            g.fill(x + inset, y + h - 1 - i, x + w - inset, y + h - i, c);
-        }
-    }
-
-    public static void hud(DrawContext g) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (!Config.targetHud || !has || mc.world == null || mc.options.hudHidden) return;
-        if (mc.currentScreen != null && !(mc.currentScreen instanceof ChatScreen)) return;
+    public static void hud(class_332 g) {
+        class_310 mc = class_310.method_1551();
+        if (!Config.targetHud || !has || mc.field_1687 == null || mc.field_1690.field_1842) return;
+        if (mc.field_1755 != null && !(mc.field_1755 instanceof class_408)) return;
 
         long now = System.currentTimeMillis();
-        float a = 1f - MathHelper.clamp((now - lastSeen) / (float) FADE_MS, 0f, 1f);   // 1 пока цель есть, потом гаснет
+        float a = 1f - class_3532.method_15363((now - lastSeen) / (float) FADE_MS, 0f, 1f);   // 1 пока цель есть, потом гаснет
         if (a <= 0f) { has = false; return; }
 
         // плавное движение полоски HP
@@ -91,43 +89,61 @@ public final class TargetHud {
         shownHp += (hp - shownHp) * 0.12f;
         if (Math.abs(hp - shownHp) < 0.02f) shownHp = hp;
 
-        TextRenderer tr = mc.textRenderer;
-        int sw = g.getScaledWindowWidth(), sh = g.getScaledWindowHeight();
+        class_327 tr = mc.field_1772;
+        int sw = g.method_51421(), sh = g.method_51443();
         float s = (float) Config.thScale;
-        int accent = 0xFF000000 | (MathHelper.hsvToRgb((float) Config.thHue, 0.75f, 1f) & 0xFFFFFF);
+        int accent = 0xFF000000 | (class_3532.method_15369((float) Config.thHue, 0.75f, 1f) & 0xFFFFFF);
         float slide = (1f - a) * 6f;   // чуть уезжает вниз при затухании
 
-        Matrix3x2fStack m = g.getMatrices();
+        Matrix3x2fStack m = g.method_51448();
         m.pushMatrix();
         m.translate(sw * (float) Config.thX / 100f - W * s / 2f, sh * (float) Config.thY / 100f + slide);
         m.scale(s, s);
 
-        rr(g, 2, 3, W, H, 5, ca(0x40000000, a));                 // тень
-        rr(g, 0, 0, W, H, 5, ca(0xE0121216, a));                 // фон
-        rr(g, 0, 0, 3, H, 1, ca(accent, a));                     // акцентная полоса слева
+        HudStyle.panel(g, 0, 0, W, H, a, accent);
+        HudStyle.avatar(g, tr, name, 7, 7, 26, a, accent);
 
-        g.drawTextWithShadow(tr, tr.trimToWidth(name, Config.thDist ? 88 : 124), 9, 6, ca(0xFFFFFFFF, a));
+        // ник и чип дистанции
+        int nameMax = W - 39 - 8;
         if (Config.thDist) {
             String d = String.format(java.util.Locale.ROOT, "%.1fм", dist);
-            g.drawTextWithShadow(tr, d, W - 8 - tr.getWidth(d), 6, ca(0xFF9AA0AA, a));
+            int cw = HudStyle.chipWidth(tr, d);
+            HudStyle.chip(g, tr, d, W - 7 - cw, 7, 0xFFB4B9CC, a);
+            nameMax -= cw + 4;
         }
+        g.method_25303(tr, tr.method_27523(name, nameMax), 39, 9, ca(0xFFFFFFFF, a));
 
-        // полоска здоровья
-        int bx = 9, by = 20, bw = W - 18, bh = 11;
-        rr(g, bx, by, bw, bh, 3, ca(0x60FFFFFF, a * 0.35f));
-        float ratio = MathHelper.clamp(shownHp / maxHp, 0f, 1f);
-        int fw = Math.round(bw * ratio);
-        if (fw > 1) {
-            int col = 0xFF000000 | (MathHelper.hsvToRgb(0.33f * ratio, 0.8f, 1f) & 0xFFFFFF);
-            rr(g, bx, by, Math.max(fw, 4), bh, 3, ca(col, a));
-            g.fill(bx + 1, by + 1, bx + Math.max(fw, 4) - 1, by + 3, ca(0x30FFFFFF, a));   // блик
-        }
+        // полоска здоровья (пилюля в цвет акцента) и значение справа
+        int bx = 39, by = 24, bw = W - 39 - 8, bh = 9;
+        float ratio = class_3532.method_15363(shownHp / maxHp, 0f, 1f);
+        HudStyle.bar(g, bx, by, bw, bh, ratio, accent, a);
+        if (ratio > 0.02f) g.method_25294(bx + 3, by + 1, bx + Math.max(4, Math.round(bw * ratio)) - 3, by + 2, ca(0x40FFFFFF, a));   // блик
         if (absorb > 0f) {   // золотые сердца поверх
-            int aw = Math.round(bw * MathHelper.clamp(absorb / maxHp, 0f, 1f));
-            if (aw > 1) rr(g, bx, by + bh - 3, aw, 3, 1, ca(0xFFFFD34D, a));
+            int aw = Math.round(bw * class_3532.method_15363(absorb / maxHp, 0f, 1f));
+            if (aw > 2) HudStyle.roundFill(g, bx, by + bh - 2, aw, 2, 1, ca(0xFFFFD34D, a));
         }
-        String t = String.format(java.util.Locale.ROOT, "%.1f / %.0f", hp, maxHp);
-        g.drawCenteredTextWithShadow(tr, t, bx + bw / 2, by + 2, ca(0xFFFFFFFF, a));
+        String t = Math.round(hp) + "hp";
+        g.method_25303(tr, t, bx + bw - 4 - tr.method_1727(t), by + 1, ca(0xFFFFFFFF, a));
+
+        // капсула с бронёй и предметом цели
+        int cnt = 0;
+        for (class_1799 st : gear) if (st != null && !st.method_7960()) cnt++;
+        if (cnt > 0) {
+            int sw2 = cnt * 15 + 9, sx = (W - sw2) / 2, sy = H + 4;
+            HudStyle.capsule(g, sx, sy, sw2, 16, a);
+            if (a > 0.4f) {
+                int ix = sx + 5;
+                for (class_1799 st : gear) {
+                    if (st == null || st.method_7960()) continue;
+                    m.pushMatrix();
+                    m.translate(ix, sy + 2);
+                    m.scale(0.75f, 0.75f);
+                    g.method_51427(st, 0, 0);
+                    m.popMatrix();
+                    ix += 15;
+                }
+            }
+        }
 
         m.popMatrix();
     }
