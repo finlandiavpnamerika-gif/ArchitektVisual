@@ -2,9 +2,9 @@ package com.example.visuals;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.class_310;
+import net.minecraft.class_327;
+import net.minecraft.class_332;
 
 /** ArrayList: включённые модули плашками с градиентом цвета. Вертикально или горизонтально. */
 public final class ArrayListHud {
@@ -14,8 +14,8 @@ public final class ArrayListHud {
     private static final int GAP = 2;      // зазор между плашками
 
     /** Рисует в (0,0), возвращает {w, h} или null, если включённых модулей нет. */
-    public static int[] draw(DrawContext g, MinecraftClient mc, float a) {
-        TextRenderer tr = mc.textRenderer;
+    public static int[] draw(class_332 g, class_310 mc, float a) {
+        class_327 tr = mc.field_1772;
         int accent = Config.COLORS[Config.arrayListColor];
 
         List<String> mods = new ArrayList<>();
@@ -34,6 +34,7 @@ public final class ArrayListHud {
         if (Config.customFog) mods.add("CustomFog");
         if (Config.particles) mods.add("Particles");
         if (Config.skyShader) mods.add("SkyShader");
+        if (Config.itemScroller) mods.add("ItemScroller");
         if (Config.damageFever) mods.add("DamageViewer");
         if (Config.targetHud) mods.add("TargetHUD");
         if (Config.handView) mods.add("HandView");
@@ -41,7 +42,7 @@ public final class ArrayListHud {
         if (Config.jumpCircle) mods.add("JumpCircle");
         if (mods.isEmpty()) return null;
 
-        mods.sort((p, q) -> tr.getWidth(q) - tr.getWidth(p));   // длинные первыми
+        mods.sort((p, q) -> tr.method_1727(q) - tr.method_1727(p));   // длинные первыми
         int n = mods.size();
 
         if (Config.arrayListHoriz) {
@@ -49,7 +50,7 @@ public final class ArrayListHud {
             for (int i = 0; i < n; i++) {
                 String s = mods.get(i);
                 int col = color(accent, i, n);
-                int w = tr.getWidth(s) + 10;
+                int w = tr.method_1727(s) + 10;
                 HudStyle.pill(g, x, 0, w, H, a, col);
                 HudStyle.text(g, tr, s, x + 6, 2, col, a, Config.arrayListShadow);
                 x += w + GAP;
@@ -58,11 +59,11 @@ public final class ArrayListHud {
         }
 
         int maxW = 0;
-        for (String s : mods) maxW = Math.max(maxW, tr.getWidth(s) + 10);
+        for (String s : mods) maxW = Math.max(maxW, tr.method_1727(s) + 10);
         for (int i = 0; i < n; i++) {
             String s = mods.get(i);
             int col = color(accent, i, n);
-            int w = tr.getWidth(s) + 10;
+            int w = tr.method_1727(s) + 10;
             int y = i * (H + GAP);
             HudStyle.pill(g, maxW - w, y, w, H, a, col);          // выровнено по правому краю
             HudStyle.text(g, tr, s, maxW - w + 6, y + 2, col, a, Config.arrayListShadow);
