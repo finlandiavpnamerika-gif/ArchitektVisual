@@ -154,19 +154,19 @@ public final class HudStyle {
     }
 
     public static int titleWidth(class_327 tr, String icon, String text) {
-        return tr.method_1727(icon) + 4 + tr.method_1727(text);
+        return HudStyle.width(tr, icon) + 4 + HudStyle.width(tr, text);
     }
 
     /** Заголовок панели: иконка цвета акцента + белый текст. @return правый край заголовка. */
     public static int title(class_332 g, class_327 tr, String icon, String text, int x, int y, float a, int accent) {
         text(g, tr, icon, x, y, accent, a, true);
-        int tx = x + tr.method_1727(icon) + 4;
+        int tx = x + HudStyle.width(tr, icon) + 4;
         text(g, tr, text, tx, y, Theme.TEXT, a, true);
-        return tx + tr.method_1727(text);
+        return tx + HudStyle.width(tr, text);
     }
 
     public static int chipWidth(class_327 tr, String s) {
-        return tr.method_1727(s) + 8;
+        return HudStyle.width(tr, s) + 8;
     }
 
     /** Маленькая тонированная метка (высота 11). @return её ширину. */
@@ -191,7 +191,7 @@ public final class HudStyle {
         roundFill(g, x, y, size, size, 4, withAlpha(withAlpha(accent, 0.30f), a));
         roundRing(g, x, y, size, size, 4, withAlpha(withAlpha(accent, 0.65f), a));
         String ch = name == null || name.isEmpty() ? "?" : name.substring(0, 1).toUpperCase();
-        text(g, tr, ch, x + (size - tr.method_1727(ch)) / 2, y + (size - 8) / 2, Theme.TEXT, a, true);
+        text(g, tr, ch, x + (size - HudStyle.width(tr, ch)) / 2, y + (size - 8) / 2, Theme.TEXT, a, true);
     }
 
     // ---------- логотип ----------
@@ -301,15 +301,29 @@ public final class HudStyle {
 
     // ---------- текст ----------
 
+    /** Ширина строки в шрифте HUD. */
+    public static int width(class_327 tr, String s) {
+        return HudFont.width(tr, s);
+    }
+
+    /** Обрезает строку по ширине (с «…»), учитывая шрифт HUD. */
+    public static String trim(class_327 tr, String s, int maxW) {
+        if (width(tr, s) <= maxW) return s;
+        int e = s.length();
+        while (e > 0 && width(tr, s.substring(0, e) + "…") > maxW) e--;
+        return s.substring(0, e) + "…";
+    }
+
     public static void text(class_332 g, class_327 tr, String s, int x, int y, int color, float a, boolean shadow) {
         int c = withAlpha(color, a);
+        if (HudFont.draw(g, tr, s, x, y, c, shadow)) return;
         if (shadow) g.method_25303(tr, s, x, y, c);
         else g.method_51433(tr, s, x, y, c, false);
     }
 
     /** Текст, прижатый правым краем к right. */
     public static void textRight(class_332 g, class_327 tr, String s, int right, int y, int color, float a, boolean shadow) {
-        text(g, tr, s, right - tr.method_1727(s), y, color, a, shadow);
+        text(g, tr, s, right - HudStyle.width(tr, s), y, color, a, shadow);
     }
 
     // ---------- элементы ----------
@@ -329,7 +343,7 @@ public final class HudStyle {
         roundFill(g, x, y, w, h, 3, bg);
         roundRing(g, x, y, w, h, 3, pressed ? withAlpha(0x66FFFFFF, a) : withAlpha(BORDER, a));
         if (!label.isEmpty()) {
-            int tw = tr.method_1727(label);
+            int tw = HudStyle.width(tr, label);
             text(g, tr, label, x + (w - tw) / 2, y + (h - 8) / 2,
                     pressed ? 0xFF101018 : 0xFFFFFFFF, a, !pressed);
         }
