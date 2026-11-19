@@ -77,7 +77,7 @@ public final class PotionHud {
             int tile = Math.max(30, 0);
             int[] tw = new int[n];
             int w = PAD;
-            for (int i = 0; i < n; i++) { tw[i] = Math.max(tile, tr.method_1727(times[i]) + 8); w += tw[i] + (i < n - 1 ? 3 : 0); }
+            for (int i = 0; i < n; i++) { tw[i] = Math.max(tile, HudStyle.width(tr, times[i]) + 8); w += tw[i] + (i < n - 1 ? 3 : 0); }
             w += PAD;
             int h = PAD * 2 + 38;
             HudStyle.panel(g, 0, 0, w, h, a, accent);
@@ -94,12 +94,12 @@ public final class PotionHud {
                 }
                 if (Config.potionLevel && e.method_5578() > 0) {
                     String lv = roman(e.method_5578() + 1);
-                    HudStyle.text(g, tr, lv, x + tw[i] - tr.method_1727(lv) - 2, PAD + 4, Theme.TEXT, a, true);
+                    HudStyle.text(g, tr, lv, x + tw[i] - HudStyle.width(tr, lv) - 2, PAD + 4, Theme.TEXT, a, true);
                 }
                 int sec = e.method_5584() / 20;
                 int tc = e.method_48559() ? HudStyle.GOOD : sec <= 10 ? HudStyle.BAD : sec <= 30 ? HudStyle.MID : Theme.TEXT;
                 float ta = (!e.method_48559() && sec <= 10) ? a * (0.55f + 0.45f * (float) Math.abs(Math.sin(nowH / 220.0))) : a;
-                HudStyle.text(g, tr, times[i], x + (tw[i] - tr.method_1727(times[i])) / 2, PAD + 24, tc, ta, true);
+                HudStyle.text(g, tr, times[i], x + (tw[i] - HudStyle.width(tr, times[i])) / 2, PAD + 24, tc, ta, true);
                 if (Config.potionBars) {
                     int max = MAX.getOrDefault(key(e.method_5579()), Math.max(1, e.method_5584()));
                     float ratio = e.method_48559() ? 1f : Math.max(0f, Math.min(1f, e.method_5584() / (float) Math.max(1, max)));
@@ -112,7 +112,7 @@ public final class PotionHud {
 
         String title = "Potions";
         int textW = HudStyle.titleWidth(tr, Theme.ICON_VISUAL, title);
-        for (int i = 0; i < n; i++) textW = Math.max(textW, tr.method_1727(names[i]) + 14 + tr.method_1727(times[i]));
+        for (int i = 0; i < n; i++) textW = Math.max(textW, HudStyle.width(tr, names[i]) + 14 + HudStyle.width(tr, times[i]));
         int iconW = Config.potionIcons ? ICON + 5 : 0;
         int w = Math.max(96, PAD * 2 + iconW + textW - (Config.potionIcons ? 0 : 0));
         int h = HEADER + 3 + (demo ? 14 : n * ROW) + 2;
