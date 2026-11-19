@@ -18,8 +18,8 @@ public final class HudRows {
                              List<String> values, List<Integer> colors, int accent, float a) {
         int lw = 0, vw = 0;
         for (int i = 0; i < labels.size(); i++) {
-            lw = Math.max(lw, tr.method_1727(labels.get(i)));
-            vw = Math.max(vw, tr.method_1727(values.get(i)));
+            lw = Math.max(lw, HudStyle.width(tr, labels.get(i)));
+            vw = Math.max(vw, HudStyle.width(tr, values.get(i)));
         }
         String icon = HudStyle.iconFor(title);
         int w = Math.max(HudStyle.titleWidth(tr, icon, title) + PAD * 2, PAD * 2 + lw + GAP + vw);
