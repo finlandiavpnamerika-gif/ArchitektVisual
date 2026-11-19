@@ -7,7 +7,7 @@ import net.minecraft.class_332;
 import net.minecraft.class_640;
 
 /**
- * Watermark: капсула - логотип «A» + название, ник с аватаром, пинг и FPS (и время по желанию).
+ * Watermark: капсула - логотип «A» + название, ник, пинг и FPS (и время по желанию).
  * Пинг показывается вместе с FPS (опция "FPS").
  */
 public final class WatermarkHud {
@@ -53,7 +53,7 @@ public final class WatermarkHud {
         // ширина
         int nameW = HudStyle.width(tr, name);
         int w = PAD + LOGO_W + 5 + nameW;
-        if (nick != null) w += GAP + 1 + GAP + 14 + 5 + HudStyle.width(tr, nick);
+        if (nick != null) w += GAP + 1 + GAP + HudStyle.width(tr, nick);
         if (ping != null) w += GAP + 1 + GAP + HudStyle.width(tr, ping);
         if (fps != null) w += (ping != null ? 8 : GAP + 1 + GAP) + HudStyle.width(tr, fps);
         if (time != null) w += GAP + 1 + GAP + HudStyle.width(tr, time);
@@ -79,8 +79,6 @@ public final class WatermarkHud {
 
         if (nick != null) {
             x += GAP; sep(g, x, a); x += 1 + GAP;
-            HudStyle.avatar(g, tr, nick, x, (H - 14) / 2, 14, a, accent);
-            x += 14 + 5;
             HudStyle.text(g, tr, nick, x, 6, Theme.TEXT, a, true);
             x += HudStyle.width(tr, nick);
         }
