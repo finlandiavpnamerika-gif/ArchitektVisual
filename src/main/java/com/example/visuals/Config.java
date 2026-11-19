@@ -382,6 +382,9 @@ public final class Config {
     public static double swingSpeed = 1.0;
     public static boolean swingSelfOnly = true;
 
+    // Шрифт HUD (Inter, assets/visualsmod/font/hud.json); false = обычный шрифт Minecraft
+    public static boolean hudFont = true;
+
     // Aspect Ratio
     public static boolean aspectOn = false;
     public static int aspectPreset = 1;            // индекс в AspectRatio.NAMES (0 = своё значение)
@@ -926,6 +929,7 @@ public final class Config {
             o.addProperty("swingAnim", swingAnim);
             o.addProperty("swingSpeed", swingSpeed);
             o.addProperty("swingSelfOnly", swingSelfOnly);
+            o.addProperty("hudFont", hudFont);
             o.addProperty("aspectOn", aspectOn);
             o.addProperty("aspectPreset", aspectPreset);
             o.addProperty("aspectCustom", aspectCustom);
@@ -1401,6 +1405,7 @@ public final class Config {
                 swingAnim = b(o, "swingAnim", swingAnim);
                 swingSpeed = d(o, "swingSpeed", swingSpeed);
                 swingSelfOnly = b(o, "swingSelfOnly", swingSelfOnly);
+                hudFont = b(o, "hudFont", hudFont);
                 aspectOn = b(o, "aspectOn", aspectOn);
                 aspectPreset = (int) d(o, "aspectPreset", aspectPreset);
                 aspectCustom = d(o, "aspectCustom", aspectCustom);
