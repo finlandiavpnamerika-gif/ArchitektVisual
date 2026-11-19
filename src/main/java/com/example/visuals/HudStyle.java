@@ -252,14 +252,27 @@ public final class HudStyle {
         return Math.max(1, Math.round(h * (float) LOGO_SW / LOGO_SH));
     }
 
-    /** Маска, уменьшенная до tw x th усреднением по области (получается мягкий край). */
-    private static int[] logoPixels(int tw, int th) {
-        if (logoCache != null && logoCacheW == tw && logoCacheH == th) return logoCache;
+    private static void ensureLogoMask() {
         if (logoMask == null) {
             byte[] m = new byte[LOGO_SW * LOGO_SH];
             for (int i = 0; i < m.length; i++) m[i] = (byte) Integer.parseInt(LOGO_HEX.substring(i * 2, i * 2 + 2), 16);
             logoMask = m;
         }
+    }
+
+    /** Размер исходной маски логотипа (для рисования на плаще и т.п.). */
+    public static int logoCols() { return LOGO_SW; }
+    public static int logoRowCount() { return LOGO_SH; }
+    /** Прозрачность пикселя маски 0..255. */
+    public static int logoAlpha(int x, int y) {
+        ensureLogoMask();
+        return logoMask[y * LOGO_SW + x] & 0xFF;
+    }
+
+    /** Маска, уменьшенная до tw x th усреднением по области (получается мягкий край). */
+    private static int[] logoPixels(int tw, int th) {
+        if (logoCache != null && logoCacheW == tw && logoCacheH == th) return logoCache;
+        ensureLogoMask();
         int[] out = new int[tw * th];
         for (int ty = 0; ty < th; ty++) {
             float sy0 = ty * (float) LOGO_SH / th, sy1 = (ty + 1) * (float) LOGO_SH / th;
