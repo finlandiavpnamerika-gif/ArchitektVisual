@@ -51,12 +51,12 @@ public final class WatermarkHud {
         }
 
         // ширина
-        int nameW = tr.method_1727(name);
+        int nameW = HudStyle.width(tr, name);
         int w = PAD + LOGO_W + 5 + nameW;
-        if (nick != null) w += GAP + 1 + GAP + 14 + 5 + tr.method_1727(nick);
-        if (ping != null) w += GAP + 1 + GAP + tr.method_1727(ping);
-        if (fps != null) w += (ping != null ? 8 : GAP + 1 + GAP) + tr.method_1727(fps);
-        if (time != null) w += GAP + 1 + GAP + tr.method_1727(time);
+        if (nick != null) w += GAP + 1 + GAP + 14 + 5 + HudStyle.width(tr, nick);
+        if (ping != null) w += GAP + 1 + GAP + HudStyle.width(tr, ping);
+        if (fps != null) w += (ping != null ? 8 : GAP + 1 + GAP) + HudStyle.width(tr, fps);
+        if (time != null) w += GAP + 1 + GAP + HudStyle.width(tr, time);
         w += PAD;
 
         HudStyle.capsule(g, 0, 0, w, H, a);
@@ -70,7 +70,7 @@ public final class WatermarkHud {
             for (int i = 0; i < name.length(); i++) {
                 String ch = String.valueOf(name.charAt(i));
                 HudStyle.text(g, tr, ch, x, 6, rainbow(i * 0.06f), a, true);
-                x += tr.method_1727(ch);
+                x += HudStyle.width(tr, ch);
             }
         } else {
             HudStyle.text(g, tr, name, x, 6, Theme.TEXT, a, true);
@@ -82,18 +82,18 @@ public final class WatermarkHud {
             HudStyle.avatar(g, tr, nick, x, (H - 14) / 2, 14, a, accent);
             x += 14 + 5;
             HudStyle.text(g, tr, nick, x, 6, Theme.TEXT, a, true);
-            x += tr.method_1727(nick);
+            x += HudStyle.width(tr, nick);
         }
         if (ping != null) {
             x += GAP; sep(g, x, a); x += 1 + GAP;
             HudStyle.text(g, tr, ping, x, 6, HudStyle.MUTED, a, true);
-            x += tr.method_1727(ping);
+            x += HudStyle.width(tr, ping);
         }
         if (fps != null) {
             if (ping != null) x += 8;
             else { x += GAP; sep(g, x, a); x += 1 + GAP; }
             HudStyle.text(g, tr, fps, x, 6, HudStyle.MUTED, a, true);
-            x += tr.method_1727(fps);
+            x += HudStyle.width(tr, fps);
         }
         if (time != null) {
             x += GAP; sep(g, x, a); x += 1 + GAP;
