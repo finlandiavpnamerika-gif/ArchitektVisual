@@ -1335,9 +1335,13 @@ public class MenuScreen extends class_437 {
                 Config.auraFriends = cbool(g, "Для друзей", Config.auraFriends);
             }
             case "cape" -> {
-                Config.capeColor = ccycle(g, "Цвет сверху", Config.COLOR_NAMES, Config.capeColor);
-                Config.capeColor2 = ccycle(g, "Цвет снизу", Config.COLOR_NAMES, Config.capeColor2);
-                Config.capeRainbow = cbool(g, "Радуга", Config.capeRainbow);
+                Config.capePreset = ccycle(g, "Плащ", Cosmetics.CAPE_PRESETS, Config.capePreset);
+                Config.capeLogo = cbool(g, "Логотип", Config.capeLogo);
+                if (Config.capePreset == 0) {
+                    Config.capeColor = ccycle(g, "Цвет сверху", Config.COLOR_NAMES, Config.capeColor);
+                    Config.capeColor2 = ccycle(g, "Цвет снизу", Config.COLOR_NAMES, Config.capeColor2);
+                    Config.capeRainbow = cbool(g, "Радуга", Config.capeRainbow);
+                }
                 Config.capeWave = cslider(g, "Волны", 0.0, 1.5, Config.capeWave, false);
                 Config.capeFriends = cbool(g, "Для друзей", Config.capeFriends);
             }
