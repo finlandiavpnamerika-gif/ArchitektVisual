@@ -359,6 +359,8 @@ public final class Config {
     public static boolean capeRainbow = false;
     public static double capeWave = 0.6;
     public static boolean capeFriends = false;
+    public static int capePreset = 1;              // 0 = свои цвета, 1..5 = готовые плащи с логотипом (Cosmetics.CAPE_PRESETS)
+    public static boolean capeLogo = true;         // логотип «A» на плаще
 
     // Nametags+
     public static boolean ntOn = false;
@@ -913,6 +915,8 @@ public final class Config {
             o.addProperty("capeRainbow", capeRainbow);
             o.addProperty("capeWave", capeWave);
             o.addProperty("capeFriends", capeFriends);
+            o.addProperty("capePreset", capePreset);
+            o.addProperty("capeLogo", capeLogo);
             o.addProperty("ntOn", ntOn);
             o.addProperty("ntRange", ntRange);
             o.addProperty("ntScale", ntScale);
@@ -1389,6 +1393,8 @@ public final class Config {
                 capeRainbow = b(o, "capeRainbow", capeRainbow);
                 capeWave = d(o, "capeWave", capeWave);
                 capeFriends = b(o, "capeFriends", capeFriends);
+                capePreset = (int) d(o, "capePreset", capePreset);
+                capeLogo = b(o, "capeLogo", capeLogo);
                 ntOn = b(o, "ntOn", ntOn);
                 ntRange = d(o, "ntRange", ntRange);
                 ntScale = d(o, "ntScale", ntScale);
