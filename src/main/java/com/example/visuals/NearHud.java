@@ -66,12 +66,12 @@ public final class NearHud {
 
         String title = "Players Near";
         String count = demo ? "0" : String.valueOf(total);
-        int w = PAD + HudStyle.titleWidth(tr, Theme.ICON_WORLD, title) + 10 + tr.method_1727(count) + PAD;
+        int w = PAD + HudStyle.titleWidth(tr, Theme.ICON_WORLD, title) + 10 + HudStyle.width(tr, count) + PAD;
         for (Row r : rows) {
-            int rw = PAD + ARROW_W + tr.method_1727(r.name) + 12 + tr.method_1727(distText(r.dist)) + PAD;
+            int rw = PAD + ARROW_W + HudStyle.width(tr, r.name) + 12 + HudStyle.width(tr, distText(r.dist)) + PAD;
             if (rw > w) w = rw;
         }
-        if (demo) w = Math.max(w, PAD + tr.method_1727("Никого рядом") + PAD);
+        if (demo) w = Math.max(w, PAD + HudStyle.width(tr, "Никого рядом") + PAD);
         w = Math.max(w, 96);
         int h = HEADER + 3 + (demo ? ROW : rows.size() * ROW) + 3;
 
