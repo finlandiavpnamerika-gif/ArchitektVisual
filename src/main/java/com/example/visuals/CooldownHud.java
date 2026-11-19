@@ -104,12 +104,12 @@ public final class CooldownHud {
         String[] names = new String[n], times = new String[n];
         for (int i = 0; i < n; i++) {
             Row r = rows.get(i);
-            names[i] = tr.method_27523(r.stack.method_7964().getString(), 80);
+            names[i] = HudStyle.trim(tr, r.stack.method_7964().getString(), 80);
             if (!Config.cdTime) times[i] = "";
             else if (r.seconds < 0) times[i] = Math.round(r.progress * 100) + "%";
             else if (r.seconds >= 10f) times[i] = (int) Math.ceil(r.seconds) + "с";
             else times[i] = String.format(Locale.ROOT, "%.1fс", r.seconds);
-            w = Math.max(w, PAD + 2 + 16 + 5 + tr.method_1727(names[i]) + 12 + tr.method_1727(times[i]) + PAD);
+            w = Math.max(w, PAD + 2 + 16 + 5 + HudStyle.width(tr, names[i]) + 12 + HudStyle.width(tr, times[i]) + PAD);
         }
         int h = HEAD + 4 + n * ROW + 1;
 
