@@ -1,10 +1,10 @@
 package com.example.visuals;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.class_1657;
+import net.minecraft.class_243;
+import net.minecraft.class_310;
+import net.minecraft.class_3532;
+import net.minecraft.class_4588;
 import org.joml.Matrix4f;
 
 /**
@@ -20,14 +20,24 @@ public final class Cosmetics {
     };
     public static final String[] AURA_STYLES = {"Кольца", "Орбиты", "Спираль"};
 
+    /** Плащи: 0 = свои цвета, дальше готовые варианты - {верх, низ, цвет логотипа}. */
+    public static final String[] CAPE_PRESETS = {"Свой", "Красный", "Синий", "Фиолетовый", "Зелёный", "Белый"};
+    private static final int[][] CAPE_PRE = {
+        {0x0E0E10, 0x60060A, 0xFF2626},
+        {0x060C2C, 0x1E40B0, 0xE6F0FF},
+        {0x120828, 0x6030BE, 0xF5EBFF},
+        {0x04140C, 0x0E8042, 0xCDFFDE},
+        {0xF6F6F8, 0xC4C8D4, 0xE00C0C},
+    };
+
     private static final double[] FEATHER_LEN = {0.6, 0.8, 1.0, 1.1, 1.05, 0.9, 0.7};
 
     public static boolean any() { return Config.wingsOn || Config.auraOn || Config.capeOn; }
 
-    private static boolean eligible(MinecraftClient mc, PlayerEntity p, boolean friends) {
-        if (p.isSpectator() || p.isInvisible()) return false;
-        if (p == mc.player) return !mc.options.getPerspective().isFirstPerson();
-        return friends && Config.friends.contains(p.getName().getString());
+    private static boolean eligible(class_310 mc, class_1657 p, boolean friends) {
+        if (p.method_7325() || p.method_5767()) return false;
+        if (p == mc.field_1724) return !mc.field_1690.method_31044().method_31034();
+        return friends && Config.friends.contains(p.method_5477().getString());
     }
 
     private static int pal(int idx) {
@@ -35,11 +45,11 @@ public final class Cosmetics {
     }
 
     private static int hue(float h) {
-        return MathHelper.hsvToRgb(((h % 1f) + 1f) % 1f, 0.65f, 1f) & 0xFFFFFF;
+        return class_3532.method_15369(((h % 1f) + 1f) % 1f, 0.65f, 1f) & 0xFFFFFF;
     }
 
     private static int mixRgb(int a, int b, float t) {
-        return HudStyle.mix(0xFF000000 | a, 0xFF000000 | b, MathHelper.clamp(t, 0f, 1f)) & 0xFFFFFF;
+        return HudStyle.mix(0xFF000000 | a, 0xFF000000 | b, class_3532.method_15363(t, 0f, 1f)) & 0xFFFFFF;
     }
 
     /** Базис игрока: right, back (горизонтальные единичные векторы). */
@@ -62,17 +72,17 @@ public final class Cosmetics {
         }
     }
 
-    public static void render(VertexConsumer q, Matrix4f m, Vec3d cam, MinecraftClient mc, float tp) {
+    public static void render(class_4588 q, Matrix4f m, class_243 cam, class_310 mc, float tp) {
         double t = System.currentTimeMillis() / 1000.0;
-        for (PlayerEntity p : mc.world.getPlayers()) {
-            double px = MathHelper.lerp((double) tp, p.lastRenderX, p.getX());
-            double py = MathHelper.lerp((double) tp, p.lastRenderY, p.getY());
-            double pz = MathHelper.lerp((double) tp, p.lastRenderZ, p.getZ());
-            double dx = px - cam.x, dy = py - cam.y, dz = pz - cam.z;
+        for (class_1657 p : mc.field_1687.method_18456()) {
+            double px = class_3532.method_16436((double) tp, p.field_6038, p.method_23317());
+            double py = class_3532.method_16436((double) tp, p.field_5971, p.method_23318());
+            double pz = class_3532.method_16436((double) tp, p.field_5989, p.method_23321());
+            double dx = px - cam.field_1352, dy = py - cam.field_1351, dz = pz - cam.field_1350;
             if (dx * dx + dy * dy + dz * dz > 48 * 48) continue;
-            float yaw = MathHelper.lerpAngleDegrees(tp, p.lastBodyYaw, p.bodyYaw);
+            float yaw = class_3532.method_17821(tp, p.field_6220, p.field_6283);
             Frame fr = new Frame(yaw);
-            boolean glide = p.isGliding();
+            boolean glide = p.method_6128();
 
             if (Config.wingsOn && !glide && eligible(mc, p, Config.wingFriends)) wings(q, m, cam, p, px, py, pz, fr, t);
             if (Config.auraOn && eligible(mc, p, Config.auraFriends)) aura(q, m, cam, px, py, pz, t);
@@ -81,10 +91,10 @@ public final class Cosmetics {
     }
 
     // ------------------------------------------------------------------ Wings
-    private static void wings(VertexConsumer q, Matrix4f m, Vec3d cam, PlayerEntity p,
+    private static void wings(class_4588 q, Matrix4f m, class_243 cam, class_1657 p,
                               double px, double py, double pz, Frame fr, double t) {
-        boolean air = !p.isOnGround();
-        double h = p.isSneaking() ? 1.05 : 1.35;
+        boolean air = !p.method_24828();
+        double h = p.method_5715() ? 1.05 : 1.35;
         double bx = px + fr.bx * 0.14, by = py + h, bz = pz + fr.bz * 0.14;
         double size = Config.wingSize;
         double flap = Math.sin(t * Config.wingSpeed * (air ? 5.0 : 1.6)) * (air ? 0.45 : 0.12);
@@ -111,10 +121,10 @@ public final class Cosmetics {
                     int c0 = WorldDraw.argb(0.95f, rgb), c1 = WorldDraw.argb(0.8f, mixRgb(rgb, white, 0.5f));
                     int c2 = WorldDraw.argb(0.45f, mixRgb(rgb, white, 0.85f));
                     WorldDraw.quad2(q, m,
-                            (float) (bx - cam.x), (float) (by - cam.y), (float) (bz - cam.z), c0,
-                            (float) (mx + wx - cam.x), (float) (my + wy - cam.y), (float) (mz + wz - cam.z), c1,
-                            (float) (tx - cam.x), (float) (ty - cam.y), (float) (tz - cam.z), c2,
-                            (float) (mx - wx - cam.x), (float) (my - wy - cam.y), (float) (mz - wz - cam.z), c1);
+                            (float) (bx - cam.field_1352), (float) (by - cam.field_1351), (float) (bz - cam.field_1350), c0,
+                            (float) (mx + wx - cam.field_1352), (float) (my + wy - cam.field_1351), (float) (mz + wz - cam.field_1350), c1,
+                            (float) (tx - cam.field_1352), (float) (ty - cam.field_1351), (float) (tz - cam.field_1350), c2,
+                            (float) (mx - wx - cam.field_1352), (float) (my - wy - cam.field_1351), (float) (mz - wz - cam.field_1350), c1);
                 }
             } else if (Config.wingStyle == 1) {
                 // летучая мышь: кость плеча, запястье, четыре пальца и перепонка между ними
@@ -135,10 +145,10 @@ public final class Cosmetics {
                 for (int k = 0; k < 3; k++)
                     tri(q, m, cam, bx, by, bz, tip[k][0], tip[k][1], tip[k][2], tip[k + 1][0], tip[k + 1][1], tip[k + 1][2], mem);
                 // кости
-                WorldDraw.ribbon(q, m, cam.x, cam.y, cam.z, bx, by, bz, ex, ey, ez, 0.02f, bone, bone);
-                WorldDraw.ribbon(q, m, cam.x, cam.y, cam.z, ex, ey, ez, wxp, wyp, wzp, 0.018f, bone, bone);
+                WorldDraw.ribbon(q, m, cam.field_1352, cam.field_1351, cam.field_1350, bx, by, bz, ex, ey, ez, 0.02f, bone, bone);
+                WorldDraw.ribbon(q, m, cam.field_1352, cam.field_1351, cam.field_1350, ex, ey, ez, wxp, wyp, wzp, 0.018f, bone, bone);
                 for (int k = 0; k < 4; k++)
-                    WorldDraw.ribbon(q, m, cam.x, cam.y, cam.z, wxp, wyp, wzp, tip[k][0], tip[k][1], tip[k][2], 0.012f, bone, bone);
+                    WorldDraw.ribbon(q, m, cam.field_1352, cam.field_1351, cam.field_1350, wxp, wyp, wzp, tip[k][0], tip[k][1], tip[k][2], 0.012f, bone, bone);
             } else {
                 newWing(q, m, cam, fr, s, bx, by, bz, size, flap, rgb, t, Config.wingStyle);
             }
@@ -162,22 +172,22 @@ public final class Cosmetics {
     }
 
     /** Треугольник с цветом в каждой вершине. */
-    private static void triC(VertexConsumer q, Matrix4f m, Vec3d cam,
+    private static void triC(class_4588 q, Matrix4f m, class_243 cam,
                              double[] a, int ca, double[] b, int cb, double[] c, int cc) {
-        float ax = (float) (a[0] - cam.x), ay = (float) (a[1] - cam.y), az = (float) (a[2] - cam.z);
+        float ax = (float) (a[0] - cam.field_1352), ay = (float) (a[1] - cam.field_1351), az = (float) (a[2] - cam.field_1350);
         WorldDraw.quad2(q, m, ax, ay, az, ca,
-                (float) (b[0] - cam.x), (float) (b[1] - cam.y), (float) (b[2] - cam.z), cb,
-                (float) (c[0] - cam.x), (float) (c[1] - cam.y), (float) (c[2] - cam.z), cc,
+                (float) (b[0] - cam.field_1352), (float) (b[1] - cam.field_1351), (float) (b[2] - cam.field_1350), cb,
+                (float) (c[0] - cam.field_1352), (float) (c[1] - cam.field_1351), (float) (c[2] - cam.field_1350), cc,
                 ax, ay, az, ca);
     }
 
-    private static void bone(VertexConsumer q, Matrix4f m, Vec3d cam, double[] a, double[] b, float w, int c) {
-        WorldDraw.ribbon(q, m, cam.x, cam.y, cam.z,
+    private static void bone(class_4588 q, Matrix4f m, class_243 cam, double[] a, double[] b, float w, int c) {
+        WorldDraw.ribbon(q, m, cam.field_1352, cam.field_1351, cam.field_1350,
                 a[0], a[1], a[2], b[0], b[1], b[2], w, c, c);
     }
 
     /** Одно перо (как у ангела): корень -> середина (шире) -> кончик. */
-    private static void feather(VertexConsumer q, Matrix4f m, Vec3d cam, Frame fr,
+    private static void feather(class_4588 q, Matrix4f m, class_243 cam, Frame fr,
                                 double bx, double by, double bz, int s,
                                 double th, double be, double len, double halfW, int c0, int c1, int c2) {
         double[] d = fr.wing(s, th, be);
@@ -190,14 +200,14 @@ public final class Cosmetics {
         double k = halfW / wl;
         wx *= k; wy *= k; wz *= k;
         WorldDraw.quad2(q, m,
-                (float) (bx - cam.x), (float) (by - cam.y), (float) (bz - cam.z), c0,
-                (float) (mx + wx - cam.x), (float) (my + wy - cam.y), (float) (mz + wz - cam.z), c1,
-                (float) (tx - cam.x), (float) (ty - cam.y), (float) (tz - cam.z), c2,
-                (float) (mx - wx - cam.x), (float) (my - wy - cam.y), (float) (mz - wz - cam.z), c1);
+                (float) (bx - cam.field_1352), (float) (by - cam.field_1351), (float) (bz - cam.field_1350), c0,
+                (float) (mx + wx - cam.field_1352), (float) (my + wy - cam.field_1351), (float) (mz + wz - cam.field_1350), c1,
+                (float) (tx - cam.field_1352), (float) (ty - cam.field_1351), (float) (tz - cam.field_1350), c2,
+                (float) (mx - wx - cam.field_1352), (float) (my - wy - cam.field_1351), (float) (mz - wz - cam.field_1350), c1);
     }
 
     /** Веер-лопасть крыла бабочки: от корня по дуге углов th0..th1. */
-    private static void wingFan(VertexConsumer q, Matrix4f m, Vec3d cam, Frame fr,
+    private static void wingFan(class_4588 q, Matrix4f m, class_243 cam, Frame fr,
                                 double bx, double by, double bz, int s,
                                 double th0, double th1, double be, double l0, double l1, double size,
                                 int cIn, int cOut, int cEdge) {
@@ -217,7 +227,7 @@ public final class Cosmetics {
         }
     }
 
-    private static void newWing(VertexConsumer q, Matrix4f m, Vec3d cam, Frame fr, int s,
+    private static void newWing(class_4588 q, Matrix4f m, class_243 cam, Frame fr, int s,
                                 double bx, double by, double bz, double size, double flap,
                                 int rgb, double t, int style) {
         double[] root = {bx, by, bz};
@@ -319,18 +329,18 @@ public final class Cosmetics {
         }
     }
 
-    private static void tri(VertexConsumer q, Matrix4f m, Vec3d cam,
+    private static void tri(class_4588 q, Matrix4f m, class_243 cam,
                             double ax, double ay, double az, double bx, double by, double bz,
                             double cx, double cy, double cz, int c) {
-        float a1 = (float) (ax - cam.x), a2 = (float) (ay - cam.y), a3 = (float) (az - cam.z);
+        float a1 = (float) (ax - cam.field_1352), a2 = (float) (ay - cam.field_1351), a3 = (float) (az - cam.field_1350);
         WorldDraw.quad2(q, m, a1, a2, a3, c,
-                (float) (bx - cam.x), (float) (by - cam.y), (float) (bz - cam.z), c,
-                (float) (cx - cam.x), (float) (cy - cam.y), (float) (cz - cam.z), c,
+                (float) (bx - cam.field_1352), (float) (by - cam.field_1351), (float) (bz - cam.field_1350), c,
+                (float) (cx - cam.field_1352), (float) (cy - cam.field_1351), (float) (cz - cam.field_1350), c,
                 a1, a2, a3, c);
     }
 
     // ------------------------------------------------------------------ Aura
-    private static void aura(VertexConsumer q, Matrix4f m, Vec3d cam, double px, double py, double pz, double t) {
+    private static void aura(class_4588 q, Matrix4f m, class_243 cam, double px, double py, double pz, double t) {
         double size = Config.auraSize, sp = Config.auraSpeed;
         int base = Config.auraRainbow ? hue((float) (t * 0.2)) : pal(Config.auraColor);
         double r0 = 0.6 * size;
@@ -342,8 +352,8 @@ public final class Cosmetics {
                     double h = 0.2 + 1.6 * (0.5 + 0.5 * Math.sin(t * sp + i * 0.9));
                     double x = px + Math.cos(a) * r0, y = py + h, z = pz + Math.sin(a) * r0;
                     int c = WorldDraw.argb(0.9f, Config.auraRainbow ? hue((float) (t * 0.2 + i / 8.0)) : base);
-                    WorldDraw.ribbon(q, m, cam.x, cam.y, cam.z, x, y - 0.07, z, x, y + 0.07, z, 0.035f, c, c);
-                    WorldDraw.ribbon(q, m, cam.x, cam.y, cam.z, x - Math.sin(a) * 0.07, y, z + Math.cos(a) * 0.07,
+                    WorldDraw.ribbon(q, m, cam.field_1352, cam.field_1351, cam.field_1350, x, y - 0.07, z, x, y + 0.07, z, 0.035f, c, c);
+                    WorldDraw.ribbon(q, m, cam.field_1352, cam.field_1351, cam.field_1350, x - Math.sin(a) * 0.07, y, z + Math.cos(a) * 0.07,
                             x + Math.sin(a) * 0.07, y, z - Math.cos(a) * 0.07, 0.035f, c, c);
                 }
             }
@@ -358,7 +368,7 @@ public final class Cosmetics {
                         float fade = (float) Math.sin(Math.PI * Math.min(1.0, y / 1.95));
                         int c = WorldDraw.argb(0.85f * fade,
                                 Config.auraRainbow ? hue((float) (t * 0.2 + y * 0.3)) : base);
-                        if (have) WorldDraw.ribbon(q, m, cam.x, cam.y, cam.z, lx, ly, lz, x, yy, z, 0.022f, c, c);
+                        if (have) WorldDraw.ribbon(q, m, cam.field_1352, cam.field_1351, cam.field_1350, lx, ly, lz, x, yy, z, 0.022f, c, c);
                         lx = x; ly = yy; lz = z; have = true;
                     }
                 }
@@ -373,7 +383,7 @@ public final class Cosmetics {
                     int seg = 28;
                     for (int k = 0; k < seg; k++) {
                         double a0 = k * 2 * Math.PI / seg, a1 = (k + 1) * 2 * Math.PI / seg;
-                        WorldDraw.ribbon(q, m, cam.x, cam.y, cam.z,
+                        WorldDraw.ribbon(q, m, cam.field_1352, cam.field_1351, cam.field_1350,
                                 px + Math.cos(a0) * rr, y, pz + Math.sin(a0) * rr,
                                 px + Math.cos(a1) * rr, y, pz + Math.sin(a1) * rr, 0.02f, c, c);
                     }
@@ -383,21 +393,31 @@ public final class Cosmetics {
     }
 
     // ------------------------------------------------------------------ Cape
-    private static void cape(VertexConsumer q, Matrix4f m, Vec3d cam, PlayerEntity p,
+    private static void cape(class_4588 q, Matrix4f m, class_243 cam, class_1657 p,
                              double px, double py, double pz, Frame fr, double t) {
-        boolean sneak = p.isSneaking();
+        boolean sneak = p.method_5715();
         double top = sneak ? 1.38 : 1.46;
         double ox = px + fr.bx * (sneak ? 0.27 : 0.14), oy = py + top, oz = pz + fr.bz * (sneak ? 0.27 : 0.14);
 
-        Vec3d v = p.getVelocity();
-        double speed = Math.sqrt(v.x * v.x + v.z * v.z);
-        double ang = MathHelper.clamp(0.14 + speed * 2.4 + (sneak ? 0.18 : 0.0), 0.1, 1.15);
+        class_243 v = p.method_18798();
+        double speed = Math.sqrt(v.field_1352 * v.field_1352 + v.field_1350 * v.field_1350);
+        double ang = class_3532.method_15350(0.14 + speed * 2.4 + (sneak ? 0.18 : 0.0), 0.1, 1.15);
         double dxv = fr.bx * Math.sin(ang), dyv = -Math.cos(ang), dzv = fr.bz * Math.sin(ang);
 
         final int rows = 10, cols = 5;
         double len = 1.2, width = 0.5;
         double wave = Config.capeWave;
-        int c1 = Config.capeRainbow ? 0 : pal(Config.capeColor), c2 = pal(Config.capeColor2);
+        final boolean preset = Config.capePreset > 0 && Config.capePreset <= CAPE_PRE.length;
+        final boolean rainbow = !preset && Config.capeRainbow;
+        int c1, c2, logoRgb;
+        if (preset) {
+            int[] pr = CAPE_PRE[Config.capePreset - 1];
+            c1 = pr[0]; c2 = pr[1]; logoRgb = pr[2];
+        } else {
+            c1 = rainbow ? 0 : pal(Config.capeColor);
+            c2 = pal(Config.capeColor2);
+            logoRgb = 0xFFFFFF;
+        }
 
         double[][][] pts = new double[rows + 1][cols + 1][];
         int[][] col = new int[rows + 1][cols + 1];
@@ -411,7 +431,7 @@ public final class Cosmetics {
                         ox + dxv * len * fr0 + fr.rx * lat + fr.bx * w,
                         oy + dyv * len * fr0,
                         oz + dzv * len * fr0 + fr.rz * lat + fr.bz * w};
-                int base = Config.capeRainbow ? hue((float) (t * 0.15 + fr0 * 0.35)) : mixRgb(c1, c2, (float) fr0);
+                int base = rainbow ? hue((float) (t * 0.15 + fr0 * 0.35)) : mixRgb(c1, c2, (float) fr0);
                 float shade = (float) (0.85 + 0.15 * Math.sin(t * 3.0 + r * 0.7 + c * 0.35));
                 col[r][c] = WorldDraw.argb(0.97f, mixRgb(0x000000, base, shade));
             }
@@ -420,10 +440,58 @@ public final class Cosmetics {
             for (int c = 0; c < cols; c++) {
                 double[] a = pts[r][c], b = pts[r][c + 1], d = pts[r + 1][c], e = pts[r + 1][c + 1];
                 WorldDraw.quad2(q, m,
-                        (float) (a[0] - cam.x), (float) (a[1] - cam.y), (float) (a[2] - cam.z), col[r][c],
-                        (float) (b[0] - cam.x), (float) (b[1] - cam.y), (float) (b[2] - cam.z), col[r][c + 1],
-                        (float) (e[0] - cam.x), (float) (e[1] - cam.y), (float) (e[2] - cam.z), col[r + 1][c + 1],
-                        (float) (d[0] - cam.x), (float) (d[1] - cam.y), (float) (d[2] - cam.z), col[r + 1][c]);
+                        (float) (a[0] - cam.field_1352), (float) (a[1] - cam.field_1351), (float) (a[2] - cam.field_1350), col[r][c],
+                        (float) (b[0] - cam.field_1352), (float) (b[1] - cam.field_1351), (float) (b[2] - cam.field_1350), col[r][c + 1],
+                        (float) (e[0] - cam.field_1352), (float) (e[1] - cam.field_1351), (float) (e[2] - cam.field_1350), col[r + 1][c + 1],
+                        (float) (d[0] - cam.field_1352), (float) (d[1] - cam.field_1351), (float) (d[2] - cam.field_1350), col[r + 1][c]);
+            }
+        }
+        if (Config.capeLogo) capeLogo(q, m, cam, pts, rows, cols, fr, logoRgb);
+    }
+
+    /** Точка на поверхности плаща по координатам (u: слева направо, v: сверху вниз, обе 0..1). */
+    private static double[] surf(double[][][] pts, int rows, int cols, double u, double v) {
+        double fr = Math.max(0, Math.min(rows, v * rows)), fc = Math.max(0, Math.min(cols, u * cols));
+        int r = Math.min(rows - 1, (int) fr), c = Math.min(cols - 1, (int) fc);
+        double tr = fr - r, tc = fc - c;
+        double[] o = new double[3];
+        for (int k = 0; k < 3; k++) {
+            double top = pts[r][c][k] + (pts[r][c + 1][k] - pts[r][c][k]) * tc;
+            double bot = pts[r + 1][c][k] + (pts[r + 1][c + 1][k] - pts[r + 1][c][k]) * tc;
+            o[k] = top + (bot - top) * tr;
+        }
+        return o;
+    }
+
+    private static int logoLevel(int a) { return a >= 96 ? 2 : (a >= 32 ? 1 : 0); }
+
+    /** Логотип «A» на спине плаща: пиксели маски ложатся на поверхность и повторяют волны. */
+    private static void capeLogo(class_4588 q, Matrix4f m, class_243 cam, double[][][] pts,
+                                 int rows, int cols, Frame fr, int rgb) {
+        final int sw = HudStyle.logoCols(), sh = HudStyle.logoRowCount();
+        final double u0 = 0.17, uw = 0.66, v0 = 0.20;
+        final double vh = uw * 0.5 * sh / sw / 1.2;        // ширина плаща 0.5, длина 1.2: сохраняем пропорции логотипа
+        final double off = 0.015;                          // чуть наружу, чтобы не мерцало на самой ткани
+        final double ox = fr.bx * off, oz = fr.bz * off;
+        for (int y = 0; y < sh; y++) {
+            int x = 0;
+            while (x < sw) {
+                int lv = logoLevel(HudStyle.logoAlpha(x, y));
+                int run = x + 1;
+                while (run < sw && logoLevel(HudStyle.logoAlpha(run, y)) == lv) run++;
+                if (lv > 0) {
+                    double ua = u0 + uw * x / sw, ub = u0 + uw * run / sw;
+                    double va = v0 + vh * y / sh, vb = v0 + vh * (y + 1) / sh;
+                    double[] a = surf(pts, rows, cols, ua, va), b = surf(pts, rows, cols, ub, va);
+                    double[] e = surf(pts, rows, cols, ub, vb), d = surf(pts, rows, cols, ua, vb);
+                    int c = WorldDraw.argb(lv == 2 ? 1.0f : 0.55f, rgb);
+                    WorldDraw.quad2(q, m,
+                            (float) (a[0] + ox - cam.field_1352), (float) (a[1] - cam.field_1351), (float) (a[2] + oz - cam.field_1350), c,
+                            (float) (b[0] + ox - cam.field_1352), (float) (b[1] - cam.field_1351), (float) (b[2] + oz - cam.field_1350), c,
+                            (float) (e[0] + ox - cam.field_1352), (float) (e[1] - cam.field_1351), (float) (e[2] + oz - cam.field_1350), c,
+                            (float) (d[0] + ox - cam.field_1352), (float) (d[1] - cam.field_1351), (float) (d[2] + oz - cam.field_1350), c);
+                }
+                x = run;
             }
         }
     }
