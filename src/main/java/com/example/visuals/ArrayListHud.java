@@ -43,7 +43,7 @@ public final class ArrayListHud {
         if (Config.jumpCircle) mods.add("JumpCircle");
         if (mods.isEmpty()) return null;
 
-        mods.sort((p, q) -> tr.method_1727(q) - tr.method_1727(p));   // длинные первыми
+        mods.sort((p, q) -> HudStyle.width(tr, q) - HudStyle.width(tr, p));   // длинные первыми
         int n = mods.size();
 
         if (Config.arrayListHoriz) {
@@ -51,7 +51,7 @@ public final class ArrayListHud {
             for (int i = 0; i < n; i++) {
                 String s = mods.get(i);
                 int col = color(accent, i, n);
-                int w = tr.method_1727(s) + 10;
+                int w = HudStyle.width(tr, s) + 10;
                 HudStyle.pill(g, x, 0, w, H, a, col);
                 HudStyle.text(g, tr, s, x + 6, 2, col, a, Config.arrayListShadow);
                 x += w + GAP;
@@ -60,11 +60,11 @@ public final class ArrayListHud {
         }
 
         int maxW = 0;
-        for (String s : mods) maxW = Math.max(maxW, tr.method_1727(s) + 10);
+        for (String s : mods) maxW = Math.max(maxW, HudStyle.width(tr, s) + 10);
         for (int i = 0; i < n; i++) {
             String s = mods.get(i);
             int col = color(accent, i, n);
-            int w = tr.method_1727(s) + 10;
+            int w = HudStyle.width(tr, s) + 10;
             int y = i * (H + GAP);
             HudStyle.pill(g, maxW - w, y, w, H, a, col);          // выровнено по правому краю
             HudStyle.text(g, tr, s, maxW - w + 6, y + 2, col, a, Config.arrayListShadow);
