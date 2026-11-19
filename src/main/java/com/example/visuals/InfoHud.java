@@ -68,16 +68,16 @@ public final class InfoHud {
             int n = labels.size();
             if (n == 0) return new int[] {1, 1};
             int w = PAD;
-            for (int i = 0; i < n; i++) w += tr.method_1727(labels.get(i)) + 4 + tr.method_1727(values.get(i)) + (i < n - 1 ? 14 : 0);
+            for (int i = 0; i < n; i++) w += HudStyle.width(tr, labels.get(i)) + 4 + HudStyle.width(tr, values.get(i)) + (i < n - 1 ? 14 : 0);
             w += PAD;
             int h = 16;
             HudStyle.panel(g, 0, 0, w, h, a, accent);
             int x = PAD;
             for (int i = 0; i < n; i++) {
                 HudStyle.text(g, tr, labels.get(i), x, 4, Theme.TEXT_DIM, a, true);
-                x += tr.method_1727(labels.get(i)) + 4;
+                x += HudStyle.width(tr, labels.get(i)) + 4;
                 HudStyle.text(g, tr, values.get(i), x, 4, colors.get(i), a, true);
-                x += tr.method_1727(values.get(i));
+                x += HudStyle.width(tr, values.get(i));
                 if (i < n - 1) { g.method_25294(x + 6, 3, x + 7, h - 3, HudStyle.withAlpha(0x40FFFFFF, a)); x += 14; }
             }
             return new int[] {w, h};
@@ -87,9 +87,9 @@ public final class InfoHud {
         String title = "ArchitektVisuals";
         int inner = HudStyle.titleWidth(tr, Theme.ICON_CLIENT, title);
         for (int i = 0; i < labels.size(); i++)
-            inner = Math.max(inner, tr.method_1727(labels.get(i)) + COL_GAP + tr.method_1727(values.get(i)));
+            inner = Math.max(inner, HudStyle.width(tr, labels.get(i)) + COL_GAP + HudStyle.width(tr, values.get(i)));
         for (int i = 0; i < effNames.size(); i++)
-            inner = Math.max(inner, tr.method_1727(effNames.get(i)) + COL_GAP + tr.method_1727(effTimes.get(i)));
+            inner = Math.max(inner, HudStyle.width(tr, effNames.get(i)) + COL_GAP + HudStyle.width(tr, effTimes.get(i)));
 
         int w = inner + PAD * 2;
         int h = HEADER + 4 + labels.size() * LINE
