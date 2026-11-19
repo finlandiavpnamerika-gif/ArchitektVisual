@@ -60,7 +60,7 @@ public final class ModuleDefaults {
             Map.entry("wp", new String[]{"wpBeam", "wpLabels", "wpDist", "wpMax", "wpColor", "wpScale", "wpDeath"}),
             Map.entry("wings", new String[]{"wingStyle", "wingColor", "wingRainbow", "wingSize", "wingSpeed", "wingFriends"}),
             Map.entry("aura", new String[]{"auraStyle", "auraColor", "auraRainbow", "auraSize", "auraSpeed", "auraFriends"}),
-            Map.entry("cape", new String[]{"capeColor", "capeColor2", "capeRainbow", "capeWave", "capeFriends"}),
+            Map.entry("cape", new String[]{"capePreset", "capeLogo", "capeColor", "capeColor2", "capeRainbow", "capeWave", "capeFriends"}),
             Map.entry("nt", new String[]{"ntRange", "ntScale", "ntBg", "ntHealth", "ntDist", "ntDistScale", "ntHide"}),
             Map.entry("chams", new String[]{"chPlayers", "chMobs", "chFriends", "chSelf"}),
             Map.entry("swing", new String[]{"swingSpeed", "swingSelfOnly"}),
