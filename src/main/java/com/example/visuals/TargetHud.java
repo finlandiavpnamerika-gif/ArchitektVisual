@@ -111,7 +111,7 @@ public final class TargetHud {
             HudStyle.chip(g, tr, d, W - 7 - cw, 7, 0xFFB4B9CC, a);
             nameMax -= cw + 4;
         }
-        g.method_25303(tr, tr.method_27523(name, nameMax), 39, 9, ca(0xFFFFFFFF, a));
+        HudStyle.text(g, tr, HudStyle.trim(tr, name, nameMax), 39, 9, 0xFFFFFFFF, a, true);
 
         // полоска здоровья (пилюля в цвет акцента) и значение справа
         int bx = 39, by = 24, bw = W - 39 - 8, bh = 9;
@@ -123,7 +123,7 @@ public final class TargetHud {
             if (aw > 2) HudStyle.roundFill(g, bx, by + bh - 2, aw, 2, 1, ca(0xFFFFD34D, a));
         }
         String t = Math.round(hp) + "hp";
-        g.method_25303(tr, t, bx + bw - 4 - tr.method_1727(t), by + 1, ca(0xFFFFFFFF, a));
+        HudStyle.text(g, tr, t, bx + bw - 4 - HudStyle.width(tr, t), by + 1, 0xFFFFFFFF, a, true);
 
         // капсула с бронёй и предметом цели
         int cnt = 0;
