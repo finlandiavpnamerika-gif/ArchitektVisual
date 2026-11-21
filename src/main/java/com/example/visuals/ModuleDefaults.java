@@ -26,6 +26,7 @@ public final class ModuleDefaults {
             Map.entry("dmg", new String[]{"dfMine", "dfDecimals", "dfHue", "dfSize", "dfLife"}),
             Map.entry("part", new String[]{"partMode", "partShape", "partHue", "partRainbow", "partCount", "partSize", "partLife", "partGravity", "partAlpha"}),
             Map.entry("sky", new String[]{"skyPreset", "skyAlpha", "skySpeed", "skyNightOnly", "skyStars"}),
+            Map.entry("atmo", new String[]{"atmoWet", "atmoWetness", "atmoPuddles", "atmoPuddleAmount", "atmoGloss", "atmoGlossPower", "atmoRipples", "atmoRadius"}),
             Map.entry("aspect", new String[]{"aspectPreset", "aspectCustom"}),
             Map.entry("hud", new String[]{"hudHoriz", "hudFps", "hudPing", "hudCoords", "hudFacing", "hudScale", "hudAlpha", "hudColor", "hudX", "hudY"}),
             Map.entry("array", new String[]{"arrayListHoriz", "arrayListColor", "arrayListShadow", "arrayListScale", "arrayListAlpha", "arrayListX", "arrayListY"}),
@@ -101,7 +102,7 @@ public final class ModuleDefaults {
     /** Переключатели модулей (то, что включается в меню). */
     private static final String[] TOGGLES = {
         "sprint", "zoom", "autoRespawn", "thirdPerson", "fullbright", "customCrosshair", "trails", "zones", "targetEsp",
-        "jumpCircle", "customItems", "handView", "targetHud", "customFog", "damageFever", "particles", "skyShader", "aspectOn",
+        "jumpCircle", "customItems", "handView", "targetHud", "customFog", "damageFever", "particles", "skyShader", "atmosphere", "aspectOn",
         "hud", "arrayList", "armorHud", "potionHud", "keystrokes", "autoswap", "itembind", "customTime", "customWeather",
         "chinaHat", "halo", "horns", "predictions", "itemPhysic", "shulkerPreview", "highlight", "streamerMode",
         "noOverlay", "hitSound", "comboHud", "watermark",
