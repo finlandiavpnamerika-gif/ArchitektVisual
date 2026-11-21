@@ -106,6 +106,7 @@ public class VisualsClient implements ClientModInitializer {
             Waypoints.tick(client);
             EventPoints.tick(client);
             JumpCircle.tick(client);
+            Atmosphere.tick(client);
             TargetHud.tick(client);
             HandView.tick(client);
             ItemFeatures.tick(client);
