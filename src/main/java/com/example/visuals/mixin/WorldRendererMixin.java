@@ -1,5 +1,6 @@
 package com.example.visuals.mixin;
 
+import com.example.visuals.Atmosphere;
 import com.example.visuals.ChinaHatRenderer;
 import com.example.visuals.Config;
 import com.example.visuals.FuntimeHelper;
@@ -28,7 +29,7 @@ public class WorldRendererMixin {
     // Вызывается в конце WorldRenderer.render(): рисует China Hat и Trails.
     @Inject(method = "render", at = @At("RETURN"))
     private void visuals$renderChinaHat(CallbackInfo ci) {
-        if (!Config.chinaHat && !Config.halo && !Config.horns && !Config.trails && !Config.zones && !Config.targetEsp && !Config.skyShader && !Config.particles && !WorldEsp.any()) return;
+        if (!Config.chinaHat && !Config.halo && !Config.horns && !Config.trails && !Config.zones && !Config.targetEsp && !Config.skyShader && !Config.atmosphere && !Config.particles && !WorldEsp.any()) return;
 
         class_310 mc = class_310.method_1551();
         if (mc.field_1687 == null || mc.field_1724 == null) return;
@@ -43,6 +44,7 @@ public class WorldRendererMixin {
         float tickProgress = mc.method_61966().method_60637(false);
 
         if (Config.skyShader) SkyRenderer.render(camera, positionMatrix, consumers, tickProgress);   // небо первым
+        if (Config.atmosphere) Atmosphere.render(camera, positionMatrix, consumers, tickProgress);   // мокрый пол - под остальными эффектами
         if (Config.chinaHat) ChinaHatRenderer.render(camera, positionMatrix, consumers, tickProgress);
         if (Config.halo) HaloRenderer.render(camera, positionMatrix, consumers, tickProgress);
         if (Config.horns) HornsRenderer.render(camera, positionMatrix, consumers, tickProgress);
