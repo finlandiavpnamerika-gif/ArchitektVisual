@@ -487,6 +487,17 @@ public final class Config {
     public static boolean skyNightOnly = false;
     public static boolean skyStars = true;
 
+    // --- Атмосфера ---
+    public static boolean atmosphere = false;      // модуль целиком
+    public static boolean atmoWet = true;          // мокрый пол (как после дождя)
+    public static double atmoWetness = 0.7;        // сила: насколько темнее и глянцевее
+    public static boolean atmoPuddles = true;      // лужи
+    public static double atmoPuddleAmount = 0.5;   // сколько луж
+    public static boolean atmoGloss = true;        // блики солнца/луны на мокром
+    public static double atmoGlossPower = 0.7;
+    public static boolean atmoRipples = true;      // круги от капель (когда идёт дождь)
+    public static double atmoRadius = 24;          // дальность эффекта, блоков
+
     // --- CustomItems (своя модель в руке) ---
     public static boolean customItems = true;
     public static int ciModel = 0;                 // какая модель
@@ -638,6 +649,15 @@ public final class Config {
             o.addProperty("skySpeed", skySpeed);
             o.addProperty("skyNightOnly", skyNightOnly);
             o.addProperty("skyStars", skyStars);
+            o.addProperty("atmosphere", atmosphere);
+            o.addProperty("atmoWet", atmoWet);
+            o.addProperty("atmoWetness", atmoWetness);
+            o.addProperty("atmoPuddles", atmoPuddles);
+            o.addProperty("atmoPuddleAmount", atmoPuddleAmount);
+            o.addProperty("atmoGloss", atmoGloss);
+            o.addProperty("atmoGlossPower", atmoGlossPower);
+            o.addProperty("atmoRipples", atmoRipples);
+            o.addProperty("atmoRadius", atmoRadius);
             o.addProperty("particles", particles);
             o.addProperty("damageFever", damageFever);
             o.addProperty("customFog", customFog);
@@ -1116,6 +1136,15 @@ public final class Config {
                 skySpeed = d(o, "skySpeed", skySpeed);
                 skyNightOnly = b(o, "skyNightOnly", skyNightOnly);
                 skyStars = b(o, "skyStars", skyStars);
+                atmosphere = b(o, "atmosphere", atmosphere);
+                atmoWet = b(o, "atmoWet", atmoWet);
+                atmoWetness = d(o, "atmoWetness", atmoWetness);
+                atmoPuddles = b(o, "atmoPuddles", atmoPuddles);
+                atmoPuddleAmount = d(o, "atmoPuddleAmount", atmoPuddleAmount);
+                atmoGloss = b(o, "atmoGloss", atmoGloss);
+                atmoGlossPower = d(o, "atmoGlossPower", atmoGlossPower);
+                atmoRipples = b(o, "atmoRipples", atmoRipples);
+                atmoRadius = d(o, "atmoRadius", atmoRadius);
                 particles = b(o, "particles", particles);
                 damageFever = b(o, "damageFever", damageFever);
                 customFog = b(o, "customFog", customFog);
