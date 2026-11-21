@@ -365,7 +365,7 @@ public class MenuScreen extends class_437 {
 
     private static final String[] SB_CATS = {"Visuals", "Interface", "Utilities", "Client", "World"};
     private static final String[][] SB_MODS = {
-            {"fb", "cross", "trails", "zones", "tesp", "sky", "aspect", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "halo", "horns", "pred", "physic", "shulker", "hl", "crit", "kill", "atk", "wings", "aura", "cape", "chams"},
+            {"fb", "cross", "trails", "zones", "tesp", "sky", "atmo", "aspect", "fog", "part", "dmg", "thud", "hv", "ci", "jc", "hat", "halo", "horns", "pred", "physic", "shulker", "hl", "crit", "kill", "atk", "wings", "aura", "cape", "chams"},
             {"hud", "array", "armor", "potion", "keys", "combo", "wm", "server", "clock", "inv", "totem", "stats", "dlog", "pcd", "cdh", "near", "nt", "tip"},
             {"sprint", "zoom", "respawn", "freelook", "noov", "hitsound", "swing", "iscroll", "stream", "fake"},
             {"autoswap", "itembind", "friends", "macro", "configs"},
@@ -380,6 +380,7 @@ public class MenuScreen extends class_437 {
             case "zones" -> "FunTime Zones";
             case "tesp" -> "Target ESP";
             case "sky" -> "Sky Shader";
+            case "atmo" -> "Атмосфера";
             case "aspect" -> "Aspect Ratio";
             case "part" -> "Particles";
             case "dmg" -> "DamageViewer";
@@ -462,6 +463,7 @@ public class MenuScreen extends class_437 {
             case "zones" -> Config.zones;
             case "tesp" -> Config.targetEsp;
             case "sky" -> Config.skyShader;
+            case "atmo" -> Config.atmosphere;
             case "aspect" -> Config.aspectOn;
             case "part" -> Config.particles;
             case "dmg" -> Config.damageFever;
@@ -537,6 +539,7 @@ public class MenuScreen extends class_437 {
             case "zones": Config.zones = v; break;
             case "tesp": Config.targetEsp = v; break;
             case "sky": Config.skyShader = v; break;
+            case "atmo": Config.atmosphere = v; break;
             case "aspect": Config.aspectOn = v; break;
             case "part": Config.particles = v; break;
             case "dmg": Config.damageFever = v; break;
@@ -1108,6 +1111,16 @@ public class MenuScreen extends class_437 {
                 Config.skySpeed = cslider(g, "Скорость", 0.2, 3.0, Config.skySpeed, false);
                 Config.skyNightOnly = cbool(g, "Только ночью", Config.skyNightOnly);
                 Config.skyStars = cbool(g, "Звёзды", Config.skyStars);
+            }
+            case "atmo" -> {
+                Config.atmoWet = cbool(g, "Мокрый пол", Config.atmoWet);
+                Config.atmoWetness = cslider(g, "Влажность", 0.2, 1.0, Config.atmoWetness, false);
+                Config.atmoPuddles = cbool(g, "Лужи", Config.atmoPuddles);
+                Config.atmoPuddleAmount = cslider(g, "Количество луж", 0.1, 1.0, Config.atmoPuddleAmount, false);
+                Config.atmoGloss = cbool(g, "Блики", Config.atmoGloss);
+                Config.atmoGlossPower = cslider(g, "Сила бликов", 0.2, 1.5, Config.atmoGlossPower, false);
+                Config.atmoRipples = cbool(g, "Круги от капель (в дождь)", Config.atmoRipples);
+                Config.atmoRadius = cslider(g, "Дальность (блоки)", 8, 40, Config.atmoRadius, true);
             }
             case "aspect" -> {
                 Config.aspectPreset = ccycle(g, "Соотношение", AspectRatio.NAMES, Config.aspectPreset);
